@@ -4,11 +4,13 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Linking } from 'react-native';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
 import { AppState, emptyAppState, loadAppState, saveAppState } from './src/data/store';
+import { EXPORT_CACHE_FILE, wipeDeviceData } from './src/data/wipe';
 import type { MilestoneKey } from './src/data/schema';
 import { initHaptics, haptic } from './src/ui/haptics';
 import { initTheme, ThemeProvider, useTheme } from './src/ui/theme';
@@ -66,7 +68,7 @@ export default function App() {
 }
 
 function AppInner() {
-  const { colors, isDark } = useTheme();
+  const { colors, isDark, resetMode } = useTheme();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(emptyAppState());
@@ -84,6 +86,7 @@ function AppInner() {
   const chapterFlowRef = React.useRef<{ flow: ChapterFlow; phase: 'celebration' | 'handoff' } | null>(null);
   const considerChapterOnOpenRef = React.useRef<(content: Manifest, appState: AppState) => void>(() => {});
   const pendingRemoteRef = React.useRef<Manifest | null>(null);
+  const suppressSaveRef = React.useRef(false);
 
   useEffect(() => {
     const init = async () => {
@@ -118,7 +121,7 @@ function AppInner() {
   }, []);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || suppressSaveRef.current) return;
     saveAppState(state).catch(err => {
       if (__DEV__) console.warn('[App] Save failed', err);
     });
@@ -209,6 +212,7 @@ function AppInner() {
   }, [flushQueuedChapter]);
 
   const handleOnboardingComplete = async (data: OnboardingData) => {
+    suppressSaveRef.current = false;
     const packPrice = parseFloat(data.packPrice) || 0;
     const packSize = packPrice > 0 ? (parseInt(data.packSize, 10) || 20) : 0;
     const quitDate = /^\d{4}-\d{2}-\d{2}$/.test(data.quitDate) ? data.quitDate : todayIso();
@@ -412,10 +416,43 @@ function AppInner() {
     });
   };
 
+  const handleDeleteData = useCallback(async () => {
+    suppressSaveRef.current = true;
+    let result;
+    try {
+      result = await wipeDeviceData();
+    } catch {
+      suppressSaveRef.current = false;
+      throw new Error('wipe');
+    }
+    if (!result.ok) {
+      suppressSaveRef.current = false;
+      throw new Error('wipe');
+    }
+
+    pendingChapterRef.current = null;
+    chapterFlowRef.current = null;
+    pendingRemoteRef.current = null;
+    setChapterFlow(null);
+    setActiveMilestone(null);
+    setUrgeVisible(false);
+    setCollectionVisible(false);
+    setUnlockedPieceName(null);
+    setSiginakFocusChapterId(null);
+    setDialog(null);
+    setActiveTab('yuva');
+    setManifest(bundledManifest);
+    setState(emptyAppState());
+    setOnboardingVisible(true);
+    resetMode();
+    // Already on `/`; replace restates the root after in-memory reset. The onboarding Modal is what the user sees.
+    router.replace('/');
+  }, [resetMode]);
+
   const handleExport = async () => {
     try {
       const payload = createExportJson(state);
-      const file = new File(Paths.cache, 'quit-veri.json');
+      const file = new File(Paths.cache, EXPORT_CACHE_FILE);
       await file.write(payload);
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Verini dışa aktar' });
@@ -481,6 +518,7 @@ function AppInner() {
             onEditPlan={() => setOnboardingVisible(true)}
             onSupport={handleSupport}
             onExport={handleExport}
+            onDeleteData={handleDeleteData}
           />
         )}
       </View>

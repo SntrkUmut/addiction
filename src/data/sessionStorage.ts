@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { AESEncryptionKey, AESSealedData, aesDecryptAsync, aesEncryptAsync } from 'expo-crypto';
 import * as aesjs from 'aes-js';
+import { AES_KEY_SUFFIX } from './wipe';
 
 /**
  * Supabase sessions can exceed SecureStore's practical per-item size limit.
@@ -12,7 +13,7 @@ import * as aesjs from 'aes-js';
  */
 class EncryptedSessionStorage {
   private queue: Promise<void> = Promise.resolve();
-  private keyName(key: string) { return `${key}:aes-gcm-v2`; }
+  private keyName(key: string) { return `${key}${AES_KEY_SUFFIX}`; }
 
   private async serialized<T>(operation: () => Promise<T>): Promise<T> {
     const previous = this.queue;

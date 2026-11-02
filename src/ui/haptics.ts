@@ -6,8 +6,7 @@
 
 import * as Haptics from 'expo-haptics';
 import { Platform, AccessibilityInfo } from 'react-native';
-
-const HAPTICS_ENABLED_KEY = 'quit-haptics-enabled-v1';
+import { HAPTICS_ENABLED_KEY } from '../data/wipe';
 
 // Global state for haptics enabled toggle (defaults to true)
 let hapticsEnabled = true;
@@ -41,6 +40,11 @@ export async function initHaptics(): Promise<void> {
  */
 export function getHapticsEnabled(): boolean {
   return hapticsEnabled;
+}
+
+/** First-run default (enabled) after a local wipe. */
+export function resetHapticsMemory() {
+  hapticsEnabled = true;
 }
 
 /**

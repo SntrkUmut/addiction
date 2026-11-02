@@ -46,6 +46,8 @@ test('privacy and support keep [ONAYLA] placeholders and omit unpublished contac
   assert.match(privacyEn, /\[ONAYLA \/ CONFIRM: contact email\]/);
   assert.match(privacyTr, /13\+/);
   assert.match(privacyEn, /ages 13\+/);
+  assert.match(privacyTr, /Tüm verilerini uygulamada Ben → "Verilerimi sil" ile bu cihazdan kalıcı olarak silebilirsin\./);
+  assert.match(privacyEn, /You can permanently delete all your data from this device in the app via Ben → "Verilerimi sil" \(Delete my data\)\./);
   assert.match(support, /\[ONAYLA: iletişim e-postası\]/);
 });
 

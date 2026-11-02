@@ -7,6 +7,7 @@ import { useColorScheme } from 'react-native';
 import * as React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { semanticLight, semanticDark } from '../theme/colors';
+import { THEME_MODE_KEY } from '../data/wipe';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
@@ -18,11 +19,10 @@ type ThemeContextValue = {
   isDark: boolean;
   themeMode: ThemeMode;
   setMode: (mode: ThemeMode) => Promise<void>;
+  resetMode: () => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
-
-const THEME_MODE_KEY = 'quit-theme-mode-v1';
 
 // Global state
 let currentMode: ThemeMode = 'system';
@@ -47,6 +47,11 @@ export async function initTheme(): Promise<ThemeMode> {
  */
 export function getThemeMode(): ThemeMode {
   return currentMode;
+}
+
+/** First-run default after a local wipe. Persistence is handled by the wipe. */
+export function resetThemeMemory() {
+  currentMode = 'system';
 }
 
 /**
@@ -90,6 +95,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     await setThemeMode(newMode);
     setModeState(newMode);
   };
+
+  const resetMode = () => {
+    resetThemeMemory();
+    setModeState('system');
+  };
   
   const value: ThemeContextValue = {
     mode,
@@ -98,6 +108,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     isDark,
     themeMode: mode,
     setMode,
+    resetMode,
   };
   
   return React.createElement(ThemeContext.Provider, { value }, children);
@@ -117,6 +128,7 @@ export function useTheme(): ThemeContextValue {
       isDark: false,
       themeMode: 'light',
       setMode: async () => {},
+      resetMode: () => {},
     };
   }
   return context;

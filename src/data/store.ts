@@ -5,13 +5,10 @@ import * as Linking from 'expo-linking';
 import { createAuthStorage } from './sessionStorage';
 import { emptyAppState, parseAppState } from './schema';
 import type { AppState, MilestoneKey } from './schema';
+import { LEGACY_MILESTONES_KEY, PENDING_SYNC_KEY, STATE_KEY } from './wipe';
 
 export { emptyAppState, parseAppState } from './schema';
 export type { AppState, CopingChoice, EventKind, Profile, ProgressEvent } from './schema';
-
-const STORAGE_KEY = 'quit-companion-state-v1';
-const PENDING_SYNC_KEY = 'quit-companion-pending-sync-v1';
-const LEGACY_MILESTONES_KEY = 'quit-milestones-seen-v1';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 export const supabaseReady = Boolean(supabaseUrl && supabaseKey);
@@ -31,7 +28,7 @@ if (supabaseUrl && supabaseKey) {
 
 export async function loadAppState(): Promise<AppState> {
   try {
-    const value = await localStorage.getItem(STORAGE_KEY);
+    const value = await localStorage.getItem(STATE_KEY);
     if (!value) return emptyAppState();
     const parsed = parseAppState(JSON.parse(value));
     if (!parsed) return emptyAppState();
@@ -72,7 +69,7 @@ function enqueueCloudSync(operation: () => Promise<boolean | null>) {
 }
 
 export async function saveAppState(state: AppState): Promise<{ cloudSync: Promise<boolean | null> | null }> {
-  await localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  await localStorage.setItem(STATE_KEY, JSON.stringify(state));
   // Device storage remains authoritative while offline. When an authenticated
   // Supabase session exists, each saved snapshot is also backed up remotely.
   if (!client) return { cloudSync: null };
@@ -111,7 +108,7 @@ export async function saveAppState(state: AppState): Promise<{ cloudSync: Promis
 }
 
 export async function clearLocalState() {
-  await localStorage.removeItem(STORAGE_KEY);
+  await localStorage.removeItem(STATE_KEY);
   await localStorage.removeItem(PENDING_SYNC_KEY);
 }
 
@@ -176,6 +173,13 @@ export async function signIn(email: string, password: string) {
 export async function signOut() {
   if (!client) return;
   const { error } = await client.auth.signOut();
+  if (error) throw error;
+}
+
+/** Drop the on-device session only. Must not call the Auth server. */
+export async function signOutLocally() {
+  if (!client) return;
+  const { error } = await client.auth.signOut({ scope: 'local' });
   if (error) throw error;
 }
 
