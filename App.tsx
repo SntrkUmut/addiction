@@ -41,7 +41,6 @@ import {
 } from './src/data/store';
 import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
-import { journeyDay, formatTurkishDateSince, formatEventTime } from './src/domain/journey';
 import { initHaptics, haptic } from './src/ui/haptics';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';

@@ -8,10 +8,26 @@ import { View, Text, Pressable, StyleSheet, ViewStyle, TextStyle, Platform } fro
 import { LinearGradient } from 'expo-linear-gradient';
 import { semantic, sceneDay, sceneNight } from '../theme/colors';
 import { textStyles, spacing, radii, heights } from '../theme/typography';
-import * as PhosphorIcons from 'phosphor-react-native';
+import { 
+  Sparkle, 
+  ArrowRight,
+  CalendarCheck,
+  Wind,
+  Prohibit,
+  Coins,
+  Waves,
+  HouseSimple,
+  Lamp,
+  Armchair,
+  GridFour,
+  Plant,
+  Books,
+  X as XIcon,
+  Circle,
+} from 'phosphor-react-native';
 
-// Re-export commonly used icons
-export const Icons = PhosphorIcons;
+// Icon type for dynamic usage
+type IconComponent = typeof Sparkle;
 
 /**
  * Scene component (day or night)
@@ -31,7 +47,7 @@ export function Scene({ variant, height, horizonY, sparkles, fadeBottom, childre
   return (
     <View style={{ height, position: 'relative', overflow: 'hidden' }}>
       <LinearGradient
-        colors={colors.sky}
+        colors={colors.sky as any}
         locations={[0, 0.55, 1]}
         style={StyleSheet.absoluteFill}
       />
@@ -157,11 +173,11 @@ export function Card({ style, children }: CardProps) {
 interface PrimaryButtonProps {
   label: string;
   onPress: () => void;
-  icon?: keyof typeof PhosphorIcons;
+  icon?: IconComponent;
   disabled?: boolean;
 }
 
-export function PrimaryButton({ label, onPress, icon, disabled }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, icon: IconComp, disabled }: PrimaryButtonProps) {
   const [pressed, setPressed] = React.useState(false);
   
   return (
@@ -198,11 +214,13 @@ export function PrimaryButton({ label, onPress, icon, disabled }: PrimaryButtonP
         >
           {label}
         </Text>
-        {icon && React.createElement(PhosphorIcons[icon], {
-          size: 20,
-          color: semantic.text.onAccent,
-          weight: 'regular',
-        })}
+        {IconComp && (
+          <IconComp
+            size={20}
+            color={semantic.text.onAccent}
+            weight="regular"
+          />
+        )}
       </Pressable>
     </View>
   );
@@ -214,10 +232,10 @@ export function PrimaryButton({ label, onPress, icon, disabled }: PrimaryButtonP
 interface SecondaryButtonProps {
   label: string;
   onPress: () => void;
-  icon?: keyof typeof PhosphorIcons;
+  icon?: IconComponent;
 }
 
-export function SecondaryButton({ label, onPress, icon }: SecondaryButtonProps) {
+export function SecondaryButton({ label, onPress, icon: IconComp }: SecondaryButtonProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -235,11 +253,13 @@ export function SecondaryButton({ label, onPress, icon }: SecondaryButtonProps) 
       <Text style={[textStyles.labelButton, { color: semantic.text.primary }]}>
         {label}
       </Text>
-      {icon && React.createElement(PhosphorIcons[icon], {
-        size: 20,
-        color: semantic.text.primary,
-        weight: 'regular',
-      })}
+      {IconComp && (
+        <IconComp
+          size={20}
+          color={semantic.text.primary}
+          weight="regular"
+        />
+      )}
     </Pressable>
   );
 }
@@ -322,7 +342,7 @@ export function LightToken({ size, withRing = true }: LightTokenProps) {
         justifyContent: 'center',
       }}
     >
-      <PhosphorIcons.Sparkle
+      <Sparkle
         size={iconSize}
         color={semantic.accent.goldDeep}
         weight="fill"
@@ -391,7 +411,7 @@ export function DayChip({ day, variant = 'day' }: DayChipProps) {
         gap: 6,
       }}
     >
-      <PhosphorIcons.Path
+      <Circle
         size={18}
         color={isDark ? semantic.text.onDark : semantic.text.accent}
         weight="regular"

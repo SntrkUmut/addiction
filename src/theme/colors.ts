@@ -151,6 +151,13 @@ export const sceneDay = {
   innerHill: primitives.terracotta[350], // #EAD0C2 at 75% opacity
 };
 
+export const sceneDusk = {
+  // Rev 5: Dusk scene for dark mode main screens
+  sky: ['#2C3440', '#202B37', '#1B1F24'], // obsidian gradient
+  horizon: primitives.obsidian[700],
+  innerHill: primitives.obsidian[600], // at 75% opacity
+};
+
 export const sceneNight = {
   sky: ['#14171B', '#1B1F24', '#202B37'], // linear gradient 180° at 0%, 55%, 100%
   horizon: primitives.obsidian[700],
