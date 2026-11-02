@@ -1,5 +1,96 @@
 {
+ "_files": {
+  "count": 85,
+  "list": [
+   "README.md",
+   "accessories-overview.png",
+   "accessories.json",
+   "it-atki-preview.png",
+   "it-atki.png",
+   "it-atki@1x.png",
+   "it-atki@2x.png",
+   "it-atki@3x.png",
+   "it-bere-preview.png",
+   "it-bere.png",
+   "it-bere@1x.png",
+   "it-bere@2x.png",
+   "it-bere@3x.png",
+   "it-hasir-sapka-preview.png",
+   "it-hasir-sapka.png",
+   "it-hasir-sapka@1x.png",
+   "it-hasir-sapka@2x.png",
+   "it-hasir-sapka@3x.png",
+   "it-lastik-cizme-preview.png",
+   "it-lastik-cizme.png",
+   "it-lastik-cizme@1x.png",
+   "it-lastik-cizme@2x.png",
+   "it-lastik-cizme@3x.png",
+   "it-orgu-eldiven-calm.png",
+   "it-orgu-eldiven-calm@1x.png",
+   "it-orgu-eldiven-calm@2x.png",
+   "it-orgu-eldiven-calm@3x.png",
+   "it-orgu-eldiven-happy.png",
+   "it-orgu-eldiven-happy@1x.png",
+   "it-orgu-eldiven-happy@2x.png",
+   "it-orgu-eldiven-happy@3x.png",
+   "it-orgu-eldiven-preview.png",
+   "it-orgu-eldiven-sleepy.png",
+   "it-orgu-eldiven-sleepy@1x.png",
+   "it-orgu-eldiven-sleepy@2x.png",
+   "it-orgu-eldiven-sleepy@3x.png",
+   "it-orgu-eldiven-wave.png",
+   "it-orgu-eldiven-wave@1x.png",
+   "it-orgu-eldiven-wave@2x.png",
+   "it-orgu-eldiven-wave@3x.png",
+   "it-orgu-eldiven.png",
+   "it-orgu-eldiven@1x.png",
+   "it-orgu-eldiven@2x.png",
+   "it-orgu-eldiven@3x.png",
+   "it-ruzgarlik-calm.png",
+   "it-ruzgarlik-calm@1x.png",
+   "it-ruzgarlik-calm@2x.png",
+   "it-ruzgarlik-calm@3x.png",
+   "it-ruzgarlik-cheer.png",
+   "it-ruzgarlik-cheer@1x.png",
+   "it-ruzgarlik-cheer@2x.png",
+   "it-ruzgarlik-cheer@3x.png",
+   "it-ruzgarlik-happy.png",
+   "it-ruzgarlik-happy@1x.png",
+   "it-ruzgarlik-happy@2x.png",
+   "it-ruzgarlik-happy@3x.png",
+   "it-ruzgarlik-preview.png",
+   "it-ruzgarlik-wave.png",
+   "it-ruzgarlik-wave@1x.png",
+   "it-ruzgarlik-wave@2x.png",
+   "it-ruzgarlik-wave@3x.png",
+   "it-ruzgarlik.png",
+   "it-ruzgarlik@1x.png",
+   "it-ruzgarlik@2x.png",
+   "it-ruzgarlik@3x.png",
+   "it-semsiye-preview.png",
+   "it-semsiye.png",
+   "it-semsiye@1x.png",
+   "it-semsiye@2x.png",
+   "it-semsiye@3x.png",
+   "it-sirt-cantasi-preview.png",
+   "it-sirt-cantasi.png",
+   "it-sirt-cantasi@1x.png",
+   "it-sirt-cantasi@2x.png",
+   "it-sirt-cantasi@3x.png",
+   "it-yildiz-rozeti-preview.png",
+   "it-yildiz-rozeti.png",
+   "it-yildiz-rozeti@1x.png",
+   "it-yildiz-rozeti@2x.png",
+   "it-yildiz-rozeti@3x.png",
+   "it-yuvarlak-gozluk-preview.png",
+   "it-yuvarlak-gozluk.png",
+   "it-yuvarlak-gozluk@1x.png",
+   "it-yuvarlak-gozluk@2x.png",
+   "it-yuvarlak-gozluk@3x.png"
+  ]
+ },
  "_notes": {
+  "overview": "accessories-overview.png",
   "canvas": "Her katman tilki pozlarıyla aynı kare tuvalde (342/683/1024), fox_idle ile piksel hizalı. region≠(0,0,1) ise katman tilki tuvaline göre x,y ofsetli ve size kat büyük bir karedir (bkz. README).",
   "transform": "RN sırası: translateX(tx·W), translateY(ty·W), rotate(rotate deg), scale(scale); merkez=tuval merkezi, pozitif açı saat yönü. p' = c + (tx,ty)·W + R·scale·(p−c).",
   "layer": "front = tilkinin önünde, back = tilkinin arkasında",
@@ -105,7 +196,8 @@
    "fox_sleepy": "pati sol gözün üstünde; gözlük patinin önüne biner",
    "fox_hero": "pilot gözlüğüyle çakışır"
   },
-  "colors": "lacivert çerçeve #2C3E6B, camlar tamamen şeffaf (göz görünür)"
+  "colors": "lacivert çerçeve #2C3E6B, camlar tamamen şeffaf (göz görünür)",
+  "preview": "it-yuvarlak-gozluk-preview.png"
  },
  "it-hasir-sapka": {
   "name": "Hasır şapka",
@@ -171,13 +263,13 @@
    },
    "fox_sleepy": {
     "scale": 0.95,
-    "rotate": -10.0,
-    "tx": 0.0273,
-    "ty": 0.0156,
+    "rotate": -6.0,
+    "tx": 0.03,
+    "ty": -0.006,
     "fit_source": "hat",
     "anchor_on_pose": [
-     0.5108,
-     0.2218
+     0.534,
+     0.1997
     ]
    },
    "fox_calm": {
@@ -219,9 +311,9 @@
   },
   "colors": "hasır #E9D29A + koyu teal kurdele #2E7F7A",
   "notes": {
-   "fox_sleepy": "kenarın sol ucu kalkık patinin üst kenarına hafifçe biner (kabul edilebilir)",
    "fox_happy": "ty −0.0159 (baş tf'sinden 0.012 yukarı) — kalkık kaşlar kenarın altında görünsün diye"
-  }
+  },
+  "preview": "it-hasir-sapka-preview.png"
  },
  "it-lastik-cizme": {
   "name": "Lastik çizme",
@@ -323,7 +415,8 @@
    "fox_calm": "bağdaş kurmuş; ayaklar farklı açıda",
    "fox_happy": "zıplıyor; bacaklar ayrık/kalkık"
   },
-  "colors": "açık mavi #5FA8D3 + krem taban/ağız #F3E3C3"
+  "colors": "açık mavi #5FA8D3 + krem taban/ağız #F3E3C3",
+  "preview": "it-lastik-cizme-preview.png"
  },
  "it-sirt-cantasi": {
   "name": "Sırt çantası",
@@ -415,7 +508,8 @@
    "fox_happy": "zıplama, gövde eğik",
    "fox_hero": "pelerin omuzları kapatır"
   },
-  "colors": "orman yeşili #4F7A4A + krem dikiş #F3E3C3 + altın toka #D9AC58"
+  "colors": "orman yeşili #4F7A4A + krem dikiş #F3E3C3 + altın toka #D9AC58",
+  "preview": "it-sirt-cantasi-preview.png"
  },
  "it-atki": {
   "name": "Atkı (\"Tilki için atkı\")",
@@ -507,7 +601,8 @@
    "fox_craving": "taş atkının sarkan ucunu keser",
    "fox_hero": "pelerin yakası"
   },
-  "colors": "koyu teal #2E7F7A + krem #F3E3C3"
+  "colors": "koyu teal #2E7F7A + krem #F3E3C3",
+  "preview": "it-atki-preview.png"
  },
  "it-semsiye": {
   "name": "Şemsiye",
@@ -553,7 +648,8 @@
   "not_recommended": {
    "diğer tüm pozlar": "şemsiye sapı fox_cheer'ın kalkık (başparmak) patisinin arkasından geçecek şekilde çizildi; başka pozda tutan pati yok"
   },
-  "colors": "koyu teal #2E7F7A / krem #F3E3C3 dilimler, altın uç #D9AC58, ahşap sap"
+  "colors": "koyu teal #2E7F7A / krem #F3E3C3 dilimler, altın uç #D9AC58, ahşap sap",
+  "preview": "it-semsiye-preview.png"
  },
  "it-bere": {
   "name": "Bere (öneri, isteğe bağlı)",
@@ -655,7 +751,8 @@
    "fox_sleepy": "pati alnında; bere patinin önüne biner",
    "fox_hero": "pilot gözlüğü"
   },
-  "colors": "lacivert #2C3E6B + altın şerit #D9AC58 + krem ponpon"
+  "colors": "lacivert #2C3E6B + altın şerit #D9AC58 + krem ponpon",
+  "preview": "it-bere-preview.png"
  },
  "it-yildiz-rozeti": {
   "name": "Yıldız rozeti",
@@ -770,7 +867,8 @@
   "colors": "lacivert disk #2C3E6B, altın kenar ve yıldız #D9AC58, krem parlama #F3E3C3, %20 yumuşak gölge; 8° saat yönü eğik",
   "notes": {
    "fox_hero": "pelerin yakasının ve yıldız tokanın altında, krem göğüste — tokayla/FX ile çakışmaz"
-  }
+  },
+  "preview": "it-yildiz-rozeti-preview.png"
  },
  "it-orgu-eldiven": {
   "name": "Örgü eldiven",
@@ -856,10 +954,10 @@
      "": "it-orgu-eldiven-wave.png"
     },
     "bbox": [
-     0.3457,
-     0.3418,
-     0.874,
-     0.8096
+     0.3398,
+     0.3311,
+     0.8848,
+     0.8154
     ]
    },
    "fox_happy": {
@@ -907,7 +1005,8 @@
    "fox_craving": "patiler taşı tutuyor"
   },
   "colors": "krem örgü gövde #F3E3C3 (gölge #D9C7A2), teal ribanalı manşet #2E7F7A, altın dikiş bandı #D9AC58",
-  "per_pose_files": true
+  "per_pose_files": true,
+  "preview": "it-orgu-eldiven-preview.png"
  },
  "it-ruzgarlik": {
   "name": "Rüzgârlık",
@@ -1006,7 +1105,7 @@
      "": "it-ruzgarlik-happy.png"
     },
     "bbox": [
-     0.2354,
+     0.2363,
      0.3955,
      0.8193,
      0.8125
@@ -1027,7 +1126,7 @@
     "bbox": [
      0.3164,
      0.5176,
-     0.791,
+     0.79,
      0.8174
     ]
    }
@@ -1038,6 +1137,7 @@
    "fox_craving": "patiler/taş göğsün önünde"
   },
   "colors": "gök mavisi gövde #5FA8D3, lacivert yaka/etek/manşet #2C3E6B, krem fermuar kenarı #F3E3C3, altın fermuar çekeceği #D9AC58",
-  "per_pose_files": true
+  "per_pose_files": true,
+  "preview": "it-ruzgarlik-preview.png"
  }
 }
