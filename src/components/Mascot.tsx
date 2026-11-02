@@ -1,4 +1,14 @@
+import { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  withSequence,
+  Easing,
+  useReducedMotion,
+} from 'react-native-reanimated';
 
 // Currently used poses. To re-enable unused poses, add them back to this union
 // and to the POSE_ASSETS map below, then import the corresponding PNG assets.
@@ -10,10 +20,8 @@ export type MascotPose =
   | 'calm'      // Timer nefes egzersizi
   | 'cheer';    // Tamamlama ekranı
 
-// Currently no effects are used (removed for light backgrounds in item 7).
-// To re-enable effects, add them back to this union and to the EFFECT_ASSETS map below.
-// Available effects in assets/mascot/fx/: smoke, shield, breath_ring, bubbles, sparkles, crystals
-export type MascotEffect = never;
+// Effects restored for upcoming dark-background screens. Not currently used on light screens.
+export type MascotEffect = 'smoke' | 'shield' | 'breath_ring' | 'bubbles' | 'sparkles' | 'crystals';
 
 type MascotProps = {
   pose: MascotPose;
@@ -32,9 +40,15 @@ const POSE_ASSETS = {
   cheer: require('../../assets/mascot/fox/fox_cheer.png'),
 } as const;
 
-// No effects currently used (removed for light backgrounds). Effect assets remain
-// in assets/mascot/fx/ but are not bundled. To re-enable: add to MascotEffect type above,
-// restore EFFECT_ASSETS map with require() statements, and restore effect components from git history.
+// Effects restored for upcoming dark-background screens (compressed with pngquant).
+const EFFECT_ASSETS = {
+  smoke: require('../../assets/mascot/fx/fx_smoke.png'),
+  shield: require('../../assets/mascot/fx/fx_shield.png'),
+  breath_ring: require('../../assets/mascot/fx/fx_breath_ring.png'),
+  bubbles: require('../../assets/mascot/fx/fx_bubbles.png'),
+  sparkles: require('../../assets/mascot/fx/fx_sparkles.png'),
+  crystals: require('../../assets/mascot/fx/fx_crystals.png'),
+} as const;
 
 const POSE_LABELS: Record<MascotPose, string> = {
   idle: 'Dinlenen tilki maskot',
@@ -44,9 +58,262 @@ const POSE_LABELS: Record<MascotPose, string> = {
   cheer: 'Başparmak yukarı cesaretlendiren tilki maskot',
 };
 
-// Effect components removed since MascotEffect = never (no effects currently used).
-// To re-enable effects: restore effect types above, uncomment EFFECT_ASSETS requires,
-// and restore these component implementations from git history.
+function SmokeEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (!motionEnabled) {
+      translateY.value = 0;
+      opacity.value = 0;
+      return;
+    }
+    translateY.value = withRepeat(
+      withSequence(
+        withTiming(0, { duration: 0 }),
+        withTiming(-24, { duration: 3500, easing: Easing.out(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(0.9, { duration: 0 }),
+        withTiming(0, { duration: 3500, easing: Easing.in(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+    return () => {
+      translateY.value = 0;
+      opacity.value = 0;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionEnabled]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }, { scale: 0.55 }],
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.Image
+      source={EFFECT_ASSETS.smoke}
+      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
+      accessible={false}
+    />
+  );
+}
+
+function ShieldEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
+  const rotate = useSharedValue(0);
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    if (!motionEnabled) {
+      rotate.value = 0;
+      scale.value = 1;
+      return;
+    }
+    rotate.value = withRepeat(
+      withTiming(360, { duration: 20000, easing: Easing.linear }),
+      -1,
+      false
+    );
+    scale.value = withRepeat(
+      withTiming(1.04, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    return () => {
+      rotate.value = 0;
+      scale.value = 1;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionEnabled]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotate.value}deg` }, { scale: scale.value }],
+  }));
+
+  return (
+    <Animated.Image
+      source={EFFECT_ASSETS.shield}
+      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
+      accessible={false}
+    />
+  );
+}
+
+function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
+  const scale = useSharedValue(0.85);
+  const opacity = useSharedValue(0.7);
+
+  useEffect(() => {
+    if (!motionEnabled) {
+      scale.value = 0.85;
+      opacity.value = 0.7;
+      return;
+    }
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.0, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0.85, { duration: 4000, easing: Easing.inOut(Easing.sin) })
+      ),
+      -1,
+      false
+    );
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1.0, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0.7, { duration: 4000, easing: Easing.inOut(Easing.sin) })
+      ),
+      -1,
+      false
+    );
+    return () => {
+      scale.value = 0.85;
+      opacity.value = 0.7;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionEnabled]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.Image
+      source={EFFECT_ASSETS.breath_ring}
+      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
+      accessible={false}
+    />
+  );
+}
+
+function BubblesEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (!motionEnabled) {
+      translateY.value = 0;
+      opacity.value = 0;
+      return;
+    }
+    translateY.value = withRepeat(
+      withSequence(
+        withTiming(0, { duration: 0 }),
+        withTiming(-40, { duration: 5500, easing: Easing.out(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 0 }),
+        withTiming(0, { duration: 5500, easing: Easing.in(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+    return () => {
+      translateY.value = 0;
+      opacity.value = 0;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionEnabled]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.Image
+      source={EFFECT_ASSETS.bubbles}
+      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
+      accessible={false}
+    />
+  );
+}
+
+function SparklesEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
+  const opacity = useSharedValue(0.4);
+  const scale = useSharedValue(0.95);
+
+  useEffect(() => {
+    if (!motionEnabled) {
+      opacity.value = 0.4;
+      scale.value = 0.95;
+      return;
+    }
+    opacity.value = withRepeat(
+      withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    scale.value = withRepeat(
+      withTiming(1.05, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    return () => {
+      opacity.value = 0.4;
+      scale.value = 0.95;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionEnabled]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.Image
+      source={EFFECT_ASSETS.sparkles}
+      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
+      accessible={false}
+    />
+  );
+}
+
+function CrystalsEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    if (!motionEnabled) {
+      translateY.value = 0;
+      return;
+    }
+    translateY.value = withRepeat(
+      withSequence(
+        withTiming(6, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(-6, { duration: 2500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+    return () => {
+      translateY.value = 0;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motionEnabled]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <Animated.Image
+      source={EFFECT_ASSETS.crystals}
+      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
+      accessible={false}
+    />
+  );
+}
 
 export function Mascot({
   pose,
@@ -54,26 +321,52 @@ export function Mascot({
   effects = [],
   accessibilityLabel,
 }: MascotProps) {
+  const reducedMotion = useReducedMotion();
+
+  const motionEnabled = !reducedMotion;
   const label = POSE_LABELS[pose];
 
-  // Effects are currently disabled (MascotEffect = never), so poseScale is always 0.95
-  const poseScale = 0.95;
+  const uniqueEffects = [...new Set(effects)];
+  const hasEffects = uniqueEffects.length > 0;
+  const poseScale = hasEffects ? 0.62 : 0.95;
+
+  const backEffects = uniqueEffects.filter((e) => ['breath_ring', 'shield', 'sparkles'].includes(e));
+  const midEffects = uniqueEffects.filter((e) => ['bubbles', 'crystals'].includes(e));
+  const frontEffects = uniqueEffects.filter((e) => e === 'smoke');
 
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessible={!!accessibilityLabel}
-      accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityRole={accessibilityLabel ? 'image' : undefined}
-      accessibilityElementsHidden={!accessibilityLabel}
-      importantForAccessibility={!accessibilityLabel ? 'no-hide-descendants' : 'auto'}
+      accessible={hasEffects || !!accessibilityLabel}
+      accessibilityLabel={hasEffects || accessibilityLabel ? accessibilityLabel ?? label : undefined}
+      accessibilityRole={hasEffects || accessibilityLabel ? 'image' : undefined}
+      accessibilityElementsHidden={!hasEffects && !accessibilityLabel}
+      importantForAccessibility={!hasEffects && !accessibilityLabel ? 'no-hide-descendants' : 'auto'}
     >
+      {backEffects.map((effect) => {
+        if (effect === 'breath_ring') return <BreathRingEffect key={effect} size={size} motionEnabled={motionEnabled} />;
+        if (effect === 'shield') return <ShieldEffect key={effect} size={size} motionEnabled={motionEnabled} />;
+        if (effect === 'sparkles') return <SparklesEffect key={effect} size={size} motionEnabled={motionEnabled} />;
+        return null;
+      })}
+
+      {midEffects.map((effect) => {
+        if (effect === 'bubbles') return <BubblesEffect key={effect} size={size} motionEnabled={motionEnabled} />;
+        if (effect === 'crystals') return <CrystalsEffect key={effect} size={size} motionEnabled={motionEnabled} />;
+        return null;
+      })}
+
       <Image
         source={POSE_ASSETS[pose]}
         style={[styles.poseImage, { width: size * poseScale, height: size * poseScale }]}
         resizeMode="contain"
         accessible={false}
       />
+
+      {frontEffects.map((effect) => {
+        if (effect === 'smoke') return <SmokeEffect key={effect} size={size} motionEnabled={motionEnabled} />;
+        return null;
+      })}
     </View>
   );
 }
