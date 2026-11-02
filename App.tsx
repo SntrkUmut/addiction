@@ -43,6 +43,7 @@ import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { Mascot } from './src/components/Mascot';
 
 type Tab = 'home' | 'shelter' | 'progress' | 'settings';
 type Panel = 'idle' | 'tool' | 'timer' | 'done' | 'checkin';
@@ -104,10 +105,6 @@ function isValidLocalDate(value: string) {
 function money(value: number, currency: string) {
   try { return new Intl.NumberFormat('tr-TR', { style: 'currency', currency, maximumFractionDigits: 0 }).format(value); }
   catch { return `${Math.round(value)} ${currency}`; }
-}
-
-function FoxMascot({ size = 92 }: { size?: number }) {
-  return <Image source={require('./assets/mascot/fox-resting.png')} accessibilityLabel="Dinlenirken görünen tilki maskot" resizeMode="cover" style={{ width: size, height: size, borderRadius: Math.min(22, size * 0.24), backgroundColor: '#202B37' }} />;
 }
 
 function Button({ title, onPress, kind = 'primary', disabled = false }: {
@@ -622,7 +619,7 @@ function Onboarding({ name, setName, cigs, setCigs, packPrice, setPackPrice, pac
       <ScrollView key={step} style={styles.onboardingScroll} contentContainerStyle={styles.onboardingContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {formError ? <Text accessibilityRole="alert" style={styles.inlineError}>{formError}</Text> : null}
         {step === 'welcome' && <>
-          <View style={styles.onboardingHero}><FoxMascot size={112}/><Text style={styles.onboardingHeroTitle}>Bırakma yolun{ '\n' }sana ait.</Text><Text style={[styles.onboardingSubtitle, { textAlign: 'center' }]}>Her şeyi bugün çözmek zorunda değilsin. Sana iyi gelecek bir sonraki küçük adımı bulmana yardım edeceğiz.</Text></View>
+          <View style={styles.onboardingHero}><Mascot pose="wave" size={112} /><Text style={styles.onboardingHeroTitle}>Bırakma yolun{ '\n' }sana ait.</Text><Text style={[styles.onboardingSubtitle, { textAlign: 'center' }]}>Her şeyi bugün çözmek zorunda değilsin. Sana iyi gelecek bir sonraki küçük adımı bulmana yardım edeceğiz.</Text></View>
           <View style={styles.onboardingFeature}><Text style={styles.onboardingFeatureIcon}>≈</Text><View style={{ flex: 1 }}><Text style={styles.onboardingFeatureTitle}>İstek geldiğinde yanında</Text><Text style={styles.onboardingFeatureCopy}>Kısa, uygulanabilir baş etme araçları.</Text></View></View>
           <View style={styles.onboardingFeature}><Text style={styles.onboardingFeatureIcon}>⌂</Text><View style={{ flex: 1 }}><Text style={styles.onboardingFeatureTitle}>Kendi sığınağını kur</Text><Text style={styles.onboardingFeatureCopy}>Küçük adımlarınla yaşayan bir alan.</Text></View></View>
           <View style={styles.onboardingFeature}><Text style={styles.onboardingFeatureIcon}>↺</Text><View style={{ flex: 1 }}><Text style={styles.onboardingFeatureTitle}>Yolun kesilmez</Text><Text style={styles.onboardingFeatureCopy}>Bir kayma önceki emeğini silmez.</Text></View></View>
@@ -700,7 +697,7 @@ function Home({ profile, elapsed, quitStarted, hasLoggedSlip, cigarettesAvoided,
     <View style={styles.hero}>
       <View style={styles.heroDecorA}/><View style={styles.heroDecorB}/>
       <View style={styles.heroHeader}><View style={styles.dayChip}><View style={styles.greenDot}/><Text style={styles.dayChipText}>{quitStarted ? hasLoggedSlip ? 'Son sigara kaydından beri' : 'Kendi yolunda' : 'Bırakma günün yaklaşıyor'}</Text></View><Text style={styles.heroSymbol}>✧</Text></View>
-      <View style={styles.heroMiddle}><View><Text style={styles.heroSmall}>{quitStarted ? hasLoggedSlip ? 'SON SİGARA KAYDINDAN BERİ' : 'YOLCULUĞUN BAŞLAYALI' : 'BAŞLANGICA KALAN SÜRE'}</Text><Text style={styles.heroNumber}>{elapsed.days}<Text style={styles.heroUnit}> gün</Text></Text><Text style={styles.heroSub}>{elapsed.hours} saat · {elapsed.minutes} dakika</Text></View><FoxMascot size={90}/></View>
+      <View style={styles.heroMiddle}><View><Text style={styles.heroSmall}>{quitStarted ? hasLoggedSlip ? 'SON SİGARA KAYDINDAN BERİ' : 'YOLCULUĞUN BAŞLAYALI' : 'BAŞLANGICA KALAN SÜRE'}</Text><Text style={styles.heroNumber}>{elapsed.days}<Text style={styles.heroUnit}> gün</Text></Text><Text style={styles.heroSub}>{elapsed.hours} saat · {elapsed.minutes} dakika</Text></View><Mascot pose="idle" size={90} /></View>
       <View style={styles.heroBottom}><Text style={styles.heroBottomText}>{quitStarted ? 'Bugün kendin için yeni bir alan açtın.' : `${localDateInput(planDate(profile.quitDate))} için kendine bir başlangıç seçtin.`}</Text><Pressable onPress={onShelter} accessibilityRole="button" accessibilityLabel="Sığınağını gör"><Text style={styles.heroLink}>Sığınağı gör →</Text></Pressable></View>
     </View>
 
@@ -750,7 +747,7 @@ function UrgeFlow({ panel, setPanel, selected, setSelected, remaining, setRemain
     <View style={styles.urgeNav}><Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="İstek aracını kapat" style={styles.backButtonHit}><Text style={styles.backButton}>‹</Text></Pressable><Text style={styles.urgeNavTitle}>İstek anı</Text><View style={{ width: 44 }}/></View>
     <ScrollView contentContainerStyle={styles.urgeContent}>
       {panel === 'tool' && <>
-        <FoxMascot size={100}/>
+        <Mascot pose="craving" size={100} effects={['shield', 'crystals']} />
         <Text style={styles.urgeHeadline}>Şu an bir sonraki küçük adımı seç.</Text>
         <Text style={styles.bodyCopy}>Bu anı hemen çözmek zorunda değilsin. Sana uygun bir araç seçebilir ya da nedenlerini hatırlayabilirsin.</Text>
         {copingChoices.map((item) => <Pressable key={item.id} onPress={() => { setSelected(item); remainingRef.current = item.minutes * 60; setRemaining(item.minutes * 60); setPanel('timer'); }} accessibilityRole="button" accessibilityLabel={`${item.title}. ${item.detail} ${item.minutes} dakika.`} style={styles.toolChoice}>
@@ -760,6 +757,11 @@ function UrgeFlow({ panel, setPanel, selected, setSelected, remaining, setRemain
       </>}
       {panel === 'timer' && <>
         <Text style={styles.eyebrow}>{selected.title.toLocaleUpperCase('tr-TR')}</Text>
+        {selected.id === 'breath' ? (
+          <Mascot pose="calm" size={100} effects={['breath_ring', 'bubbles']} />
+        ) : (
+          <Mascot pose="idle" size={100} />
+        )}
         <Text style={styles.urgeHeadline}>Sadece bu ana odaklan.</Text>
         <View style={styles.timerFace} accessible accessibilityLabel={`${mins} dakika ${secs} saniye kaldı`}><View style={styles.timerRing} accessible={false}><Text style={styles.timerText} accessible={false}>{mins}:{secs}</Text><Text style={styles.timerLabel} accessible={false}>kendine ayırdığın süre</Text></View></View>
         <Text style={[styles.bodyCopy, { textAlign: 'center' }]}>{selected.id === 'breath' ? 'Rahat ettiğin bir ritimde nefes al. Saymak zorunda değilsin; istediğin an durabilirsin.' : selected.id === 'reasons' ? (reason ? `“${reason}”` : 'Kendine bu kararı neden verdiğini düşünmek için birkaç sakin an ver.') : selected.detail}</Text>
@@ -767,7 +769,7 @@ function UrgeFlow({ panel, setPanel, selected, setSelected, remaining, setRemain
         <Button title="Başka bir araç seç" kind="quiet" onPress={() => setPanel('tool')}/>
       </>}
       {panel === 'done' && <>
-        <View style={styles.doneBadge}><Text style={{ fontSize: 42, color: C.green }}>✦</Text></View>
+        <Mascot pose="cheer" size={100} effects={['sparkles']} />
         <Text style={styles.urgeHeadline}>Bu an için kendine alan açtın.</Text>
         <Text style={styles.bodyCopy}>İstek şimdi nasıl?</Text>
         <View style={styles.feelingRow}>{['Azaldı', 'Aynı', 'Geri geldi'].map((item) => <Pressable key={item} onPress={() => { recordUrgeResult(item); }} accessibilityRole="button" accessibilityLabel={`İstek ${item.toLocaleLowerCase('tr-TR')}`} style={styles.feelingChip}><Text style={styles.feelingText}>{item}</Text></Pressable>)}</View>
@@ -803,7 +805,7 @@ function Shelter({ coins, builtPieces, checkIn, checkedInToday, openUrge }: { co
   const nextThreshold = Math.min(12, (builtPieces + 1) * 2);
   const lightsToNext = Math.max(0, nextThreshold - coins);
   return <>
-    <View style={styles.shelterHero}><View style={styles.shelterSky}><Text style={styles.shelterStar1}>✦</Text><Text style={styles.shelterStar2}>·</Text><Text style={styles.shelterStar3}>✧</Text><View style={styles.moon}/><View style={styles.hillBack}/><View style={styles.hillFront}/><View style={styles.den}><View style={styles.denRoof}/><View style={styles.denBody}/><View style={styles.denDoor}/><View style={styles.denWindow}/></View><View style={styles.shelterMascot}><FoxMascot size={74}/></View></View>
+    <View style={styles.shelterHero}><View style={styles.shelterSky}><Text style={styles.shelterStar1}>✦</Text><Text style={styles.shelterStar2}>·</Text><Text style={styles.shelterStar3}>✧</Text><View style={styles.moon}/><View style={styles.hillBack}/><View style={styles.hillFront}/><View style={styles.den}><View style={styles.denRoof}/><View style={styles.denBody}/><View style={styles.denDoor}/><View style={styles.denWindow}/></View><View style={styles.shelterMascot}><Mascot pose="idle" size={74} /></View></View>
       <Text style={styles.shelterTitle}>Sığınağın, adım adım</Text><Text style={styles.shelterCaption}>Işıklar küçük adımlarının kaydı. Her 2 ışık yeni bir parçayı açar. Kayma, kurduğun alanı veya biriktirdiklerini silmez.</Text><View style={styles.shelterProgress} accessibilityRole="progressbar" accessibilityLabel="Sığınak parçalarının ilerlemesi" accessibilityValue={{ min: 0, max: pieces.length, now: builtPieces, text: `${builtPieces} / ${pieces.length} parça açıldı` }}><View style={[styles.shelterProgressFill, { width: `${Math.min(100, builtPieces / pieces.length * 100)}%` as DimensionValue }]}/></View><Text style={styles.shelterCount}>{builtPieces} / {pieces.length} parça açık · {coins} ışık biriktirdin</Text>
     </View>
     <View style={styles.sectionHead}><Text style={styles.sectionTitle}>Sıradaki adım</Text><Text style={styles.sectionAside}>{builtPieces === pieces.length ? 'Sığınak tamamlandı' : `${lightsToNext} ışık kaldı`}</Text></View>
