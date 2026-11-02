@@ -28,10 +28,10 @@ interface Props {
 
 export function Yuva({ state, onCheckIn, onCraving, onQuestTap }: Props) {
   const { colors, isDark } = useTheme();
-  const days = journeyDay(new Date(state.profile.quitDate));
-  const todayLight = state.lights.find((l: any) => l.date === new Date().toISOString().split('T')[0]);
-  const checkedInToday = !!todayLight;
-  const lightsEarned = state.lights.length;
+  const days = journeyDay(state.profile.quitDate);
+  const today = new Date().toISOString().split('T')[0];
+  const checkedInToday = state.events.some((e: any) => e.kind === 'checkin' && e.at.startsWith(today));
+  const lightsEarned = state.lights || 0;
 
   // Mock quests for now
   const quests = [
@@ -41,24 +41,24 @@ export function Yuva({ state, onCheckIn, onCraving, onQuestTap }: Props) {
   ];
 
   return (
-    <Scene variant={isDark ? 'dusk' : 'day'}>
+    <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
         {/* Header with day chips */}
         <View style={styles.header}>
-          <DayChip variant={state.slips.length > 0 ? 'journey' : 'clean'} />
-          <LightChip count={lightsEarned} size="sm" />
+          <DayChip day={days} variant={isDark ? 'night' : 'day'} />
+          <LightChip count={lightsEarned} variant={isDark ? 'night' : 'day'} />
         </View>
 
         {/* Journey days */}
         <View style={styles.hero}>
-          <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
             SENİN YOLCULUĞUN
           </Eyebrow>
           <Text style={[styles.heroTitle, { color: colors.text.primary }]}>
-            {formatTurkishDateSince(new Date(state.profile.quitDate))}
+            {formatTurkishDateSince(state.profile.quitDate)}
           </Text>
           <Text style={[styles.heroSubtitle, { color: colors.text.secondary }]}>
             {days} gün · {lightsEarned} ışık
@@ -66,7 +66,10 @@ export function Yuva({ state, onCheckIn, onCraving, onQuestTap }: Props) {
         </View>
 
         {/* Mascot area (placeholder) */}
-        <View style={[styles.mascotArea, { backgroundColor: colors.surface.card, borderColor: colors.border.default }]}>
+        <View style={[
+          styles.mascotArea,
+          { backgroundColor: colors.surface.card, borderColor: colors.border.default }
+        ]}>
           <Text style={[styles.mascotPlaceholder, { color: colors.text.tertiary }]}>
             🦊 Mascot + ring
           </Text>
@@ -79,7 +82,7 @@ export function Yuva({ state, onCheckIn, onCraving, onQuestTap }: Props) {
 
         {/* Today's quests */}
         <View style={styles.questsSection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
             BUGÜN
           </Eyebrow>
           {quests.map(quest => (
@@ -90,8 +93,8 @@ export function Yuva({ state, onCheckIn, onCraving, onQuestTap }: Props) {
             >
               <Card style={[
                 styles.questCard,
-                quest.done && { backgroundColor: colors.surface.rewardSoft }
-              ]}>
+                quest.done ? { backgroundColor: colors.surface.rewardSoft } : null
+              ] as any}>
                 <View style={styles.questRow}>
                   <View style={styles.questLeft}>
                     <View style={[
@@ -150,9 +153,7 @@ export function Yuva({ state, onCheckIn, onCraving, onQuestTap }: Props) {
         </View>
 
         {/* Craving button */}
-        <SecondaryButton onPress={onCraving} style={styles.cravingButton}>
-          İstek geldi mi?
-        </SecondaryButton>
+        <SecondaryButton label="İstek geldi mi?" onPress={onCraving} />
 
         <View style={{ height: 40 }} />
       </ScrollView>

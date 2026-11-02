@@ -14,10 +14,10 @@ import { Sparkle, MapPin } from 'phosphor-react-native';
 type IconComponent = typeof Sparkle;
 
 /**
- * Scene component (day or night)
+ * Scene component (day, dusk, or night)
  */
 interface SceneProps {
-  variant: 'day' | 'night';
+  variant: 'day' | 'dusk' | 'night';
   height: number;
   horizonY: number;
   sparkles?: { x: number; y: number; width: number; opacity: number };
@@ -26,7 +26,7 @@ interface SceneProps {
 }
 
 export function Scene({ variant, height, horizonY, sparkles, fadeBottom, children }: SceneProps) {
-  const colors = variant === 'day' ? sceneDay : sceneNight;
+  const colors = variant === 'day' ? sceneDay : variant === 'dusk' ? { sky: ['#2C3440', '#202B37', '#1B1F24'], horizon: '#2C3440', innerHill: '#3A4350' } : sceneNight;
   
   return (
     <View style={{ height, position: 'relative', overflow: 'hidden' }}>

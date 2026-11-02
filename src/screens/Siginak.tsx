@@ -18,7 +18,7 @@ interface Props {
 
 export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: Props) {
   const { colors, isDark } = useTheme();
-  const lightsEarned = state.lights.length;
+  const lightsEarned = state.lights || 0;
 
   // Mock chapters data
   const chapters = [
@@ -35,21 +35,24 @@ export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: P
   ];
 
   return (
-    <Scene variant={isDark ? 'dusk' : 'day'}>
+    <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View style={styles.header}>
-          <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
             SIĞINAK
           </Eyebrow>
-          <LightChip count={lightsEarned} size="sm" />
+          <LightChip count={lightsEarned} variant={isDark ? 'night' : 'day'} />
         </View>
 
         {/* Path visualization */}
-        <View style={[styles.pathContainer, { backgroundColor: colors.surface.card, borderColor: colors.border.default }]}>
+        <View style={[
+          styles.pathContainer,
+          { backgroundColor: colors.surface.card, borderColor: colors.border.default }
+        ] as any}>
           <Text style={[styles.pathPlaceholder, { color: colors.text.tertiary }]}>
             📍 Path visualization
           </Text>
@@ -71,13 +74,13 @@ export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: P
               >
                 <Card style={[
                   styles.chapterCard,
-                  locked && { opacity: 0.5 }
-                ]}>
+                  locked ? { opacity: 0.5 } : null
+                ] as any}>
                   <View style={styles.chapterRow}>
                     <View style={styles.chapterLeft}>
                       <Text style={[
                         styles.chapterNumber,
-                        { color: colors.accent.goldText || colors.accent.gold }
+                        { color: colors.accent.goldText }
                       ]}>
                         {index + 1}
                       </Text>
@@ -100,8 +103,8 @@ export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: P
           })}
 
           {/* Upcoming chapter teaser */}
-          <Card style={[styles.teaserCard, { backgroundColor: colors.surface.sunken }]}>
-            <Text style={[styles.teaserEyebrow, { color: colors.text.accent }]}>
+          <Card style={[styles.teaserCard, { backgroundColor: colors.surface.sunken }] as any}>
+            <Text style={[styles.teaserEyebrow, { color: colors.text.accent }] as any}>
               SONRA
             </Text>
             <Text style={[styles.teaserText, { color: colors.text.secondary }]}>
@@ -112,22 +115,22 @@ export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: P
 
         {/* Milestones section */}
         <View style={styles.milestonesSection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
             KİLOMETRE TAŞLARI
           </Eyebrow>
           <View style={styles.milestonesGrid}>
             {milestones.map(ms => (
-              <TouchableOpacity
-                key={ms.day}
-                onPress={() => ms.unlocked && onMilestoneTap(ms.day)}
-                activeOpacity={0.7}
-                disabled={!ms.unlocked}
-              >
-                <Card style={[
-                  styles.milestoneCard,
-                  { backgroundColor: ms.unlocked ? colors.surface.rewardSoft : colors.surface.sunken },
-                  !ms.unlocked && { opacity: 0.5 }
-                ]}>
+            <TouchableOpacity
+              key={ms.day}
+              onPress={() => ms.unlocked && onMilestoneTap(ms.day)}
+              activeOpacity={0.7}
+              disabled={!ms.unlocked}
+            >
+              <Card style={[
+                styles.milestoneCard,
+                { backgroundColor: ms.unlocked ? colors.surface.rewardSoft : colors.surface.sunken },
+                !ms.unlocked && { opacity: 0.5 }
+              ] as any}>
                   <Text style={[styles.milestoneDay, { color: colors.text.primary }]}>
                     Gün {ms.day}
                   </Text>

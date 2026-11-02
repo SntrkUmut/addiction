@@ -93,6 +93,7 @@ export const semanticLight = {
     gold: primitives.gold[500],
     goldDeep: primitives.gold[600],
     goldEdge: primitives.gold[700],
+    goldText: primitives.gold.text, // rev 5.1: #866018 for gold text on light mode
     teal: primitives.teal[400],
     tealDeep: primitives.teal[700],
   },

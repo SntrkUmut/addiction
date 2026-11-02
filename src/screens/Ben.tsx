@@ -21,10 +21,11 @@ interface Props {
 export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
   const { colors, isDark, themeMode } = useTheme();
   const [hapticsOn, setHapticsOn] = React.useState(false);
-  const days = journeyDay(new Date(state.profile.quitDate));
+  const days = journeyDay(state.profile.quitDate);
 
   React.useEffect(() => {
-    getHapticsEnabled().then(setHapticsOn);
+    const enabled = getHapticsEnabled();
+    setHapticsOn(enabled);
   }, []);
 
   const toggleHaptics = async (value: boolean) => {
@@ -46,13 +47,13 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
   };
 
   return (
-    <Scene variant={isDark ? 'dusk' : 'day'}>
+    <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }]}>
+        <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
           PROFİL
         </Eyebrow>
 
@@ -62,13 +63,13 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
             Yolculuğun
           </Text>
           <Text style={[styles.summarySubtitle, { color: colors.text.secondary }]}>
-            {days} gün · {state.lights.length} ışık
+            {days} gün · {state.lights || 0} ışık
           </Text>
         </View>
 
         {/* Plan section */}
         <View style={styles.section}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
             PLAN
           </Eyebrow>
           <TouchableOpacity onPress={onEditPlan} activeOpacity={0.7}>

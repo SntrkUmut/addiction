@@ -41,6 +41,7 @@ export type AppState = {
   schemaVersion?: 2; // absent = 1
   profile: Profile | null; 
   events: ProgressEvent[];
+  lights?: number; // Rev 5: total lights earned (calculated from check-ins)
   milestones?: { seen: MilestoneSeen[] }; // Rev 4: synced
   collection?: { earned: CollectionItem[] }; // Rev 4: synced, grow-only
   personalization?: Personalization; // Rev 4: synced, LWW

@@ -63,7 +63,7 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
   };
 
   return (
-    <Scene variant="day">
+    <Scene variant="day" height={800} horizonY={160}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -230,31 +230,27 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
 
           {/* Navigation buttons */}
           <View style={styles.buttons}>
-            {step === 'welcome' && <PrimaryButton onPress={handleNext}>Başla</PrimaryButton>}
+            {step === 'welcome' && <PrimaryButton onPress={handleNext} label="Başla" />}
             {step === 'cigs' && (
               <PrimaryButton
                 onPress={handleNext}
                 disabled={!data.cigarettesPerDay || parseFloat(data.cigarettesPerDay) <= 0}
-              >
-                Devam et
-              </PrimaryButton>
+                label="Devam et"
+              />
             )}
             {step === 'price' && (
               <>
                 <PrimaryButton
                   onPress={handleNext}
                   disabled={!data.packPrice || parseFloat(data.packPrice) <= 0}
-                >
-                  Devam et
-                </PrimaryButton>
-                <TextButton onPress={handleSkipPrice} style={{ marginTop: 12 }}>
-                  Bu adımı geç
-                </TextButton>
+                  label="Devam et"
+                />
+                <TextButton onPress={handleSkipPrice} label="Bu adımı geç" />
               </>
             )}
-            {step === 'date' && <PrimaryButton onPress={handleNext}>Devam et</PrimaryButton>}
+            {step === 'date' && <PrimaryButton onPress={handleNext} label="Devam et" />}
             {step === 'summary' && (
-              <PrimaryButton onPress={handleNext}>Yolculuğa başla</PrimaryButton>
+              <PrimaryButton onPress={handleNext} label="Yolculuğa başla" />
             )}
           </View>
 

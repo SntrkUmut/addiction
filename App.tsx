@@ -41,7 +41,7 @@ export default function App() {
       setState(loaded);
       
       // Show onboarding if no quit date set
-      if (!loaded.profile.quitDate) {
+      if (!loaded || !loaded.profile || !loaded.profile.quitDate) {
         setOnboardingVisible(true);
       }
       
@@ -67,9 +67,10 @@ export default function App() {
     const updatedState: AppState = {
       ...state,
       profile: {
-        ...state.profile,
+        name: state.profile?.name || '',
+        reason: state.profile?.reason || '',
         cigarettesPerDay: parseFloat(data.cigarettesPerDay) || 0,
-        packPrice: parseFloat(data.packPrice) || null,
+        packPrice: parseFloat(data.packPrice) || 0,
         packSize: parseInt(data.packSize) || 20,
         currency: data.currency || '₺',
         quitDate: data.quitDate,
@@ -86,7 +87,9 @@ export default function App() {
     if (!state) return;
     
     const today = new Date().toISOString().split('T')[0];
-    const alreadyCheckedIn = state.lights.some(l => l.date === today);
+    const alreadyCheckedIn = state.events.some(e => 
+      e.kind === 'checkin' && e.at.startsWith(today)
+    );
     
     if (alreadyCheckedIn) {
       setDialog({
@@ -98,19 +101,14 @@ export default function App() {
     
     const updatedState: AppState = {
       ...state,
-      lights: [
-        ...state.lights,
-        {
-          date: today,
-          source: 'checkin',
-          timestamp: new Date().toISOString(),
-        },
-      ],
+      lights: (state.lights || 0) + 1,
       events: [
         ...state.events,
         {
-          timestamp: new Date().toISOString(),
+          id: `checkin-${Date.now()}`,
+          at: new Date().toISOString(),
           kind: 'checkin',
+          details: {},
         },
       ],
     };
@@ -301,7 +299,7 @@ export default function App() {
             <Onboarding
               onComplete={handleOnboardingComplete}
               onEdit={() => {}}
-              isEditing={!!state.profile.quitDate}
+              isEditing={!!(state?.profile?.quitDate)}
             />
           </Modal>
 

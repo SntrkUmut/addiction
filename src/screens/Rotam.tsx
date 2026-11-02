@@ -18,15 +18,15 @@ interface Props {
 
 export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
   const { colors, isDark } = useTheme();
-  const days = journeyDay(new Date(state.profile.quitDate));
-  const lightsEarned = state.lights.length;
+  const days = journeyDay(state.profile.quitDate);
+  const lightsEarned = state.lights || 0;
 
   // Mock last 7 days strip
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (6 - i));
     const dateStr = date.toISOString().split('T')[0];
-    const hasLight = state.lights.some((l: any) => l.date === dateStr);
+    const hasLight = state.events.some((e: any) => e.kind === 'checkin' && e.at.startsWith(dateStr));
     return { date, hasLight };
   });
 
@@ -38,20 +38,20 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
   ];
 
   return (
-    <Scene variant={isDark ? 'dusk' : 'day'}>
+    <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }]}>
+        <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
           SENİN YOLCULUĞUN
         </Eyebrow>
 
         {/* Journey hero */}
         <View style={styles.hero}>
           <Text style={[styles.heroTitle, { color: colors.text.primary }]}>
-            {formatTurkishDateSince(new Date(state.profile.quitDate))}
+            {formatTurkishDateSince(state.profile.quitDate)}
           </Text>
           <Text style={[styles.heroSubtitle, { color: colors.text.secondary }]}>
             {days} gün · {lightsEarned} ışık kazanıldı
@@ -60,10 +60,13 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
 
         {/* Milestones track */}
         <View style={styles.milestonesSection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
             KİLOMETRE TAŞLARI
           </Eyebrow>
-          <View style={[styles.milestonesTrack, { backgroundColor: colors.surface.card, borderColor: colors.border.default }]}>
+          <View style={[
+            styles.milestonesTrack,
+            { backgroundColor: colors.surface.card, borderColor: colors.border.default }
+          ]}>
             <Text style={[styles.trackPlaceholder, { color: colors.text.tertiary }]}>
               🎯 Horizontal milestone stops
             </Text>
@@ -128,7 +131,7 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
 
         {/* Recent history */}
         <View style={styles.historySection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={[styles.sectionEyebrow as any, { color: colors.text.accent }]}>
             SON KAYITLARIN
           </Eyebrow>
           {recentEvents.map((event, i) => (
@@ -139,11 +142,11 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
                     {event.title}
                   </Text>
                   <Text style={[styles.historyTime, { color: colors.text.tertiary }]}>
-                    {formatEventTime(event.time)}
+                    {formatEventTime(event.time.toISOString())}
                   </Text>
                 </View>
                 {event.lights > 0 && (
-                  <Text style={[styles.historyLights, { color: colors.accent.goldText || colors.accent.gold }]}>
+                  <Text style={[styles.historyLights, { color: colors.accent.goldText }]}>
                     +{event.lights}
                   </Text>
                 )}

@@ -5,6 +5,7 @@
 
 import { useColorScheme } from 'react-native';
 import * as React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { semanticLight, semanticDark } from '../theme/colors';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
@@ -19,7 +20,7 @@ type ThemeContextValue = {
   setMode: (mode: ThemeMode) => Promise<void>;
 };
 
-const ThemeContext = createContext<ThemeContextValue | null>(null);
+const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
 const THEME_MODE_KEY = 'quit-theme-mode-v1';
 
@@ -31,7 +32,7 @@ let currentMode: ThemeMode = 'system';
  */
 export async function initTheme(): Promise<ThemeMode> {
   try {
-    const stored = await localStorage.getItem(THEME_MODE_KEY);
+    const stored = await AsyncStorage.getItem(THEME_MODE_KEY);
     if (stored === 'light' || stored === 'dark' || stored === 'system') {
       currentMode = stored;
     }
@@ -54,7 +55,7 @@ export function getThemeMode(): ThemeMode {
 export async function setThemeMode(mode: ThemeMode): Promise<void> {
   currentMode = mode;
   try {
-    await localStorage.setItem(THEME_MODE_KEY, mode);
+    await AsyncStorage.setItem(THEME_MODE_KEY, mode);
   } catch {
     // Silently fail - mode still works in memory
   }
@@ -75,9 +76,9 @@ export function resolveTheme(mode: ThemeMode, systemScheme: 'light' | 'dark' | n
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemScheme = useColorScheme();
-  const [mode, setModeState] = useState<ThemeMode>(currentMode);
+  const [mode, setModeState] = React.useState<ThemeMode>(currentMode);
   
-  useEffect(() => {
+  React.useEffect(() => {
     initTheme().then(setModeState);
   }, []);
   
@@ -93,7 +94,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const value: ThemeContextValue = {
     mode,
     resolved,
-    colors,
+    colors: colors as typeof semanticLight,
     isDark,
     themeMode: mode,
     setMode,
@@ -106,7 +107,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
  * React hook for theme
  */
 export function useTheme(): ThemeContextValue {
-  const context = useContext(ThemeContext);
+  const context = React.useContext(ThemeContext);
   if (!context) {
     // Fallback for use outside provider
     return {
