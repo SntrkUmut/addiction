@@ -124,15 +124,29 @@ function EndOfContentCard({
       <Text style={[styles.endBody, { color: colors.text.secondary }]}>{view.body}</Text>
 
       <View style={[styles.countdown, { backgroundColor: colors.surface.sunken }]}>
-        <View style={[styles.hourglass, { backgroundColor: colors.surface.rewardSoft }]}>
+        <View
+          style={[styles.hourglass, { backgroundColor: colors.surface.rewardSoft }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           <Hourglass size={22} color={colors.accent.goldDeep} weight="fill" />
         </View>
-        <View style={{ flex: 1 }}>
+        <View
+          style={{ flex: 1 }}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={view.opensA11y}
+        >
           <Text style={[styles.countdownLabel, { color: colors.text.secondary }]}>{view.opensLabel}</Text>
           <Text style={[styles.countdownValue, { color: colors.text.primary }]}>{view.opensValue}</Text>
         </View>
         {view.bankedLights > 0 ? (
-          <View style={styles.banked}>
+          <View
+            style={styles.banked}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={view.bankedA11y}
+          >
             <Text style={[styles.countdownValue, { color: colors.text.primary, textAlign: 'right' }]}>
               {view.lightsReadyLabel}
             </Text>

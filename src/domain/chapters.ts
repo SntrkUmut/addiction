@@ -20,10 +20,10 @@ export type ChapterFlow = {
 
 /**
  * UI chrome that is not in the bundled v11 chapter/upcoming copy.
- * copyStatus: pending — TODO-review. Listed in the PR as "Yeni metinler (onay bekliyor)".
+ * copyStatus: approved — Umut, 2026-11-02.
  */
 export const CHAPTER_CHROME = {
-  copyStatus: 'pending' as const,
+  copyStatus: 'approved' as const,
   fogFallbackTitle: 'Sisin ardında yeni bir yer var',
   fogCaption: (threshold: number, remaining: number) => (
     `${threshold}. ışıkta açılır · ${remaining} ışık kaldı`
@@ -40,6 +40,16 @@ export const CHAPTER_CHROME = {
   continueCta: 'Yola devam et',
   remainingLights: (n: number) => `${n} ışık kaldı`,
 } as const;
+
+/** Screen-reader label for "Açılmasına" + "{n} gün" / "Yakında". */
+export function opensA11yLabel(opensValue: string): string {
+  return `${CHAPTER_CHROME.opensIn} ${opensValue}`;
+}
+
+/** Screen-reader label for the visible "{n} ışık hazır" / "ilk parçaya gider" pair. */
+export function bankedA11yLabel(n: number): string {
+  return `${CHAPTER_CHROME.lightsReady(n)}, sonraki bölümün ilk parçasına gider`;
+}
 
 export function chapterSeenKey(order: number): ChapterSeenKey {
   return `chapter-${order}`;
@@ -201,9 +211,11 @@ export type EndOfContentView = {
   body: string;
   opensLabel: string;
   opensValue: string;
+  opensA11y: string;
   bankedLights: number;
   lightsReadyLabel: string;
   firstPieceHint: string;
+  bankedA11y: string;
   meanwhile: string;
   collectionLabel: string;
 };
@@ -236,9 +248,11 @@ export function endOfContentView(
     body: CHAPTER_CHROME.endBody,
     opensLabel: CHAPTER_CHROME.opensIn,
     opensValue,
+    opensA11y: opensA11yLabel(opensValue),
     bankedLights: banked,
     lightsReadyLabel: CHAPTER_CHROME.lightsReady(banked),
     firstPieceHint: CHAPTER_CHROME.goesToFirstPiece,
+    bankedA11y: bankedA11yLabel(banked),
     meanwhile: CHAPTER_CHROME.meanwhile,
     collectionLabel: CHAPTER_CHROME.collection,
   };

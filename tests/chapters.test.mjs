@@ -67,9 +67,20 @@ test('end-of-content replaces the fog teaser after chapter 8', () => {
   assert.equal(end.title, bundled.upcoming.teaserLine);
   assert.equal(end.body, CHAPTER_CHROME.endBody);
   assert.equal(end.opensValue, 'Yakında');
+  assert.equal(end.opensA11y, 'Açılmasına Yakında');
   assert.equal(end.bankedLights, 2);
   assert.equal(end.lightsReadyLabel, '2 ışık hazır');
+  assert.equal(end.firstPieceHint, 'ilk parçaya gider');
+  assert.equal(end.bankedA11y, '2 ışık hazır, sonraki bölümün ilk parçasına gider');
   assert.doesNotMatch(end.title + end.body, /Sığınak tamamlandı|bitti|tamamlandı/i);
+
+  const dated = {
+    ...bundled,
+    upcoming: { ...bundled.upcoming, opensAt: '2026-11-06T09:00:00+03:00' },
+  };
+  const datedEnd = endOfContentView(dated, 96, new Date('2026-11-02T12:00:00+03:00'));
+  assert.equal(datedEnd?.opensValue, '4 gün');
+  assert.equal(datedEnd?.opensA11y, 'Açılmasına 4 gün');
 });
 
 test('fog teaser uses the next chapter teaser or upcoming copy', () => {
@@ -91,6 +102,6 @@ test('fog teaser uses the next chapter teaser or upcoming copy', () => {
   assert.equal(late?.remaining, 6);
 });
 
-test('new chrome copy stays pending for review', () => {
-  assert.equal(CHAPTER_CHROME.copyStatus, 'pending');
+test('chapter chrome copy is approved', () => {
+  assert.equal(CHAPTER_CHROME.copyStatus, 'approved');
 });
