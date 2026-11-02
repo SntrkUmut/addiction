@@ -19,6 +19,7 @@ type ThemeContextValue = {
   isDark: boolean;
   themeMode: ThemeMode;
   setMode: (mode: ThemeMode) => Promise<void>;
+  resetMode: () => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
@@ -94,6 +95,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     await setThemeMode(newMode);
     setModeState(newMode);
   };
+
+  const resetMode = () => {
+    resetThemeMemory();
+    setModeState('system');
+  };
   
   const value: ThemeContextValue = {
     mode,
@@ -102,6 +108,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     isDark,
     themeMode: mode,
     setMode,
+    resetMode,
   };
   
   return React.createElement(ThemeContext.Provider, { value }, children);
@@ -121,6 +128,7 @@ export function useTheme(): ThemeContextValue {
       isDark: false,
       themeMode: 'light',
       setMode: async () => {},
+      resetMode: () => {},
     };
   }
   return context;

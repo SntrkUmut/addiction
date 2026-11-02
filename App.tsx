@@ -68,7 +68,7 @@ export default function App() {
 }
 
 function AppInner() {
-  const { colors, isDark, setMode } = useTheme();
+  const { colors, isDark, resetMode } = useTheme();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(emptyAppState());
@@ -418,12 +418,16 @@ function AppInner() {
 
   const handleDeleteData = useCallback(async () => {
     suppressSaveRef.current = true;
-    let failed = false;
+    let result;
     try {
-      const result = await wipeDeviceData();
-      if (!result.ok) failed = true;
+      result = await wipeDeviceData();
     } catch {
-      failed = true;
+      suppressSaveRef.current = false;
+      throw new Error('wipe');
+    }
+    if (!result.ok) {
+      suppressSaveRef.current = false;
+      throw new Error('wipe');
     }
 
     pendingChapterRef.current = null;
@@ -440,10 +444,10 @@ function AppInner() {
     setManifest(bundledManifest);
     setState(emptyAppState());
     setOnboardingVisible(true);
-    await setMode('system');
+    resetMode();
+    // Already on `/`; replace restates the root after in-memory reset. The onboarding Modal is what the user sees.
     router.replace('/');
-    if (failed) throw new Error('wipe');
-  }, [setMode]);
+  }, [resetMode]);
 
   const handleExport = async () => {
     try {

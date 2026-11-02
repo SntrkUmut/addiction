@@ -74,7 +74,14 @@ export function Ben({ state, onEditPlan, onSupport, onExport, onDeleteData }: Pr
     try {
       await onDeleteData();
     } catch {
-      Alert.alert(WIPE_ERROR_MESSAGE);
+      Alert.alert(
+        WIPE_ERROR_MESSAGE,
+        undefined,
+        [
+          { text: 'Vazgeç', style: 'cancel' },
+          { text: 'Tekrar dene', onPress: () => { runDelete(); } },
+        ],
+      );
     } finally {
       wipingRef.current = false;
       setWiping(false);

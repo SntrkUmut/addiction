@@ -45,6 +45,7 @@ function mockDeps(overrides = {}) {
     asyncCleared: 0,
     secureDeleted: [],
     notificationsCancelled: 0,
+    notificationsDismissed: 0,
     badgeResets: 0,
     cacheDeleted: [],
     signOut: 0,
@@ -83,6 +84,9 @@ function mockDeps(overrides = {}) {
     },
     cancelNotifications: async () => {
       calls.notificationsCancelled += 1;
+    },
+    dismissNotifications: async () => {
+      calls.notificationsDismissed += 1;
     },
     resetBadge: async () => {
       calls.badgeResets += 1;
@@ -173,6 +177,7 @@ test('wipe removes every known key, cancels notifications, and signs out locally
   assert.equal(calls.secureDeleted.includes(`sb-demo-auth-token${AES_KEY_SUFFIX}`), true);
   assert.equal(secure.size, 0);
   assert.equal(calls.notificationsCancelled, 1);
+  assert.equal(calls.notificationsDismissed, 1);
   assert.equal(calls.badgeResets, 1);
   assert.deepEqual(calls.cacheDeleted, [EXPORT_CACHE_FILE]);
   assert.equal(calls.memoryResets, 1);
@@ -184,26 +189,69 @@ test('a partial error does not stop the rest of the wipe', async () => {
       calls.sqliteRemoved.push(key);
       if (key === STATE_KEY) throw new Error('sqlite busy');
     },
-    cancelNotifications: async () => {
-      throw new Error('notifications unavailable');
-    },
-    signOutLocal: async () => {
-      throw new Error('no session');
-    },
   });
 
   const result = await wipeLocalData(deps);
 
   assert.equal(result.ok, false);
   assert.equal(result.errors.includes('sqlite:quit-companion-state-v1'), true);
-  assert.equal(result.errors.includes('cancelNotifications'), true);
-  assert.equal(result.errors.includes('signOutLocal'), true);
   assert.equal(calls.sqliteRemoved.includes(REMINDER_KEY), true);
   assert.equal(calls.sqliteRemoved.includes(MANIFEST_CACHE_KEY), true);
   assert.equal(calls.sqliteCleared, 1);
   assert.equal(calls.asyncCleared, 1);
+  assert.equal(calls.notificationsCancelled, 1);
+  assert.equal(calls.notificationsDismissed, 1);
   assert.equal(calls.badgeResets, 1);
   assert.deepEqual(calls.cacheDeleted, [EXPORT_CACHE_FILE]);
+  assert.equal(calls.memoryResets, 1);
+});
+
+test('a signOut network error is non-fatal and the rest of the wipe still runs', async () => {
+  const { deps, calls, sqlite, asyncStore } = mockDeps({
+    signOutLocal: async () => {
+      calls.signOut += 1;
+      throw new Error('Network request failed');
+    },
+  });
+
+  const result = await wipeLocalData(deps);
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.errors, []);
+  assert.equal(calls.signOut, 1);
+  assert.equal(sqlite.size, 0);
+  assert.equal(asyncStore.size, 0);
+  assert.equal(calls.notificationsCancelled, 1);
+  assert.equal(calls.memoryResets, 1);
+});
+
+test('missing web APIs are non-fatal', async () => {
+  const { deps, calls, sqlite, asyncStore } = mockDeps({
+    secureStoreDelete: async () => {
+      throw new Error('SecureStore is unavailable on web');
+    },
+    cancelNotifications: async () => {
+      throw new Error('Notifications unavailable');
+    },
+    dismissNotifications: async () => {
+      throw new Error('Notifications unavailable');
+    },
+    resetBadge: async () => {
+      throw new Error('Badge unavailable');
+    },
+    deleteCacheFile: async () => {
+      throw new Error('FileSystem unavailable');
+    },
+  });
+
+  const result = await wipeLocalData(deps);
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.errors, []);
+  assert.equal(sqlite.size, 0);
+  assert.equal(asyncStore.size, 0);
+  assert.equal(calls.sqliteCleared, 1);
+  assert.equal(calls.asyncCleared, 1);
   assert.equal(calls.memoryResets, 1);
 });
 
@@ -222,6 +270,7 @@ test('signOutLocally is local-only and wipe never calls the server', () => {
   assert.equal(wipe.includes('delete-account'), false);
   assert.equal(wipe.includes('functions.invoke'), false);
   assert.match(wipe, /cancelAllScheduledNotificationsAsync/);
+  assert.match(wipe, /dismissAllNotificationsAsync/);
   assert.match(wipe, /setBadgeCountAsync\(0\)/);
 });
 
@@ -234,6 +283,8 @@ test('Ben uses the approved Alert copy, terracotta accent, and a11y on Verilerim
   );
   assert.match(ben, /text: 'Vazgeç', style: 'cancel'/);
   assert.match(ben, /text: 'Sil', style: 'destructive'/);
+  assert.match(ben, /Silinemedi\. Lütfen tekrar dene\./);
+  assert.match(ben, /text: 'Tekrar dene'/);
   assert.match(ben, /accessibilityRole="button"/);
   assert.match(ben, /accessibilityLabel="Verilerimi sil"/);
   assert.match(ben, /accessibilityHint="Bu cihazdaki tüm verileri kalıcı olarak siler"/);
@@ -251,7 +302,42 @@ test('wipe returns to onboarding without restarting the app', () => {
   assert.match(app, /emptyAppState\(\)/);
   assert.match(app, /setOnboardingVisible\(true\)/);
   assert.match(app, /router\.replace\('\/'\)/);
-  assert.match(app, /setMode\('system'\)/);
+  assert.match(app, /resetMode\(\)/);
+  assert.equal(app.includes("setMode('system')"), false);
   assert.equal(app.includes('Updates.reloadAsync'), false);
   assert.equal(app.includes('DevSettings.reload'), false);
+});
+
+test('resetMode restores system theme in memory without writing the key back', () => {
+  const theme = readFileSync(new URL('../src/ui/theme.ts', import.meta.url), 'utf8');
+  const resetMode = theme.slice(theme.indexOf('const resetMode'), theme.indexOf('const value'));
+  assert.match(resetMode, /resetThemeMemory\(\)/);
+  assert.match(resetMode, /setModeState\('system'\)/);
+  assert.equal(resetMode.includes('setThemeMode'), false);
+  assert.equal(resetMode.includes('AsyncStorage.setItem'), false);
+
+  const app = readFileSync(new URL('../App.tsx', import.meta.url), 'utf8');
+  const fn = app.slice(app.indexOf('const handleDeleteData'), app.indexOf('const handleExport'));
+  assert.match(fn, /resetMode\(\)/);
+  assert.equal(/\bsetMode\(/.test(fn), false);
+  assert.equal(fn.includes('setThemeMode'), false);
+});
+
+test('a failed wipe stays on Ben and offers Tekrar dene', () => {
+  const ben = readFileSync(new URL('../src/screens/Ben.tsx', import.meta.url), 'utf8');
+  assert.match(ben, /const WIPE_ERROR_MESSAGE = 'Silinemedi\. Lütfen tekrar dene\.';/);
+  const catchBlock = ben.slice(ben.indexOf('} catch {'), ben.indexOf('} finally {'));
+  assert.match(catchBlock, /WIPE_ERROR_MESSAGE/);
+  assert.match(catchBlock, /text: 'Vazgeç', style: 'cancel'/);
+  assert.match(catchBlock, /text: 'Tekrar dene'/);
+  assert.match(catchBlock, /onPress: \(\) => \{ runDelete\(\); \}/);
+
+  const app = readFileSync(new URL('../App.tsx', import.meta.url), 'utf8');
+  const fn = app.slice(app.indexOf('const handleDeleteData'), app.indexOf('const handleExport'));
+  const failIdx = fn.indexOf("throw new Error('wipe')");
+  const onboardIdx = fn.indexOf('setOnboardingVisible(true)');
+  assert.equal(failIdx !== -1, true);
+  assert.equal(onboardIdx !== -1, true);
+  assert.equal(failIdx < onboardIdx, true);
+  assert.match(fn, /if \(!result\.ok\)/);
 });

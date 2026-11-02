@@ -59,6 +59,7 @@ export type WipeDeps = {
   asyncStorageClear: () => Promise<void>;
   secureStoreDelete: (key: string) => Promise<void>;
   cancelNotifications: () => Promise<void>;
+  dismissNotifications: () => Promise<void>;
   resetBadge: () => Promise<void>;
   deleteCacheFile: (name: string) => Promise<void>;
   signOutLocal: () => Promise<void>;
@@ -67,11 +68,16 @@ export type WipeDeps = {
 
 export type WipeResult = { ok: boolean; errors: string[] };
 
-async function step(errors: string[], name: string, run: () => Promise<void> | void) {
+async function step(
+  errors: string[],
+  name: string,
+  run: () => Promise<void> | void,
+  fatal = true,
+) {
   try {
     await run();
   } catch {
-    errors.push(name);
+    if (fatal) errors.push(name);
   }
 }
 
@@ -83,7 +89,8 @@ export async function wipeLocalData(deps: WipeDeps): Promise<WipeResult> {
   const errors: string[] = [];
   const authKeys = supabaseAuthStorageKeys();
 
-  await step(errors, 'signOutLocal', () => deps.signOutLocal());
+  // Local sign-out still POSTs /logout; a network error is not a wipe failure.
+  await step(errors, 'signOutLocal', () => deps.signOutLocal(), false);
 
   for (const key of SQLITE_KEYS) {
     await step(errors, `sqlite:${key}`, () => deps.sqliteRemove(key));
@@ -96,14 +103,15 @@ export async function wipeLocalData(deps: WipeDeps): Promise<WipeResult> {
   });
   for (const key of asyncKeys) {
     await step(errors, `asyncStorage:${key}`, () => deps.asyncStorageRemove([key]));
-    await step(errors, `secureStore:${key}`, () => deps.secureStoreDelete(key));
-    await step(errors, `secureStore:${key}${AES_KEY_SUFFIX}`, () => deps.secureStoreDelete(`${key}${AES_KEY_SUFFIX}`));
+    await step(errors, `secureStore:${key}`, () => deps.secureStoreDelete(key), false);
+    await step(errors, `secureStore:${key}${AES_KEY_SUFFIX}`, () => deps.secureStoreDelete(`${key}${AES_KEY_SUFFIX}`), false);
   }
   await step(errors, 'asyncStorageClear', () => deps.asyncStorageClear());
 
-  await step(errors, 'cancelNotifications', () => deps.cancelNotifications());
-  await step(errors, 'resetBadge', () => deps.resetBadge());
-  await step(errors, 'exportCache', () => deps.deleteCacheFile(EXPORT_CACHE_FILE));
+  await step(errors, 'cancelNotifications', () => deps.cancelNotifications(), false);
+  await step(errors, 'dismissNotifications', () => deps.dismissNotifications(), false);
+  await step(errors, 'resetBadge', () => deps.resetBadge(), false);
+  await step(errors, 'exportCache', () => deps.deleteCacheFile(EXPORT_CACHE_FILE), false);
   await step(errors, 'resetMemory', () => { deps.resetMemory(); });
 
   return { ok: errors.length === 0, errors };
@@ -141,6 +149,7 @@ export async function wipeDeviceData(): Promise<WipeResult> {
     asyncStorageClear: () => AsyncStorage.clear(),
     secureStoreDelete: key => SecureStore.deleteItemAsync(key),
     cancelNotifications: () => Notifications.cancelAllScheduledNotificationsAsync(),
+    dismissNotifications: () => Notifications.dismissAllNotificationsAsync(),
     resetBadge: async () => {
       await Notifications.setBadgeCountAsync(0);
     },
