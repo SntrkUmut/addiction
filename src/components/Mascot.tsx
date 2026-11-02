@@ -1,27 +1,19 @@
-import { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  withSequence,
-  Easing,
-  useReducedMotion,
-} from 'react-native-reanimated';
 
+// Currently used poses. To re-enable unused poses, add them back to this union
+// and to the POSE_ASSETS map below, then import the corresponding PNG assets.
+// Unused poses available in assets/mascot/fox/: happy, sad_coal, sleepy, hero
 export type MascotPose =
-  | 'idle'
-  | 'wave'
-  | 'happy'
-  | 'sad_coal'
-  | 'craving'
-  | 'calm'
-  | 'cheer'
-  | 'sleepy'
-  | 'hero';
+  | 'idle'      // Yuva (home), Sığınak (shelter), timer fallback
+  | 'wave'      // Onboarding karşılama
+  | 'craving'   // İstek akışı tool seçimi
+  | 'calm'      // Timer nefes egzersizi
+  | 'cheer';    // Tamamlama ekranı
 
-export type MascotEffect = 'smoke' | 'shield' | 'breath_ring' | 'bubbles' | 'sparkles' | 'crystals';
+// Currently no effects are used (removed for light backgrounds in item 7).
+// To re-enable effects, add them back to this union and to the EFFECT_ASSETS map below.
+// Available effects in assets/mascot/fx/: smoke, shield, breath_ring, bubbles, sparkles, crystals
+export type MascotEffect = never;
 
 type MascotProps = {
   pose: MascotPose;
@@ -30,295 +22,31 @@ type MascotProps = {
   accessibilityLabel?: string;
 };
 
+// Only currently used poses are imported. Unused poses (happy, sad_coal, sleepy, hero)
+// remain in assets/mascot/fox/ but are not bundled until re-enabled above.
 const POSE_ASSETS = {
   idle: require('../../assets/mascot/fox/fox_idle.png'),
   wave: require('../../assets/mascot/fox/fox_wave.png'),
-  happy: require('../../assets/mascot/fox/fox_happy.png'),
-  sad_coal: require('../../assets/mascot/fox/fox_sad_coal.png'),
   craving: require('../../assets/mascot/fox/fox_craving.png'),
   calm: require('../../assets/mascot/fox/fox_calm.png'),
   cheer: require('../../assets/mascot/fox/fox_cheer.png'),
-  sleepy: require('../../assets/mascot/fox/fox_sleepy.png'),
-  hero: require('../../assets/mascot/fox/fox_hero.png'),
 } as const;
 
-const EFFECT_ASSETS = {
-  smoke: require('../../assets/mascot/fx/fx_smoke.png'),
-  shield: require('../../assets/mascot/fx/fx_shield.png'),
-  breath_ring: require('../../assets/mascot/fx/fx_breath_ring.png'),
-  bubbles: require('../../assets/mascot/fx/fx_bubbles.png'),
-  sparkles: require('../../assets/mascot/fx/fx_sparkles.png'),
-  crystals: require('../../assets/mascot/fx/fx_crystals.png'),
-} as const;
+// No effects currently used (removed for light backgrounds). Effect assets remain
+// in assets/mascot/fx/ but are not bundled. To re-enable: add to MascotEffect type above,
+// restore EFFECT_ASSETS map with require() statements, and restore effect components from git history.
 
 const POSE_LABELS: Record<MascotPose, string> = {
   idle: 'Dinlenen tilki maskot',
   wave: 'El sallayan tilki maskot',
-  happy: 'Sevinçle zıplayan tilki maskot',
-  sad_coal: 'Kömür taşı tutan üzgün tilki maskot',
-  craving: 'Kararlı duran, kristal kömür taşlı tilki maskot',
+  craving: 'Kararlı duran tilki maskot',
   calm: 'Bağdaş kurmuş meditasyon yapan tilki maskot',
   cheer: 'Başparmak yukarı cesaretlendiren tilki maskot',
-  sleepy: 'Esneyen uykulu tilki maskot',
-  hero: 'Kahraman pelerin ve gözlüklü tilki maskot',
 };
 
-function SmokeEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
-  const translateY = useSharedValue(0);
-  const opacity = useSharedValue(0);
-
-  useEffect(() => {
-    if (!motionEnabled) {
-      translateY.value = 0;
-      opacity.value = 0;
-      return;
-    }
-    translateY.value = withRepeat(
-      withSequence(
-        withTiming(0, { duration: 0 }),
-        withTiming(-24, { duration: 3500, easing: Easing.out(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(0.9, { duration: 0 }),
-        withTiming(0, { duration: 3500, easing: Easing.in(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-    return () => {
-      translateY.value = 0;
-      opacity.value = 0;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionEnabled]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }, { scale: 0.55 }],
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.Image
-      source={EFFECT_ASSETS.smoke}
-      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
-      accessible={false}
-    />
-  );
-}
-
-function ShieldEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
-  const rotate = useSharedValue(0);
-  const scale = useSharedValue(1);
-
-  useEffect(() => {
-    if (!motionEnabled) {
-      rotate.value = 0;
-      scale.value = 1;
-      return;
-    }
-    rotate.value = withRepeat(
-      withTiming(360, { duration: 20000, easing: Easing.linear }),
-      -1,
-      false
-    );
-    scale.value = withRepeat(
-      withTiming(1.04, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
-    );
-    return () => {
-      rotate.value = 0;
-      scale.value = 1;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionEnabled]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotate.value}deg` }, { scale: scale.value }],
-  }));
-
-  return (
-    <Animated.Image
-      source={EFFECT_ASSETS.shield}
-      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
-      accessible={false}
-    />
-  );
-}
-
-function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
-  const scale = useSharedValue(0.85);
-  const opacity = useSharedValue(0.7);
-
-  useEffect(() => {
-    if (!motionEnabled) {
-      scale.value = 0.85;
-      opacity.value = 0.7;
-      return;
-    }
-    scale.value = withRepeat(
-      withSequence(
-        withTiming(1.0, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
-        withTiming(0.85, { duration: 4000, easing: Easing.inOut(Easing.sin) })
-      ),
-      -1,
-      false
-    );
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(1.0, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
-        withTiming(0.7, { duration: 4000, easing: Easing.inOut(Easing.sin) })
-      ),
-      -1,
-      false
-    );
-    return () => {
-      scale.value = 0.85;
-      opacity.value = 0.7;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionEnabled]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.Image
-      source={EFFECT_ASSETS.breath_ring}
-      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
-      accessible={false}
-    />
-  );
-}
-
-function BubblesEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
-  const translateY = useSharedValue(0);
-  const opacity = useSharedValue(0);
-
-  useEffect(() => {
-    if (!motionEnabled) {
-      translateY.value = 0;
-      opacity.value = 0;
-      return;
-    }
-    translateY.value = withRepeat(
-      withSequence(
-        withTiming(0, { duration: 0 }),
-        withTiming(-40, { duration: 5500, easing: Easing.out(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 0 }),
-        withTiming(0, { duration: 5500, easing: Easing.in(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-    return () => {
-      translateY.value = 0;
-      opacity.value = 0;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionEnabled]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.Image
-      source={EFFECT_ASSETS.bubbles}
-      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
-      accessible={false}
-    />
-  );
-}
-
-function SparklesEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
-  const opacity = useSharedValue(0.4);
-  const scale = useSharedValue(0.95);
-
-  useEffect(() => {
-    if (!motionEnabled) {
-      opacity.value = 0.4;
-      scale.value = 0.95;
-      return;
-    }
-    opacity.value = withRepeat(
-      withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
-    );
-    scale.value = withRepeat(
-      withTiming(1.05, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      true
-    );
-    return () => {
-      opacity.value = 0.4;
-      scale.value = 0.95;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionEnabled]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <Animated.Image
-      source={EFFECT_ASSETS.sparkles}
-      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
-      accessible={false}
-    />
-  );
-}
-
-function CrystalsEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
-  const translateY = useSharedValue(0);
-
-  useEffect(() => {
-    if (!motionEnabled) {
-      translateY.value = 0;
-      return;
-    }
-    translateY.value = withRepeat(
-      withSequence(
-        withTiming(6, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
-        withTiming(-6, { duration: 2500, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-    return () => {
-      translateY.value = 0;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [motionEnabled]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
-
-  return (
-    <Animated.Image
-      source={EFFECT_ASSETS.crystals}
-      style={[styles.effectLayer, { width: size, height: size }, animatedStyle]}
-      accessible={false}
-    />
-  );
-}
+// Effect components removed since MascotEffect = never (no effects currently used).
+// To re-enable effects: restore effect types above, uncomment EFFECT_ASSETS requires,
+// and restore these component implementations from git history.
 
 export function Mascot({
   pose,
@@ -326,52 +54,26 @@ export function Mascot({
   effects = [],
   accessibilityLabel,
 }: MascotProps) {
-  const reducedMotion = useReducedMotion();
+  const label = POSE_LABELS[pose];
 
-  const motionEnabled = !reducedMotion;
-  const label = accessibilityLabel ?? POSE_LABELS[pose];
-
-  const uniqueEffects = [...new Set(effects)];
-  const hasEffects = uniqueEffects.length > 0;
-  const poseScale = hasEffects ? 0.62 : 0.95;
-
-  const backEffects = uniqueEffects.filter((e) => ['breath_ring', 'shield', 'sparkles'].includes(e));
-  const midEffects = uniqueEffects.filter((e) => ['bubbles', 'crystals'].includes(e));
-  const frontEffects = uniqueEffects.filter((e) => e === 'smoke');
+  // Effects are currently disabled (MascotEffect = never), so poseScale is always 0.95
+  const poseScale = 0.95;
 
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessible={hasEffects || !!accessibilityLabel}
-      accessibilityLabel={hasEffects || accessibilityLabel ? label : undefined}
-      accessibilityRole={hasEffects || accessibilityLabel ? 'image' : undefined}
-      accessibilityElementsHidden={!hasEffects && !accessibilityLabel}
-      importantForAccessibility={!hasEffects && !accessibilityLabel ? 'no-hide-descendants' : 'auto'}
+      accessible={!!accessibilityLabel}
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityRole={accessibilityLabel ? 'image' : undefined}
+      accessibilityElementsHidden={!accessibilityLabel}
+      importantForAccessibility={!accessibilityLabel ? 'no-hide-descendants' : 'auto'}
     >
-      {backEffects.map((effect) => {
-        if (effect === 'breath_ring') return <BreathRingEffect key={effect} size={size} motionEnabled={motionEnabled} />;
-        if (effect === 'shield') return <ShieldEffect key={effect} size={size} motionEnabled={motionEnabled} />;
-        if (effect === 'sparkles') return <SparklesEffect key={effect} size={size} motionEnabled={motionEnabled} />;
-        return null;
-      })}
-
-      {midEffects.map((effect) => {
-        if (effect === 'bubbles') return <BubblesEffect key={effect} size={size} motionEnabled={motionEnabled} />;
-        if (effect === 'crystals') return <CrystalsEffect key={effect} size={size} motionEnabled={motionEnabled} />;
-        return null;
-      })}
-
       <Image
         source={POSE_ASSETS[pose]}
         style={[styles.poseImage, { width: size * poseScale, height: size * poseScale }]}
         resizeMode="contain"
         accessible={false}
       />
-
-      {frontEffects.map((effect) => {
-        if (effect === 'smoke') return <SmokeEffect key={effect} size={size} motionEnabled={motionEnabled} />;
-        return null;
-      })}
     </View>
   );
 }

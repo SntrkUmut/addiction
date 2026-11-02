@@ -3,6 +3,11 @@
 Onaylanan karakter sayfasına birebir uyumlu tilki maskotu + ayrı efekt (FX) katmanları.
 Tüm dosyalar **şeffaf PNG (RGBA)**, kare tuval, içerik ortalı ve küçük kenar boşluklu.
 
+**NOT:** Paket boyutunu azaltmak için, şu anda kullanılmayan pozlar ve efektler `src/components/Mascot.tsx`'ten kaldırıldı. Tüm dosyalar repoda mevcut; kullanılmaya hazırlar. Yeniden etkinleştirmek için:
+1. `Mascot.tsx` içinde `MascotPose` veya `MascotEffect` type'ına ekle
+2. `POSE_ASSETS` veya efekt için yeni map oluştur ve ilgili `require()` ekle
+3. Efektler için bileşen kodunu git history'den geri getir
+
 ## Klasör yapısı ve Expo adlandırması
 
 ```
