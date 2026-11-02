@@ -4,27 +4,11 @@
  */
 
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, ViewStyle, TextStyle, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { semantic, sceneDay, sceneNight } from '../theme/colors';
 import { textStyles, spacing, radii, heights } from '../theme/typography';
-import { 
-  Sparkle, 
-  ArrowRight,
-  CalendarCheck,
-  Wind,
-  Prohibit,
-  Coins,
-  Waves,
-  HouseSimple,
-  Lamp,
-  Armchair,
-  GridFour,
-  Plant,
-  Books,
-  X as XIcon,
-  Circle,
-} from 'phosphor-react-native';
+import { Sparkle, MapPin } from 'phosphor-react-native';
 
 // Icon type for dynamic usage
 type IconComponent = typeof Sparkle;
@@ -411,7 +395,7 @@ export function DayChip({ day, variant = 'day' }: DayChipProps) {
         gap: 6,
       }}
     >
-      <Circle
+      <MapPin
         size={18}
         color={isDark ? semantic.text.onDark : semantic.text.accent}
         weight="regular"
@@ -452,11 +436,7 @@ export function ProgressRing({
 }: ProgressRingProps) {
   // This would use react-native-svg for actual circular progress
   // For now, a simplified version
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progress);
   const trackColor = onDark ? semantic.border.glassDark : semantic.surface.sunken;
-  const progressColor = variant === 'teal' ? semantic.accent.teal : semantic.accent.gold;
   
   return (
     <View

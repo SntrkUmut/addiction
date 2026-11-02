@@ -5,8 +5,7 @@
  */
 
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
-import { AccessibilityInfo } from 'react-native';
+import { Platform, AccessibilityInfo } from 'react-native';
 
 const HAPTICS_ENABLED_KEY = 'quit-haptics-enabled-v1';
 
