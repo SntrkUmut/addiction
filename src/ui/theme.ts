@@ -3,11 +3,23 @@
  * Supports light/dark modes with system detection and manual override.
  */
 
-import { useColorScheme } from 'react-native';
-import { useState, useEffect } from 'react';
+import React, { useColorScheme } from 'react-native';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { semanticLight, semanticDark } from '../theme/colors';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
+
+type ThemeContextValue = {
+  mode: ThemeMode;
+  resolved: ResolvedTheme;
+  colors: typeof semanticLight;
+  isDark: boolean;
+  themeMode: ThemeMode;
+  setMode: (mode: ThemeMode) => Promise<void>;
+};
+
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const THEME_MODE_KEY = 'quit-theme-mode-v1';
 
@@ -59,9 +71,9 @@ export function resolveTheme(mode: ThemeMode, systemScheme: 'light' | 'dark' | n
 }
 
 /**
- * React hook for theme
+ * Theme Provider component
  */
-export function useTheme(): { mode: ThemeMode; resolved: ResolvedTheme; setMode: (mode: ThemeMode) => Promise<void> } {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemScheme = useColorScheme();
   const [mode, setModeState] = useState<ThemeMode>(currentMode);
   
@@ -70,11 +82,41 @@ export function useTheme(): { mode: ThemeMode; resolved: ResolvedTheme; setMode:
   }, []);
   
   const resolved = resolveTheme(mode, systemScheme);
+  const isDark = resolved === 'dark';
+  const colors = isDark ? semanticDark : semanticLight;
   
   const setMode = async (newMode: ThemeMode) => {
     await setThemeMode(newMode);
     setModeState(newMode);
   };
   
-  return { mode, resolved, setMode };
+  const value: ThemeContextValue = {
+    mode,
+    resolved,
+    colors,
+    isDark,
+    themeMode: mode,
+    setMode,
+  };
+  
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+
+/**
+ * React hook for theme
+ */
+export function useTheme(): ThemeContextValue {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    // Fallback for use outside provider
+    return {
+      mode: 'light',
+      resolved: 'light',
+      colors: semanticLight,
+      isDark: false,
+      themeMode: 'light',
+      setMode: async () => {},
+    };
+  }
+  return context;
 }

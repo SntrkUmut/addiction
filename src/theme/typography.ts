@@ -143,3 +143,33 @@ export const heights = {
   closeButton: 44,
   tabBar: 84,
 } as const;
+
+// Grouped API for easier imports
+export const typography = {
+  display: {
+    xl: textStyles.displayXl,
+    lg: textStyles.displayLg,
+    md: textStyles.titleLg,
+    sm: textStyles.titleMd,
+  },
+  title: {
+    lg: textStyles.titleLg,
+    md: textStyles.titleMd,
+    sm: textStyles.titleSm,
+  },
+  body: {
+    lg: textStyles.bodyLg,
+    md: textStyles.bodyMd,
+    sm: textStyles.smStrong,
+  },
+  label: {
+    button: textStyles.labelButton,
+    textButton: textStyles.labelTextButton,
+    md: textStyles.smStrongValue,
+    sm: textStyles.eyebrow,
+  },
+  caption: {
+    regular: textStyles.caption,
+    bold: textStyles.captionBold,
+  },
+} as const;
