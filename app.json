@@ -9,14 +9,13 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F5F1EB"
+      "backgroundColor": "#F8F6F1"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.sntrk.quit",
       "buildNumber": "1",
       "infoPlist": {
-        "NSUserTrackingUsageDescription": "Bu uygulama kullanıcı takibi yapmaz.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },

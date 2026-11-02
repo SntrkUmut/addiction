@@ -7,6 +7,10 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_MANIFEST_CHANNEL": "beta"
+      },
       "ios": {
         "buildConfiguration": "Debug"
       },
@@ -16,11 +20,20 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "preview",
+        "EXPO_PUBLIC_MANIFEST_CHANNEL": "beta"
+      },
       "ios": {
         "simulator": false
       }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_MANIFEST_CHANNEL": "prod"
+      }
+    }
   },
   "submit": {
     "production": {}
