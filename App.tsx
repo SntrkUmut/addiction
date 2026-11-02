@@ -17,6 +17,7 @@ import { Ben } from './src/screens/Ben';
 import { semanticLight, semanticDark } from './src/theme/colors';
 import { typography } from './src/theme/typography';
 import { journeyDay } from './src/domain/journey';
+import { House, MapTrifold, Campfire, User } from 'phosphor-react-native';
 
 type Tab = 'yuva' | 'siginak' | 'rotam' | 'ben';
 
@@ -264,30 +265,81 @@ export default function App() {
             styles.tabbar,
             { backgroundColor: semanticLight.surface.card, borderTopColor: semanticLight.border.default }
           ]}>
-            <TabButton
-              icon="🏠"
-              label="Yuva"
-              active={activeTab === 'yuva'}
-              onPress={() => setActiveTab('yuva')}
-            />
-            <TabButton
-              icon="🏔️"
-              label="Sığınak"
-              active={activeTab === 'siginak'}
-              onPress={() => setActiveTab('siginak')}
-            />
-            <TabButton
-              icon="📍"
-              label="Rotam"
-              active={activeTab === 'rotam'}
-              onPress={() => setActiveTab('rotam')}
-            />
-            <TabButton
-              icon="👤"
-              label="Ben"
-              active={activeTab === 'ben'}
-              onPress={() => setActiveTab('ben')}
-            />
+            <TouchableOpacity style={styles.tabButton} onPress={() => { setActiveTab('yuva'); haptic('light'); }} activeOpacity={0.7}>
+              <House
+                weight={activeTab === 'yuva' ? 'fill' : 'regular'}
+                color={activeTab === 'yuva' ? semanticLight.text.accent : semanticLight.text.tertiary}
+                size={24}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: activeTab === 'yuva' ? semanticLight.text.accent : semanticLight.text.tertiary,
+                    fontWeight: activeTab === 'yuva' ? '700' : '600',
+                  },
+                ]}
+              >
+                Yuva
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.tabButton} onPress={() => { setActiveTab('siginak'); haptic('light'); }} activeOpacity={0.7}>
+              <Campfire
+                weight={activeTab === 'siginak' ? 'fill' : 'regular'}
+                color={activeTab === 'siginak' ? semanticLight.text.accent : semanticLight.text.tertiary}
+                size={24}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: activeTab === 'siginak' ? semanticLight.text.accent : semanticLight.text.tertiary,
+                    fontWeight: activeTab === 'siginak' ? '700' : '600',
+                  },
+                ]}
+              >
+                Sığınak
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.tabButton} onPress={() => { setActiveTab('rotam'); haptic('light'); }} activeOpacity={0.7}>
+              <MapTrifold
+                weight={activeTab === 'rotam' ? 'fill' : 'regular'}
+                color={activeTab === 'rotam' ? semanticLight.text.accent : semanticLight.text.tertiary}
+                size={24}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: activeTab === 'rotam' ? semanticLight.text.accent : semanticLight.text.tertiary,
+                    fontWeight: activeTab === 'rotam' ? '700' : '600',
+                  },
+                ]}
+              >
+                Rotam
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.tabButton} onPress={() => { setActiveTab('ben'); haptic('light'); }} activeOpacity={0.7}>
+              <User
+                weight={activeTab === 'ben' ? 'fill' : 'regular'}
+                color={activeTab === 'ben' ? semanticLight.text.accent : semanticLight.text.tertiary}
+                size={24}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: activeTab === 'ben' ? semanticLight.text.accent : semanticLight.text.tertiary,
+                    fontWeight: activeTab === 'ben' ? '700' : '600',
+                  },
+                ]}
+              >
+                Ben
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Onboarding modal */}
@@ -369,35 +421,6 @@ export default function App() {
         </View>
       </DialogContext.Provider>
     </ThemeProvider>
-  );
-}
-
-function TabButton({
-  icon,
-  label,
-  active,
-  onPress,
-}: {
-  icon: string;
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity style={styles.tabButton} onPress={onPress} activeOpacity={0.7}>
-      <Text style={[styles.tabIcon, active && { opacity: 1 }]}>{icon}</Text>
-      <Text
-        style={[
-          styles.tabLabel,
-          {
-            color: active ? semanticLight.text.accent : semanticLight.text.tertiary,
-            fontWeight: active ? '700' : '600',
-          },
-        ]}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
   );
 }
 
