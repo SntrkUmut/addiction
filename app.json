@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "MVP Önizleme",
+    "slug": "smoking-cessation-mvp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.example.smokingcessation"
+    },
+    "android": {
+      "package": "com.example.smokingcessation",
+      "adaptiveIcon": {
+        "backgroundColor": "#F8F3E9",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-router",
+      "expo-secure-store",
+      "expo-notifications",
+      "@react-native-community/datetimepicker",
+      "expo-sharing"
+    ],
+    "scheme": "quit-companion",
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
