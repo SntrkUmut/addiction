@@ -31,7 +31,7 @@ export function Scene({ variant, height, horizonY, sparkles, fadeBottom, childre
   const colors = variant === 'day' ? sceneDay : variant === 'dusk' ? sceneDusk : sceneNight;
 
   return (
-    <View style={{ flex: 1, position: 'relative' }}>
+    <View style={{ flex: 1, position: 'relative', backgroundColor: variant === 'night' ? colors.sky[2] : undefined }}>
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: height || 420, overflow: 'hidden' }} pointerEvents="none">
         <LinearGradient
           colors={colors.sky as [string, string, string]}

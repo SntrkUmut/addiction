@@ -5,6 +5,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import {
+  Nunito_400Regular,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+  Nunito_800ExtraBold,
+  Nunito_900Black,
+} from '@expo-google-fonts/nunito';
+import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
@@ -51,11 +60,31 @@ type Tab = 'yuva' | 'siginak' | 'rotam' | 'ben';
 type DialogAction = { label: string; onPress: () => void; destructive?: boolean };
 type DialogState = { title: string; message: string; actions?: DialogAction[] } | null;
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 function newEventId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    Nunito_400Regular,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
+    Nunito_900Black,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <ThemeProvider>
       <SafeAreaProvider>

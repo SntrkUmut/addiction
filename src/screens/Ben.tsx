@@ -17,6 +17,12 @@ import {
   type ReminderSettings,
 } from '../domain/reminders';
 import type { AppState } from '../data/schema';
+import {
+  CLOUD_SYNC_CARD_TITLE,
+  cloudSyncStatusSubtitle,
+  ON_DEVICE_DATA_NOTE,
+  shouldShowCloudSyncCard,
+} from '../domain/buildEnv';
 
 interface Props {
   state: AppState;
@@ -74,6 +80,11 @@ export function Ben({ state, onEditPlan, onSupport, onExport }: Props) {
     light: 'Açık',
     dark: 'Koyu',
   };
+
+  const showCloudSyncCard = shouldShowCloudSyncCard();
+  const supabaseConfigured = Boolean(
+    process.env.EXPO_PUBLIC_SUPABASE_URL && process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+  );
 
   return (
     <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
@@ -173,18 +184,30 @@ export function Ben({ state, onEditPlan, onSupport, onExport }: Props) {
         </View>
 
         <View style={styles.section}>
-          <Eyebrow style={styles.sectionEyebrow}>VERİ VE EŞİTLEME</Eyebrow>
-          <Card style={styles.settingCard}>
-            <View style={styles.settingLeft}>
-              <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Bulut eşitleme</Text>
-              <Text style={[styles.settingSubtitle, { color: colors.text.secondary }]}>
-                {process.env.EXPO_PUBLIC_SUPABASE_URL && process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
-                  ? 'Uzak içerik ve yedekleme hazır · giriş isteğe bağlı'
-                  : 'Bağlı değil · Tüm veriler cihazda'}
-              </Text>
-            </View>
-          </Card>
-          <TouchableOpacity onPress={onExport} activeOpacity={0.7} style={{ marginTop: 8 }}>
+          <Eyebrow style={styles.sectionEyebrow}>
+            {showCloudSyncCard ? 'VERİ VE EŞİTLEME' : 'VERİ'}
+          </Eyebrow>
+          {showCloudSyncCard ? (
+            <Card style={styles.settingCard}>
+              <View style={styles.settingLeft}>
+                <Text style={[styles.settingTitle, { color: colors.text.primary }]}>
+                  {CLOUD_SYNC_CARD_TITLE}
+                </Text>
+                <Text style={[styles.settingSubtitle, { color: colors.text.secondary }]}>
+                  {cloudSyncStatusSubtitle(supabaseConfigured)}
+                </Text>
+              </View>
+            </Card>
+          ) : (
+            <Text style={[styles.deviceNote, { color: colors.text.secondary }]}>
+              {ON_DEVICE_DATA_NOTE}
+            </Text>
+          )}
+          <TouchableOpacity
+            onPress={onExport}
+            activeOpacity={0.7}
+            style={{ marginTop: showCloudSyncCard ? 8 : 12 }}
+          >
             <Card style={styles.settingCard}>
               <View style={styles.settingRow}>
                 <Text style={[styles.settingTitle, { color: colors.text.primary }]}>Verini dışa aktar</Text>
@@ -259,6 +282,10 @@ const styles = StyleSheet.create({
   },
   settingSubtitle: {
     ...typography.body.sm,
+  },
+  deviceNote: {
+    ...typography.body.sm,
+    marginBottom: 4,
   },
   chevron: {
     fontSize: 28,
