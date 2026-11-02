@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "version": 0,
+  "lightsPerPiece": 2,
+  "chapters": [
+    {
+      "id": "ch-temel",
+      "order": 1,
+      "eyebrow": "BÖLÜM 1 · TEMEL",
+      "title": "Sığınağın ilk odası",
+      "theme": { "scene": "day" },
+      "pieces": [
+        { "id": "pc-temel", "name": "Sığınak temeli", "icon": "house-simple" },
+        { "id": "pc-isiklar", "name": "Sıcak ışıklar", "icon": "lamp" },
+        { "id": "pc-dinlenme", "name": "Dinlenme köşesi", "icon": "armchair" },
+        { "id": "pc-pencere", "name": "Pencere", "icon": "grid-four" },
+        { "id": "pc-yesil", "name": "Yeşil köşe", "icon": "plant" },
+        { "id": "pc-kitaplik", "name": "Kitaplık", "icon": "books" }
+      ],
+      "completionReward": "it-atki"
+    },
+    {
+      "id": "ch-bahce",
+      "order": 2,
+      "eyebrow": "BÖLÜM 2 · BAHÇE",
+      "title": "Sığınağın bahçesi",
+      "theme": { "scene": "day" },
+      "teaser": {
+        "previewIcons": ["door-open", "flower-tulip", "bird"]
+      },
+      "pieces": [
+        { "id": "pc-bahce-kapisi", "name": "Bahçe kapısı", "icon": "door-open" },
+        { "id": "pc-tas-yol", "name": "Taş yol", "icon": "footprints" },
+        { "id": "pc-cicek-tarhi", "name": "Çiçek tarhı", "icon": "flower-tulip" },
+        { "id": "pc-kus-evi", "name": "Kuş evi", "icon": "bird" },
+        { "id": "pc-bahce-feneri", "name": "Bahçe feneri", "icon": "lightbulb" },
+        { "id": "pc-golge-agaci", "name": "Gölge ağacı", "icon": "tree" }
+      ],
+      "completionReward": "it-bere"
+    },
+    {
+      "id": "ch-dere",
+      "order": 3,
+      "eyebrow": "BÖLÜM 3 · DERE KENARI",
+      "title": "Suyun sesi",
+      "theme": { "scene": "day" },
+      "teaser": {
+        "previewIcons": ["bridge", "drop", "waves"]
+      },
+      "pieces": [
+        { "id": "pc-kucuk-kopru", "name": "Küçük köprü", "icon": "bridge" },
+        { "id": "pc-su-birikintisi", "name": "Su birikintisi", "icon": "drop" },
+        { "id": "pc-nilufer", "name": "Nilüfer", "icon": "flower-lotus" },
+        { "id": "pc-kayik", "name": "Kayık", "icon": "boat" },
+        { "id": "pc-balik-havuzu", "name": "Balık havuzu", "icon": "fish" },
+        { "id": "pc-dalga-taslari", "name": "Dalga taşları", "icon": "waves" }
+      ]
+    }
+  ],
+  "upcoming": {
+    "chapterOrder": 4,
+    "eyebrow": "BÖLÜM 4 · ORMAN YOLU",
+    "title": "Ağaçların arası",
+    "opensAt": null
+  },
+  "milestones": [
+    {
+      "key": "day-60",
+      "day": 60,
+      "reward": "it-aytasi",
+      "copy": {
+        "eyebrow": "İKİ AY OLDU",
+        "lead": "60 gün boyunca bu yoldasın.",
+        "body": "İki ay öncesinden beri küçük adımlar atıyorsun. Her gün yolun biraz daha senin oluyor.",
+        "slipEyebrow": "YOLCULUĞUN DEVAM EDİYOR",
+        "slipLead": "60 gün oldu.",
+        "slipBody": "Kaymalar oldu ama yolun kesilmedi. Önemli olan, her seferinde yeniden devam etmen."
+      }
+    }
+  ],
+  "goalPool": [
+    {
+      "id": "g-checkin-3",
+      "metric": "checkinDays",
+      "target": 3,
+      "title": "3 gün check-in yap",
+      "reward": "it-kristal-lamba"
+    },
+    {
+      "id": "g-coping-2",
+      "metric": "copingSessions",
+      "target": 2,
+      "title": "2 kez bir baş etme aracı dene",
+      "reward": "it-kuvars"
+    },
+    {
+      "id": "g-rearrange-1",
+      "metric": "rearrange",
+      "target": 1,
+      "title": "Sığınağında bir parçanın yerini değiştir",
+      "reward": "it-ametist"
+    }
+  ],
+  "seasons": [],
+  "items": [
+    {
+      "id": "it-ametist",
+      "set": "crystals",
+      "name": "Ametist",
+      "icon": "diamond"
+    },
+    {
+      "id": "it-kuvars",
+      "set": "crystals",
+      "name": "Kuvars",
+      "icon": "diamonds-four"
+    },
+    {
+      "id": "it-kristal-lamba",
+      "set": "crystals",
+      "name": "Kristal lamba",
+      "icon": "lamp"
+    },
+    {
+      "id": "it-atki",
+      "set": "fox-accessories",
+      "name": "Tilki için atkı",
+      "icon": "t-shirt"
+    },
+    {
+      "id": "it-bere",
+      "set": "fox-accessories",
+      "name": "Tilki için bere",
+      "icon": "baseball-cap"
+    },
+    {
+      "id": "it-aytasi",
+      "set": "crystals",
+      "name": "Ay taşı",
+      "icon": "moon-stars"
+    }
+  ]
+}

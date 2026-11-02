@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quit-companion.app/schemas/content-manifest.v1.json",
+  "title": "Sığınak content manifest (schemaVersion 1)",
+  "description": "Authoring/CI schema (strict). The app parser is lenient: it ignores unknown fields and drops invalid entries instead of rejecting the manifest.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "version", "lightsPerPiece", "chapters", "upcoming", "items"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "version": { "type": "integer", "minimum": 0 },
+    "lightsPerPiece": { "const": 2 },
+    "chapters": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/chapter" } },
+    "upcoming": { "$ref": "#/$defs/upcoming" },
+    "milestones": { "type": "array", "items": { "$ref": "#/$defs/milestone" } },
+    "goalPool": { "type": "array", "items": { "$ref": "#/$defs/goal" } },
+    "seasons": { "type": "array", "items": { "$ref": "#/$defs/season" } },
+    "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/item" } }
+  },
+  "$defs": {
+    "copyStatus": { "enum": ["approved", "pending"] },
+    "icon": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Phosphor icon name; fallback art" },
+    "assetPath": { "type": "string", "pattern": "^[a-z0-9-]+/[a-z0-9-]+/[a-z0-9-]+\\.[0-9a-f]{6,}@2x\\.(png|webp)$" },
+    "text24": { "type": "string", "minLength": 1, "maxLength": 24 },
+    "text40": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "text64": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "text200": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "dateTime": { "type": "string", "format": "date-time" },
+    "screenCopy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["eyebrow", "title", "body"],
+      "properties": { "eyebrow": { "$ref": "#/$defs/text40" }, "title": { "$ref": "#/$defs/text64" },
+        "body": { "$ref": "#/$defs/text200" }, "cta": { "$ref": "#/$defs/text24" } }
+    },
+    "piece": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "icon"],
+      "properties": { "id": { "type": "string", "pattern": "^pc-[a-z0-9-]+$" }, "name": { "$ref": "#/$defs/text24" },
+        "icon": { "$ref": "#/$defs/icon" }, "line": { "$ref": "#/$defs/text64" }, "art": { "$ref": "#/$defs/assetPath" } }
+    },
+    "chapter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "order", "copyStatus", "eyebrow", "title", "theme", "pieces", "completion", "completionReward"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^ch-[a-z0-9-]+$" },
+        "order": { "type": "integer", "minimum": 1 },
+        "copyStatus": { "$ref": "#/$defs/copyStatus" },
+        "eyebrow": { "$ref": "#/$defs/text40" },
+        "title": { "$ref": "#/$defs/text40" },
+        "theme": { "type": "object", "additionalProperties": false, "required": ["scene"],
+          "properties": { "scene": { "enum": ["day", "dusk", "night", "snow"] }, "art": { "$ref": "#/$defs/assetPath" } } },
+        "teaser": { "type": "object", "additionalProperties": false, "required": ["line", "previewIcons"],
+          "properties": { "line": { "$ref": "#/$defs/text64" },
+            "previewIcons": { "type": "array", "items": { "$ref": "#/$defs/icon" }, "minItems": 1, "maxItems": 3 } } },
+        "intro": { "$ref": "#/$defs/screenCopy" },
+        "completion": { "$ref": "#/$defs/screenCopy" },
+        "pieces": { "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/$defs/piece" } },
+        "completionReward": { "type": "string", "pattern": "^it-[a-z0-9-]+$" },
+        "retired": { "type": "boolean" }
+      },
+      "if": { "properties": { "order": { "minimum": 2 } } },
+      "then": { "required": ["intro", "teaser"], "properties": { "intro": { "required": ["cta"] } } }
+    },
+    "upcoming": {
+      "type": "object", "additionalProperties": false,
+      "required": ["chapterOrder", "eyebrow", "title", "teaserLine", "opensAt"],
+      "properties": { "chapterOrder": { "type": "integer", "minimum": 2 }, "eyebrow": { "$ref": "#/$defs/text40" },
+        "title": { "$ref": "#/$defs/text40" }, "teaserLine": { "$ref": "#/$defs/text64" },
+        "opensAt": { "anyOf": [ { "$ref": "#/$defs/dateTime" }, { "type": "null" } ] } }
+    },
+    "milestone": {
+      "type": "object", "additionalProperties": false,
+      "required": ["key", "day", "copyStatus", "reward", "copy"],
+      "properties": { "key": { "type": "string", "pattern": "^day-[0-9]+$" }, "day": { "type": "integer", "minimum": 31 },
+        "copyStatus": { "$ref": "#/$defs/copyStatus" }, "reward": { "type": "string", "pattern": "^it-[a-z0-9-]+$" },
+        "copy": { "type": "object", "additionalProperties": false,
+          "required": ["eyebrow", "lead", "body", "slipEyebrow", "slipLead", "slipBody"],
+          "properties": { "eyebrow": { "$ref": "#/$defs/text40" }, "lead": { "$ref": "#/$defs/text64" }, "body": { "$ref": "#/$defs/text200" },
+            "slipEyebrow": { "$ref": "#/$defs/text40" }, "slipLead": { "$ref": "#/$defs/text64" }, "slipBody": { "$ref": "#/$defs/text200" } } } }
+    },
+    "goal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "copyStatus", "metric", "target", "title", "reward"],
+      "properties": { "id": { "type": "string", "pattern": "^g-[a-z0-9-]+$" }, "copyStatus": { "$ref": "#/$defs/copyStatus" },
+        "chapterId": { "type": "string", "pattern": "^ch-[a-z0-9-]+$" },
+        "metric": { "enum": ["checkinDays", "copingSessions", "rearrange", "reasonRead"] },
+        "target": { "type": "integer", "minimum": 1, "maximum": 5 }, "title": { "$ref": "#/$defs/text64" },
+        "reward": { "type": "string", "pattern": "^it-[a-z0-9-]+$" } }
+    },
+    "season": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "copyStatus", "title", "icon", "startsAt", "endsAt", "lightTarget", "reward"],
+      "properties": { "id": { "type": "string", "pattern": "^s-[a-z0-9-]+$" }, "copyStatus": { "$ref": "#/$defs/copyStatus" },
+        "title": { "$ref": "#/$defs/text40" }, "icon": { "$ref": "#/$defs/icon" },
+        "startsAt": { "$ref": "#/$defs/dateTime" }, "endsAt": { "$ref": "#/$defs/dateTime" },
+        "lightTarget": { "type": "integer", "minimum": 1, "maximum": 14 }, "reward": { "type": "string", "pattern": "^it-[a-z0-9-]+$" } }
+    },
+    "item": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "set", "name", "icon", "hint"],
+      "properties": { "id": { "type": "string", "pattern": "^it-[a-z0-9-]+$" },
+        "set": { "enum": ["crystals", "fox-accessories", "decor", "season"] },
+        "name": { "$ref": "#/$defs/text24" }, "icon": { "$ref": "#/$defs/icon" }, "hint": { "$ref": "#/$defs/text24" },
+        "art": { "$ref": "#/$defs/assetPath" }, "retired": { "type": "boolean" } }
+    }
+  }
+}
