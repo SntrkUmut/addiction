@@ -30,7 +30,7 @@ export function Milestone({ milestone, slipped, onShelter, onHome }: Props) {
     <Scene variant="night" height={520} horizonY={200}>
       <View style={styles.wrap}>
         <DayChip day={copy.day} variant="night" />
-        <Mascot pose="joyful" size={140} darkScene />
+        <Mascot pose="joyful" size={140} darkScene effects={['sparkles']} />
         <Text style={[styles.eyebrow, { color: colors.accent.gold }]}>{copy.eyebrow}</Text>
         <Text style={[styles.number, { color: colors.text.onDark }]}>{copy.day} gün</Text>
         <Text style={[styles.lead, { color: colors.text.onDark }]}>{copy.lead}</Text>

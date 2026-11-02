@@ -96,7 +96,7 @@ export function Istek({
 
         {panel === 'tools' && (
           <View style={styles.block}>
-            <Mascot pose="wistful" size={120} darkScene />
+            <Mascot pose="wistful" size={120} darkScene effects={['shield', 'crystals']} />
             <Text style={[styles.headline, { color: colors.text.onDark }]}>
               Şu an bir sonraki küçük adımı seç.
             </Text>
@@ -120,6 +120,12 @@ export function Istek({
         {panel === 'timer' && (
           <View style={styles.block}>
             <Eyebrow>{selected.title}</Eyebrow>
+            <Mascot
+              pose={selected.id === 'breath' ? 'content' : 'hopeful'}
+              size={80}
+              darkScene
+              effects={selected.id === 'breath' ? ['breath_ring', 'bubbles'] : []}
+            />
             <Text style={[styles.headline, { color: colors.text.onDark }]}>Sadece bu ana odaklan.</Text>
             <View style={[styles.timerFace, { borderColor: colors.accent.teal }]}>
               {selected.id === 'breath' && (
@@ -144,7 +150,7 @@ export function Istek({
 
         {panel === 'done' && (
           <View style={styles.block}>
-            <Mascot pose="joyful" size={120} darkScene />
+            <Mascot pose="joyful" size={120} darkScene effects={['sparkles']} />
             <Text style={[styles.headline, { color: colors.text.onDark }]}>
               Bu an için kendine alan açtın.
             </Text>
