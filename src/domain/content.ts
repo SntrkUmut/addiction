@@ -30,7 +30,7 @@ function getManifestChannel(): 'beta' | 'prod' {
 
 /**
  * Fetch manifest from Supabase content_manifests table
- * Silently fails if credentials are missing
+ * Silently fails if credentials are missing. Bundled fallback is full v11 (8 chapters).
  */
 async function fetchRemoteManifest(): Promise<Manifest | null> {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;

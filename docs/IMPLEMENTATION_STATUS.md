@@ -20,7 +20,7 @@
 
 ### Content System
 - ✅ Content manifest schema (JSON Schema draft 2020-12)
-- ✅ Bundled manifest (chapters 1-4 APPROVED, ch5 teaser APPROVED)
+- ✅ Bundled manifest v11 (chapters 1–8 APPROVED, 48 pieces, 28 items)
 - ✅ Manifest validation script with approval checks
 - ✅ Day 60/90 milestones (APPROVED copy)
 - ✅ Chapter 3-4 goals and collection items (APPROVED)
@@ -74,9 +74,7 @@ All migrations tested on PGlite (in-memory Postgres 18) by the designer.
 - ⏳ Collection and personalization UI
 
 ### Chapters
-- ⏳ Chapter 3 (Dere kenarı) - copy APPROVED, art pending
-- ⏳ Chapter 4 (Orman yolu) - copy APPROVED, art pending
-- ⏳ Chapters 5-8 - piece names DRAFT (not approved for production)
+- ✅ Chapters 1–8 copy is bundled offline (v11). Art assets still pending.
 
 ### Fox Accessories
 - ✅ Source-of-truth list (9 items: 1 per chapter 1-8, plus Atkı from goal)

@@ -11,7 +11,7 @@
 - ✅ UI components library (Scene, Card, Buttons, Chips, Rings, Eyebrow)
 - ✅ Data model (AppState schema v2 with backward-compatible parsing)
 - ✅ Domain logic (journey days, Turkish suffix, merge, content fetch)
-- ✅ Content manifest system (v8, fetch, cache, approval gating)
+- ✅ Content manifest system (v11, fetch, cache, approval gating)
 - ✅ Haptics system with Ben toggle
 - ✅ Theme switching (Sistem/Açık/Koyu)
 
@@ -37,10 +37,10 @@
 - ✅ docs/SUPABASE_SETUP.md for owner's manual setup
 
 ### Content
-- ✅ Manifest v8 bundled with owner-approved copyStatus
-  - Chapters 1-4: approved
+- ✅ Manifest v11 bundled with owner-approved copyStatus
+  - Chapters 1–8: approved (48 pieces)
   - Day 60/90 milestones: approved
-  - Bölüm 2 completion title fix
+  - Collection items: 28
 - ✅ Fire/smoke refs removed from mascot README
 - ✅ Collection item renames (Sıcak çay köşesi, Gece defteri, Küçük yelkenli)
 

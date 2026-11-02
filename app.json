@@ -8,14 +8,14 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.sntrk.quit",
+      "bundleIdentifier": "com.quit.addiction",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.sntrk.quit",
+      "package": "com.quit.addiction",
       "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#F8F3E9",

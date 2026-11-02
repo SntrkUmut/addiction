@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": 8,
+  "version": 11,
   "lightsPerPiece": 2,
   "chapters": [
     {
@@ -253,14 +253,290 @@
         }
       ],
       "completionReward": "it-sirt-cantasi"
+    },
+    {
+      "id": "ch-teras",
+      "order": 5,
+      "copyStatus": "approved",
+      "eyebrow": "BÖLÜM 5 · YILDIZ TERASI",
+      "title": "Gece göğü",
+      "theme": {
+        "scene": "night"
+      },
+      "teaser": {
+        "line": "Yukarıda bir terasın ışıkları parlıyor.",
+        "previewIcons": [
+          "lamp-pendant",
+          "star",
+          "moon-stars"
+        ]
+      },
+      "intro": {
+        "eyebrow": "BÖLÜM 5 · YILDIZ TERASI",
+        "title": "Yol bir terasa çıkıyor.",
+        "body": "Ormanın ötesinde, yıldızlara yakın bir teras var. Her 2 ışık terasa yeni bir parça ekler; geçtiğin her yer olduğu gibi duruyor.",
+        "cta": "Terasa çık"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 5 TAMAMLANDI",
+        "title": "Yıldız terası hazır.",
+        "body": "Terasa altı parça yerleştirdin. Gece göğü artık sığınağının bir parçası.",
+        "cta": "Bölüm 6’ya bak"
+      },
+      "pieces": [
+        {
+          "id": "pc-teras-feneri",
+          "name": "Teras feneri",
+          "icon": "lamp-pendant",
+          "line": "Küçük bir ampul, terasa yumuşak bir ışık veriyor."
+        },
+        {
+          "id": "pc-yildiz-haritasi",
+          "name": "Yıldız haritası",
+          "icon": "star",
+          "line": "Gökyüzünü tanımak için sakin bir başlangıç."
+        },
+        {
+          "id": "pc-ay-penceresi",
+          "name": "Ay penceresi",
+          "icon": "moon-stars",
+          "line": "Ay, pencerenin tam ortasından görünüyor."
+        },
+        {
+          "id": "pc-kayan-yildiz",
+          "name": "Kayan yıldız",
+          "icon": "shooting-star",
+          "line": "Bir an parlıyor, sonra gökyüzü yine sakin."
+        },
+        {
+          "id": "pc-gezegen-modeli",
+          "name": "Gezegen modeli",
+          "icon": "planet",
+          "line": "Masanın üstünde ağır ağır dönen küçük bir dünya."
+        },
+        {
+          "id": "pc-gece-defteri",
+          "name": "Gece defteri",
+          "icon": "book-open-text",
+          "line": "Gökyüzünde gördüklerini not ettiğin küçük bir defter."
+        }
+      ],
+      "completionReward": "it-yildiz-rozeti"
+    },
+    {
+      "id": "ch-kis-odasi",
+      "order": 6,
+      "copyStatus": "approved",
+      "eyebrow": "BÖLÜM 6 · KIŞ ODASI",
+      "title": "Sıcak bir köşe",
+      "theme": {
+        "scene": "snow"
+      },
+      "teaser": {
+        "line": "Pencerenin ardında kar taneleri dönüyor.",
+        "previewIcons": [
+          "snowflake",
+          "tea-bag",
+          "guitar"
+        ]
+      },
+      "intro": {
+        "eyebrow": "BÖLÜM 6 · KIŞ ODASI",
+        "title": "Yol sıcak bir odaya varıyor.",
+        "body": "Terastan inince içi huzurlu bir kış odası seni bekliyor. Her 2 ışık odaya yeni bir parça ekler; geçtiğin her yer olduğu gibi duruyor.",
+        "cta": "Odaya gir"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 6 TAMAMLANDI",
+        "title": "Kış odası hazır.",
+        "body": "Odaya altı parça yerleştirdin. Dışarıda kar yağsa da burası sıcak ve sakin.",
+        "cta": "Bölüm 7’ye bak"
+      },
+      "pieces": [
+        {
+          "id": "pc-kar-penceresi",
+          "name": "Kar penceresi",
+          "icon": "snowflake",
+          "line": "Dışarıda kar yağıyor, içerisi sakin."
+        },
+        {
+          "id": "pc-cay-kosesi",
+          "name": "Sıcak çay köşesi",
+          "icon": "tea-bag",
+          "line": "Bir fincan çay ve acele etmeyen bir akşam."
+        },
+        {
+          "id": "pc-muzik-kosesi",
+          "name": "Müzik köşesi",
+          "icon": "music-notes",
+          "line": "Alçak sesle çalan sevdiğin bir şarkı."
+        },
+        {
+          "id": "pc-gitar",
+          "name": "Gitar",
+          "icon": "guitar",
+          "line": "Duvara yaslanmış, çalınmayı bekliyor."
+        },
+        {
+          "id": "pc-orgu-sepeti",
+          "name": "Örgü sepeti",
+          "icon": "yarn",
+          "line": "Yarım kalmış bir örgü; hiç acelesi yok."
+        },
+        {
+          "id": "pc-kis-bitkisi",
+          "name": "Kış bitkisi",
+          "icon": "potted-plant",
+          "line": "Kışın da yeşil kalan küçük bir saksı."
+        }
+      ],
+      "completionReward": "it-orgu-eldiven"
+    },
+    {
+      "id": "ch-kiyi",
+      "order": 7,
+      "copyStatus": "approved",
+      "eyebrow": "BÖLÜM 7 · KIYI",
+      "title": "Deniz feneri",
+      "theme": {
+        "scene": "dusk"
+      },
+      "teaser": {
+        "line": "Rüzgârda tuzlu bir deniz kokusu var.",
+        "previewIcons": [
+          "lighthouse",
+          "sailboat",
+          "island"
+        ]
+      },
+      "intro": {
+        "eyebrow": "BÖLÜM 7 · KIYI",
+        "title": "Yol denize açılıyor.",
+        "body": "Odadan çıkınca yol sakin bir kıyıya iniyor. Her 2 ışık kıyıya yeni bir parça ekler; geçtiğin her yer olduğu gibi duruyor.",
+        "cta": "Kıyıya yürü"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 7 TAMAMLANDI",
+        "title": "Kıyı hazır.",
+        "body": "Kıyıya altı parça yerleştirdin. Deniz feneri her akşam senin için de parlıyor.",
+        "cta": "Bölüm 8’e bak"
+      },
+      "pieces": [
+        {
+          "id": "pc-deniz-feneri",
+          "name": "Deniz feneri",
+          "icon": "lighthouse",
+          "line": "Akşam olunca kıyıya yol gösteren bir ışık."
+        },
+        {
+          "id": "pc-kucuk-yelkenli",
+          "name": "Küçük yelkenli",
+          "icon": "sailboat",
+          "line": "Rüzgârı arkasına almış, kıyıya yakın süzülüyor."
+        },
+        {
+          "id": "pc-ada-manzarasi",
+          "name": "Ada manzarası",
+          "icon": "island",
+          "line": "Uzakta, sakin suların ortasında küçük bir ada."
+        },
+        {
+          "id": "pc-gun-batimi",
+          "name": "Gün batımı",
+          "icon": "sun-horizon",
+          "line": "Gökyüzü yavaş yavaş turuncuya dönüyor."
+        },
+        {
+          "id": "pc-kagit-firildak",
+          "name": "Kâğıt fırıldak",
+          "icon": "pinwheel",
+          "line": "Deniz rüzgârıyla kendi kendine dönüyor."
+        },
+        {
+          "id": "pc-deniz-kabuklari",
+          "name": "Deniz kabukları",
+          "icon": "spiral",
+          "line": "Kumda bulduğun küçük, sarmal kabuklar."
+        }
+      ],
+      "completionReward": "it-semsiye"
+    },
+    {
+      "id": "ch-tepe",
+      "order": 8,
+      "copyStatus": "approved",
+      "eyebrow": "BÖLÜM 8 · TEPE",
+      "title": "Manzara",
+      "theme": {
+        "scene": "day"
+      },
+      "teaser": {
+        "line": "Yukarıda geniş bir manzara açılıyor.",
+        "previewIcons": [
+          "mountains",
+          "cloud-sun",
+          "rainbow"
+        ]
+      },
+      "intro": {
+        "eyebrow": "BÖLÜM 8 · TEPE",
+        "title": "Yol tepeye tırmanıyor.",
+        "body": "Kıyının ardında yumuşak bir tepe yükseliyor. Her 2 ışık tepeye yeni bir parça ekler; geçtiğin her yer olduğu gibi duruyor.",
+        "cta": "Tepeye çık"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 8 TAMAMLANDI",
+        "title": "Tepedeki manzara hazır.",
+        "body": "Tepeye altı parça yerleştirdin. Buradan bakınca geçtiğin bütün yol görünüyor.",
+        "cta": "Bölüm 9’a bak"
+      },
+      "pieces": [
+        {
+          "id": "pc-dag-yolu",
+          "name": "Dağ yolu",
+          "icon": "mountains",
+          "line": "Adım adım yükselen, acelesi olmayan bir yol."
+        },
+        {
+          "id": "pc-bulut-seyri",
+          "name": "Bulut seyri",
+          "icon": "cloud-sun",
+          "line": "Bulutlar ağır ağır geçiyor, sen de dinleniyorsun."
+        },
+        {
+          "id": "pc-gokkusagi",
+          "name": "Gökkuşağı",
+          "icon": "rainbow",
+          "line": "Yağmurdan sonra tepede beliren renkler."
+        },
+        {
+          "id": "pc-tepe-flamasi",
+          "name": "Tepe flaması",
+          "icon": "flag-banner",
+          "line": "Tepenin en üstünde hafifçe dalgalanıyor."
+        },
+        {
+          "id": "pc-pusula",
+          "name": "Pusula",
+          "icon": "compass",
+          "line": "Hangi yöne gidersen git, yolunu bulmana yardım eder."
+        },
+        {
+          "id": "pc-gun-dogumu",
+          "name": "Gün doğumu",
+          "icon": "sun",
+          "line": "Yeni bir gün, tepenin ardından usulca doğuyor."
+        }
+      ],
+      "completionReward": "it-ruzgarlik"
     }
   ],
   "upcoming": {
-    "chapterOrder": 5,
-    "eyebrow": "BÖLÜM 5 · YILDIZ TERASI",
-    "title": "Gece göğü",
-    "teaserLine": "Yukarıda bir terasın ışıkları yanıyor.",
-    "opensAt": "2026-11-16T09:00:00+03:00"
+    "chapterOrder": 9,
+    "eyebrow": "BÖLÜM 9",
+    "title": "Yeni bir yer",
+    "teaserLine": "Sisin ardında yeni bir yer hazırlanıyor.",
+    "opensAt": null
   },
   "milestones": [
     {
@@ -360,6 +636,78 @@
       "target": 2,
       "title": "Ağaçların arasında mola: bu hafta 2 kez bir baş etme aracı dene",
       "reward": "it-mese-yapragi"
+    },
+    {
+      "id": "g-teras-checkin-3",
+      "copyStatus": "approved",
+      "chapterId": "ch-teras",
+      "metric": "checkinDays",
+      "target": 3,
+      "title": "Terasa uğra: bu hafta 3 gün check-in yap",
+      "reward": "it-yildiz-kavanozu"
+    },
+    {
+      "id": "g-teras-reason-1",
+      "copyStatus": "approved",
+      "chapterId": "ch-teras",
+      "metric": "reasonRead",
+      "target": 1,
+      "title": "Yıldızlara bak: bu hafta bırakma nedenini bir kez yeniden oku",
+      "reward": "it-gece-minderi"
+    },
+    {
+      "id": "g-kis-checkin-3",
+      "copyStatus": "approved",
+      "chapterId": "ch-kis-odasi",
+      "metric": "checkinDays",
+      "target": 3,
+      "title": "Odaya uğra: bu hafta 3 gün check-in yap",
+      "reward": "it-kar-kuresi"
+    },
+    {
+      "id": "g-kis-coping-2",
+      "copyStatus": "approved",
+      "chapterId": "ch-kis-odasi",
+      "metric": "copingSessions",
+      "target": 2,
+      "title": "Pencere kenarında mola: bu hafta 2 kez bir baş etme aracı dene",
+      "reward": "it-kurabiye-kavanozu"
+    },
+    {
+      "id": "g-kiyi-checkin-3",
+      "copyStatus": "approved",
+      "chapterId": "ch-kiyi",
+      "metric": "checkinDays",
+      "target": 3,
+      "title": "Deniz kenarına uğra: bu hafta 3 gün check-in yap",
+      "reward": "it-deniz-yildizi"
+    },
+    {
+      "id": "g-kiyi-coping-2",
+      "copyStatus": "approved",
+      "chapterId": "ch-kiyi",
+      "metric": "copingSessions",
+      "target": 2,
+      "title": "Dalgalarla nefes al: bu hafta 2 kez bir baş etme aracı dene",
+      "reward": "it-kucuk-capa"
+    },
+    {
+      "id": "g-tepe-checkin-3",
+      "copyStatus": "approved",
+      "chapterId": "ch-tepe",
+      "metric": "checkinDays",
+      "target": 3,
+      "title": "Tepeye uğra: bu hafta 3 gün check-in yap",
+      "reward": "it-dag-cicegi"
+    },
+    {
+      "id": "g-tepe-reason-1",
+      "copyStatus": "approved",
+      "chapterId": "ch-tepe",
+      "metric": "reasonRead",
+      "target": 1,
+      "title": "Manzaraya bak: bu hafta bırakma nedenini bir kez yeniden oku",
+      "reward": "it-tepe-haritasi"
     }
   ],
   "seasons": [
@@ -372,6 +720,16 @@
       "endsAt": "2026-11-30T23:59:59+03:00",
       "lightTarget": 5,
       "reward": "it-yaprak-susu"
+    },
+    {
+      "id": "s-kis-2026",
+      "copyStatus": "approved",
+      "title": "Kış şenliği",
+      "icon": "snowflake",
+      "startsAt": "2026-12-01T00:00:00+03:00",
+      "endsAt": "2027-01-31T23:59:59+03:00",
+      "lightTarget": 8,
+      "reward": "it-bere"
     }
   ],
   "items": [
@@ -479,6 +837,99 @@
       "name": "Yaprak süsü",
       "icon": "leaf",
       "hint": "Sonbahar şenliği"
+    },
+    {
+      "id": "it-yildiz-rozeti",
+      "set": "fox-accessories",
+      "name": "Yıldız rozeti",
+      "icon": "star-four",
+      "hint": "Bölüm 5"
+    },
+    {
+      "id": "it-orgu-eldiven",
+      "set": "fox-accessories",
+      "name": "Örgü eldiven",
+      "icon": "hand-palm",
+      "hint": "Bölüm 6"
+    },
+    {
+      "id": "it-semsiye",
+      "set": "fox-accessories",
+      "name": "Şemsiye",
+      "icon": "umbrella",
+      "hint": "Bölüm 7",
+      "art": "accessories/it-semsiye/it-semsiye.a08323a3@2x.png"
+    },
+    {
+      "id": "it-ruzgarlik",
+      "set": "fox-accessories",
+      "name": "Rüzgârlık",
+      "icon": "wind",
+      "hint": "Bölüm 8"
+    },
+    {
+      "id": "it-bere",
+      "set": "fox-accessories",
+      "name": "Bere",
+      "icon": "beanie",
+      "hint": "Kış şenliği",
+      "art": "accessories/it-bere/it-bere.a4d0a213@2x.png"
+    },
+    {
+      "id": "it-yildiz-kavanozu",
+      "set": "decor",
+      "name": "Yıldız kavanozu",
+      "icon": "sparkle",
+      "hint": "Bölüm 5 hedefi"
+    },
+    {
+      "id": "it-gece-minderi",
+      "set": "decor",
+      "name": "Gece minderi",
+      "icon": "moon-stars",
+      "hint": "Bölüm 5 hedefi"
+    },
+    {
+      "id": "it-kar-kuresi",
+      "set": "decor",
+      "name": "Kar küresi",
+      "icon": "snowflake",
+      "hint": "Bölüm 6 hedefi"
+    },
+    {
+      "id": "it-kurabiye-kavanozu",
+      "set": "decor",
+      "name": "Kurabiye kavanozu",
+      "icon": "cookie",
+      "hint": "Bölüm 6 hedefi"
+    },
+    {
+      "id": "it-deniz-yildizi",
+      "set": "decor",
+      "name": "Deniz yıldızı",
+      "icon": "star",
+      "hint": "Bölüm 7 hedefi"
+    },
+    {
+      "id": "it-kucuk-capa",
+      "set": "decor",
+      "name": "Küçük çapa",
+      "icon": "anchor",
+      "hint": "Bölüm 7 hedefi"
+    },
+    {
+      "id": "it-dag-cicegi",
+      "set": "decor",
+      "name": "Dağ çiçeği",
+      "icon": "flower",
+      "hint": "Bölüm 8 hedefi"
+    },
+    {
+      "id": "it-tepe-haritasi",
+      "set": "decor",
+      "name": "Tepe haritası",
+      "icon": "map-trifold",
+      "hint": "Bölüm 8 hedefi"
     }
   ]
 }

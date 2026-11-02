@@ -39,10 +39,12 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_your_key_here
 #### EAS Builds (TestFlight/App Store)
 Set environment variables in EAS using one of:
 
-**Option 1: EAS CLI**
+**Option 1: EAS CLI** (`eas env:set` is the current name of `eas env:create`)
 ```bash
-eas env:create EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co"
-eas env:create EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here"
+eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co" --environment preview --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here" --environment preview --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co" --environment production --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here" --environment production --visibility plaintext
 ```
 
 **Option 2: Expo Dashboard**
@@ -67,8 +69,8 @@ EXPO_PUBLIC_MANIFEST_CHANNEL=beta  # or "prod"
 **Default:** `beta` if not set
 
 **Fallback behavior:**
-- If the requested channel has no manifest rows, the app falls back to the bundled v8/v11 manifest without errors
-- If Supabase env vars are missing, remote fetch is skipped entirely (bundled manifest always used)
+- If the requested channel has no manifest rows, the app falls back to the bundled **v11** manifest (all 8 chapters) without errors
+- If Supabase env vars are missing, remote fetch is skipped entirely (bundled v11 manifest always used)
 
 ---
 
@@ -127,3 +129,73 @@ This is useful for:
 - Local development without credentials
 - TestFlight builds before Supabase is set up
 - Users who prefer fully local/offline operation
+
+---
+
+## TestFlight için Umut'un yapacakları
+
+Bu adımları **sen çalıştırırsın** (kendi mevcut Apple ve Expo hesaplarınla). Ajan `eas init`, `eas build` veya `eas submit` çalıştırmaz; ücretli bir işlem de başlatmaz.
+
+Bundle id her iki platformda da `com.quit.addiction`. Sürüm `1.0.0`, iOS `buildNumber` `"1"`, Android `versionCode` `1`.
+
+### 1. EAS CLI kur ve giriş yap
+
+```bash
+npm install -g eas-cli
+eas login
+```
+
+### 2. Projeyi Expo hesabına bağla (bir kez)
+
+Repo kökünde:
+
+```bash
+eas init
+```
+
+Bu komut `app.json` içindeki `extra.eas.projectId` yer tutucusunu senin Expo proje kimliğinle değiştirir.
+
+### 3. Supabase ortam değişkenlerini ayarla
+
+Güncel EAS CLI'da oluşturma komutu `eas env:set` (eski adı `eas env:create`). `preview` = TestFlight, `production` = App Store. Değerleri kendi Supabase projenle değiştir.
+
+```bash
+eas env:create --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment preview --visibility plaintext
+eas env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment preview --visibility plaintext
+eas env:create --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment production --visibility plaintext
+eas env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment production --visibility plaintext
+```
+
+`eas env:create` yoksa aynı adımlar `eas env:set` ile:
+
+```bash
+eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment preview --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment preview --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment production --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment production --visibility plaintext
+```
+
+Kontrol:
+
+```bash
+eas env:list --environment preview
+eas env:list --environment production
+```
+
+Supabase henüz yoksa bu adımı atla; uygulama çevrimdışı bundled v11 manifesto ile çalışır.
+
+### 4. İlk iOS production build
+
+```bash
+eas build --platform ios --profile production
+```
+
+Apple hesabınla giriş yapman ve sertifikaları onaylaman istenir.
+
+### 5. TestFlight'a gönder
+
+```bash
+eas submit --platform ios
+```
+
+App Store Connect / TestFlight yine senin Apple hesabınla açılır.
