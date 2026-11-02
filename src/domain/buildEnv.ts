@@ -18,13 +18,8 @@ export const ON_DEVICE_DATA_NOTE = 'Verilerin bu cihazda saklanır';
 
 export const CLOUD_SYNC_CARD_TITLE = 'Bulut eşitleme';
 
-export function cloudSyncStatusSubtitle(
-  supabaseConfigured: boolean,
-  appEnv = process.env.EXPO_PUBLIC_APP_ENV,
-): string {
-  if (!shouldShowCloudSyncCard(appEnv)) {
-    return ON_DEVICE_DATA_NOTE;
-  }
+/** Preview/dev status line. Production UI uses ON_DEVICE_DATA_NOTE instead. */
+export function cloudSyncStatusSubtitle(supabaseConfigured: boolean): string {
   return supabaseConfigured
     ? 'Uzak içerik ve yedekleme hazır · giriş isteğe bağlı'
     : 'Bağlı değil · Tüm veriler cihazda';

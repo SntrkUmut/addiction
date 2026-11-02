@@ -15,17 +15,22 @@ test('night Scene fills below the gradient with the last sky stop; other variant
   assert.equal(sceneDusk.sky[2], '#1B1F24');
 });
 
-test('App loads the Nunito weights typography uses and hides splash on success or failure', () => {
-  const app = readFileSync(new URL('../App.tsx', import.meta.url), 'utf8');
-  assert.match(app, /SplashScreen\.preventAutoHideAsync\(\)/);
-  assert.match(app, /useFonts\(/);
-  assert.match(app, /fontsLoaded \|\| fontError/);
-  assert.match(app, /SplashScreen\.hideAsync\(\)/);
-  assert.match(app, /if \(!fontsLoaded && !fontError\)/);
+test('root layout loads Nunito, hides splash on success, error, or timeout', () => {
+  const layout = readFileSync(new URL('../src/app/_layout.tsx', import.meta.url), 'utf8');
+  assert.match(layout, /SplashScreen\.preventAutoHideAsync\(\)/);
+  assert.match(layout, /useFonts\(/);
+  assert.match(layout, /FONT_LOAD_TIMEOUT_MS/);
+  assert.match(layout, /fontsLoaded \|\| Boolean\(fontError\) \|\| timedOut/);
+  assert.match(layout, /SplashScreen\.hideAsync\(\)/);
 
-  const loaded = [...app.matchAll(/Nunito_\w+/g)].map(match => match[0]);
+  const loaded = [...layout.matchAll(/Nunito_\w+/g)].map(match => match[0]);
   const unique = [...new Set(loaded)];
   assert.deepEqual(unique.sort(), Object.values(fontWeights).slice().sort());
+
+  const appJson = JSON.parse(readFileSync(new URL('../app.json', import.meta.url), 'utf8'));
+  const fontPlugin = appJson.expo.plugins.find(entry => Array.isArray(entry) && entry[0] === 'expo-font');
+  assert.ok(fontPlugin);
+  assert.equal(fontPlugin[1].fonts.length, 5);
 });
 
 test('Milestone respects the top safe area the way chapter celebration does', () => {

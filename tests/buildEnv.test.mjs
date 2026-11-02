@@ -26,8 +26,6 @@ test('production and prod hide the cloud-sync card and use the on-device note', 
   assert.equal(isProductionBuild('prod'), true);
   assert.equal(shouldShowCloudSyncCard('production'), false);
   assert.equal(shouldShowCloudSyncCard('prod'), false);
-  assert.equal(cloudSyncStatusSubtitle(true, 'production'), ON_DEVICE_DATA_NOTE);
-  assert.equal(cloudSyncStatusSubtitle(false, 'production'), ON_DEVICE_DATA_NOTE);
   assert.equal(ON_DEVICE_DATA_NOTE, 'Verilerin bu cihazda saklanır');
 });
 
@@ -40,11 +38,11 @@ test('preview, development and unset env keep the optional sign-in status card',
   assert.equal(shouldShowCloudSyncCard(undefined), true);
   assert.equal(CLOUD_SYNC_CARD_TITLE, 'Bulut eşitleme');
   assert.equal(
-    cloudSyncStatusSubtitle(true, 'preview'),
+    cloudSyncStatusSubtitle(true),
     'Uzak içerik ve yedekleme hazır · giriş isteğe bağlı',
   );
   assert.equal(
-    cloudSyncStatusSubtitle(false, 'preview'),
+    cloudSyncStatusSubtitle(false),
     'Bağlı değil · Tüm veriler cihazda',
   );
 });
@@ -53,7 +51,6 @@ test('isProductionBuild reads EXPO_PUBLIC_APP_ENV from the process', () => {
   withAppEnv('production', () => {
     assert.equal(isProductionBuild(), true);
     assert.equal(shouldShowCloudSyncCard(), false);
-    assert.equal(cloudSyncStatusSubtitle(true), ON_DEVICE_DATA_NOTE);
   });
   withAppEnv('preview', () => {
     assert.equal(isProductionBuild(), false);

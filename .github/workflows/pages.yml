@@ -1,13 +1,9 @@
-# Deploys only site/ (never docs/). Independent of quality.yml so existing CI
-# is unchanged. GitHub Pages is not enabled yet; this job will run on main
-# after site/** changes, or via workflow_dispatch once Pages is turned on.
+# Deploys only site/ (never docs/). Independent of quality.yml.
+# Manual-only until the public contact email is confirmed; a push to main
+# would fail while GitHub Pages is still off.
 name: Deploy site to GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "site/**"
   workflow_dispatch:
 
 permissions:
@@ -31,7 +27,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
       - name: Deploy to GitHub Pages

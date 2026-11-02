@@ -1,5 +1,6 @@
 :root {
   --terracotta: #C84F2E;
+  --link: #8E3623;
   --cream: #F8F6F1;
   --ink: #1C1917;
   --muted: #5C5652;
@@ -14,6 +15,7 @@
     --muted: #c4beb6;
     --card: #1c2128;
     --line: #2a3038;
+    --link: #E8A090;
   }
 }
 
@@ -35,7 +37,7 @@ body {
 }
 
 a {
-  color: var(--terracotta);
+  color: var(--link);
 }
 
 a:hover,
@@ -56,7 +58,7 @@ header {
 
 .brand {
   display: inline-block;
-  color: var(--terracotta);
+  color: var(--link);
   font-weight: 700;
   letter-spacing: 0.02em;
   text-decoration: none;
