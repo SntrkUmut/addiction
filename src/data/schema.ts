@@ -46,7 +46,17 @@ export type AppState = {
   collection?: { earned: CollectionItem[] }; // Rev 4: synced, grow-only
   personalization?: Personalization; // Rev 4: synced, LWW
 };
-export type CopingChoice = { id: string; title: string; detail: string; icon: string; minutes: number };
+export type CopingChoice = { id: string; title: string; detail: string; icon?: string; minutes: number };
+
+export function emptyAppState(): AppState {
+  return {
+    schemaVersion: 2,
+    profile: null,
+    events: [],
+    milestones: { seen: [] },
+    collection: { earned: [] },
+  };
+}
 
 const eventKinds = new Set<EventKind>(['checkin', 'craving', 'coping', 'slip', 'urge_result']);
 const MAX_EVENTS = 10_000;
@@ -82,24 +92,34 @@ export function parseAppState(value: unknown): AppState | null {
   }
   if (!candidate.profile || typeof candidate.profile !== 'object' || Array.isArray(candidate.profile)) return null;
   const profile = candidate.profile as Record<string, unknown>;
-  if (typeof profile.name !== 'string' || profile.name.length > 120
-    || typeof profile.reason !== 'string' || profile.reason.length > 2_000
+  const name = typeof profile.name === 'string' ? profile.name : profile.name == null ? '' : null;
+  const reason = typeof profile.reason === 'string' ? profile.reason : profile.reason == null ? '' : null;
+  const currency = normalizeCurrency(profile.currency);
+  if (name === null || name.length > 120
+    || reason === null || reason.length > 2_000
     || typeof profile.quitDate !== 'string' || !Number.isFinite(Date.parse(profile.quitDate))
-    || typeof profile.currency !== 'string' || !/^[A-Z]{3}$/.test(profile.currency)
+    || currency === null
     || typeof profile.cigarettesPerDay !== 'number' || !Number.isFinite(profile.cigarettesPerDay) || profile.cigarettesPerDay < 0 || profile.cigarettesPerDay > 100
     || typeof profile.packPrice !== 'number' || !Number.isFinite(profile.packPrice) || profile.packPrice < 0 || profile.packPrice > 10_000_000
     || typeof profile.packSize !== 'number' || !Number.isFinite(profile.packSize) || profile.packSize < 0 || profile.packSize > 100
     || ((profile.packPrice === 0) !== (profile.packSize === 0))) return null;
 
   return buildAppState({
-    name: profile.name,
+    name,
     cigarettesPerDay: profile.cigarettesPerDay,
     packPrice: profile.packPrice,
     packSize: profile.packSize,
     quitDate: profile.quitDate,
-    reason: profile.reason,
-    currency: profile.currency,
+    reason,
+    currency,
   }, events, candidate);
+}
+
+function normalizeCurrency(value: unknown): string | null {
+  if (value == null || value === '' || value === '₺' || value === 'TL' || value === 'tl') return 'TRY';
+  if (typeof value !== 'string') return null;
+  if (/^[A-Z]{3}$/.test(value)) return value;
+  return null;
 }
 
 function buildAppState(profile: Profile | null, events: ProgressEvent[], candidate: Record<string, unknown>): AppState {

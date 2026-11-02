@@ -43,6 +43,17 @@ test('rejects impossible plans and incomplete package price pairs', () => {
   assert.equal(parseAppState({ profile: { ...profile, packSize: 0 }, events: [] }), null);
 });
 
+test('migrates symbol currency and missing name/reason without dropping the snapshot', () => {
+  const parsed = parseAppState({
+    profile: { ...profile, name: undefined, reason: undefined, currency: '₺' },
+    events: [event],
+  });
+
+  assert.equal(parsed?.profile?.currency, 'TRY');
+  assert.equal(parsed?.profile?.name, '');
+  assert.equal(parsed?.profile?.reason, '');
+});
+
 test('rejects snapshots larger than the cloud snapshot limit', () => {
   const oversizedEvent = { ...event, details: { note: 'x'.repeat(700_000) } };
 

@@ -8,6 +8,7 @@
  * - Controlled by EXPO_PUBLIC_MANIFEST_CHANNEL env var
  */
 
+import 'expo-sqlite/localStorage/install';
 import bundledManifest from '../content/manifest.bundled.json';
 
 const MANIFEST_CACHE_KEY = 'quit-content-manifest-v1';
@@ -21,7 +22,10 @@ export type Manifest = typeof bundledManifest;
  */
 function getManifestChannel(): 'beta' | 'prod' {
   const channel = process.env.EXPO_PUBLIC_MANIFEST_CHANNEL;
-  return channel === 'prod' ? 'prod' : 'beta';
+  if (channel === 'prod' || channel === 'beta') return channel;
+  const appEnv = process.env.EXPO_PUBLIC_APP_ENV;
+  if (appEnv === 'production' || appEnv === 'prod') return 'prod';
+  return 'beta';
 }
 
 /**

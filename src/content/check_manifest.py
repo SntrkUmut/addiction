@@ -13,6 +13,13 @@ if not errs:
     orders=[c["order"] for c in sorted(m["chapters"],key=lambda c:c["order"])]
     orders!=list(range(1,len(orders)+1)) and errs.append(f"chapter orders must be 1..n contiguous, got {orders}")
     m["upcoming"]["chapterOrder"]!=len(orders)+1 and errs.append("upcoming.chapterOrder must be last chapter + 1")
+    opens=m["upcoming"].get("opensAt")
+    if opens is not None:
+        try:
+            from datetime import datetime
+            datetime.fromisoformat(str(opens).replace("Z", "+00:00"))
+        except Exception:
+            errs.append("upcoming/opensAt must be ISO-8601 date-time")
     refs=[("chapter "+c["id"],c["completionReward"]) for c in m["chapters"]]+[("milestone "+x["key"],x["reward"]) for x in m.get("milestones",[])]\
         +[("goal "+g["id"],g["reward"]) for g in m.get("goalPool",[])]+[("season "+s["id"],s["reward"]) for s in m.get("seasons",[])]
     for who,r in refs: r not in items and errs.append(f"{who} rewards unknown item {r}")
