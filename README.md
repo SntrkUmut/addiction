@@ -40,7 +40,7 @@ The cloud table stores the complete app snapshot as JSONB, protected by per-user
 - The current engineering privacy inventory and release checks are tracked in `PRIVACY_DATA_INVENTORY.md`; it is not a substitute for the published privacy notice or legal review.
 
 - “Sığınak” is an in-app feature label, not the selected product name.
-- The selected mascot species is a fox. `assets/mascot/fox-resting.png` is cropped from the supplied four-pose reference and retains its dark background; replace it with production-ready source artwork before store submission.
+- The selected mascot species is a fox. The `assets/mascot/` folder contains production-ready transparent PNG poses (@1x/@2x/@3x) and effect layers. These assets are used via the reusable `Mascot` component (`src/components/Mascot.tsx`).
 - The app icon and Android adaptive icon are warm-toned fox/shelter marks for development preview. Replace or approve them after the product name and final mascot artwork are selected.
 - Savings and avoided-cigarette numbers are estimates based on user-entered values. They are not medical outcomes.
 - The app is a self-management companion and does not provide diagnosis or treatment.

@@ -747,7 +747,7 @@ function UrgeFlow({ panel, setPanel, selected, setSelected, remaining, setRemain
     <View style={styles.urgeNav}><Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="İstek aracını kapat" style={styles.backButtonHit}><Text style={styles.backButton}>‹</Text></Pressable><Text style={styles.urgeNavTitle}>İstek anı</Text><View style={{ width: 44 }}/></View>
     <ScrollView contentContainerStyle={styles.urgeContent}>
       {panel === 'tool' && <>
-        <Mascot pose="craving" size={100} effects={['shield', 'crystals']} />
+        <Mascot pose="craving" size={100} />
         <Text style={styles.urgeHeadline}>Şu an bir sonraki küçük adımı seç.</Text>
         <Text style={styles.bodyCopy}>Bu anı hemen çözmek zorunda değilsin. Sana uygun bir araç seçebilir ya da nedenlerini hatırlayabilirsin.</Text>
         {copingChoices.map((item) => <Pressable key={item.id} onPress={() => { setSelected(item); remainingRef.current = item.minutes * 60; setRemaining(item.minutes * 60); setPanel('timer'); }} accessibilityRole="button" accessibilityLabel={`${item.title}. ${item.detail} ${item.minutes} dakika.`} style={styles.toolChoice}>
@@ -758,9 +758,9 @@ function UrgeFlow({ panel, setPanel, selected, setSelected, remaining, setRemain
       {panel === 'timer' && <>
         <Text style={styles.eyebrow}>{selected.title.toLocaleUpperCase('tr-TR')}</Text>
         {selected.id === 'breath' ? (
-          <Mascot pose="calm" size={100} effects={['breath_ring', 'bubbles']} />
+          <Mascot pose="calm" size={80} />
         ) : (
-          <Mascot pose="idle" size={100} />
+          <Mascot pose="idle" size={80} />
         )}
         <Text style={styles.urgeHeadline}>Sadece bu ana odaklan.</Text>
         <View style={styles.timerFace} accessible accessibilityLabel={`${mins} dakika ${secs} saniye kaldı`}><View style={styles.timerRing} accessible={false}><Text style={styles.timerText} accessible={false}>{mins}:{secs}</Text><Text style={styles.timerLabel} accessible={false}>kendine ayırdığın süre</Text></View></View>
@@ -769,7 +769,7 @@ function UrgeFlow({ panel, setPanel, selected, setSelected, remaining, setRemain
         <Button title="Başka bir araç seç" kind="quiet" onPress={() => setPanel('tool')}/>
       </>}
       {panel === 'done' && <>
-        <Mascot pose="cheer" size={100} effects={['sparkles']} />
+        <Mascot pose="cheer" size={100} />
         <Text style={styles.urgeHeadline}>Bu an için kendine alan açtın.</Text>
         <Text style={styles.bodyCopy}>İstek şimdi nasıl?</Text>
         <View style={styles.feelingRow}>{['Azaldı', 'Aynı', 'Geri geldi'].map((item) => <Pressable key={item} onPress={() => { recordUrgeResult(item); }} accessibilityRole="button" accessibilityLabel={`İstek ${item.toLocaleLowerCase('tr-TR')}`} style={styles.feelingChip}><Text style={styles.feelingText}>{item}</Text></Pressable>)}</View>

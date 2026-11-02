@@ -65,20 +65,34 @@ const POSE_LABELS: Record<MascotPose, string> = {
 
 function SmokeEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
   const translateY = useSharedValue(0);
-  const opacity = useSharedValue(0.9);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) {
+      translateY.value = 0;
+      opacity.value = 0;
+      return;
+    }
     translateY.value = withRepeat(
-      withTiming(-24, { duration: 3500, easing: Easing.linear }),
+      withSequence(
+        withTiming(0, { duration: 0 }),
+        withTiming(-24, { duration: 3500, easing: Easing.out(Easing.ease) })
+      ),
       -1,
       false
     );
     opacity.value = withRepeat(
-      withTiming(0, { duration: 3500, easing: Easing.linear }),
+      withSequence(
+        withTiming(0.9, { duration: 0 }),
+        withTiming(0, { duration: 3500, easing: Easing.in(Easing.ease) })
+      ),
       -1,
       false
     );
+    return () => {
+      translateY.value = 0;
+      opacity.value = 0;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionEnabled]);
 
@@ -101,7 +115,11 @@ function ShieldEffect({ size, motionEnabled }: { size: number; motionEnabled: bo
   const scale = useSharedValue(1);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) {
+      rotate.value = 0;
+      scale.value = 1;
+      return;
+    }
     rotate.value = withRepeat(
       withTiming(360, { duration: 20000, easing: Easing.linear }),
       -1,
@@ -112,6 +130,10 @@ function ShieldEffect({ size, motionEnabled }: { size: number; motionEnabled: bo
       -1,
       true
     );
+    return () => {
+      rotate.value = 0;
+      scale.value = 1;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionEnabled]);
 
@@ -133,7 +155,11 @@ function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled
   const opacity = useSharedValue(0.7);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) {
+      scale.value = 0.85;
+      opacity.value = 0.7;
+      return;
+    }
     scale.value = withRepeat(
       withSequence(
         withTiming(1.0, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
@@ -150,6 +176,10 @@ function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled
       -1,
       false
     );
+    return () => {
+      scale.value = 0.85;
+      opacity.value = 0.7;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionEnabled]);
 
@@ -169,20 +199,34 @@ function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled
 
 function BubblesEffect({ size, motionEnabled }: { size: number; motionEnabled: boolean }) {
   const translateY = useSharedValue(0);
-  const opacity = useSharedValue(1);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) {
+      translateY.value = 0;
+      opacity.value = 0;
+      return;
+    }
     translateY.value = withRepeat(
-      withTiming(-40, { duration: 5500, easing: Easing.linear }),
+      withSequence(
+        withTiming(0, { duration: 0 }),
+        withTiming(-40, { duration: 5500, easing: Easing.out(Easing.ease) })
+      ),
       -1,
       false
     );
     opacity.value = withRepeat(
-      withTiming(0, { duration: 5500, easing: Easing.linear }),
+      withSequence(
+        withTiming(1, { duration: 0 }),
+        withTiming(0, { duration: 5500, easing: Easing.in(Easing.ease) })
+      ),
       -1,
       false
     );
+    return () => {
+      translateY.value = 0;
+      opacity.value = 0;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionEnabled]);
 
@@ -205,7 +249,11 @@ function SparklesEffect({ size, motionEnabled }: { size: number; motionEnabled: 
   const scale = useSharedValue(0.95);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) {
+      opacity.value = 0.4;
+      scale.value = 0.95;
+      return;
+    }
     opacity.value = withRepeat(
       withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
       -1,
@@ -216,6 +264,10 @@ function SparklesEffect({ size, motionEnabled }: { size: number; motionEnabled: 
       -1,
       true
     );
+    return () => {
+      opacity.value = 0.4;
+      scale.value = 0.95;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionEnabled]);
 
@@ -237,7 +289,10 @@ function CrystalsEffect({ size, motionEnabled }: { size: number; motionEnabled: 
   const translateY = useSharedValue(0);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) {
+      translateY.value = 0;
+      return;
+    }
     translateY.value = withRepeat(
       withSequence(
         withTiming(6, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
@@ -246,6 +301,9 @@ function CrystalsEffect({ size, motionEnabled }: { size: number; motionEnabled: 
       -1,
       false
     );
+    return () => {
+      translateY.value = 0;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motionEnabled]);
 
@@ -273,16 +331,22 @@ export function Mascot({
   const motionEnabled = !reducedMotion;
   const label = accessibilityLabel ?? POSE_LABELS[pose];
 
-  const backEffects = effects.filter((e) => ['breath_ring', 'shield', 'sparkles'].includes(e));
-  const midEffects = effects.filter((e) => ['bubbles', 'crystals'].includes(e));
-  const frontEffects = effects.filter((e) => e === 'smoke');
+  const uniqueEffects = [...new Set(effects)];
+  const hasEffects = uniqueEffects.length > 0;
+  const poseScale = hasEffects ? 0.62 : 0.95;
+
+  const backEffects = uniqueEffects.filter((e) => ['breath_ring', 'shield', 'sparkles'].includes(e));
+  const midEffects = uniqueEffects.filter((e) => ['bubbles', 'crystals'].includes(e));
+  const frontEffects = uniqueEffects.filter((e) => e === 'smoke');
 
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessible
-      accessibilityLabel={label}
-      accessibilityRole="image"
+      accessible={hasEffects || !!accessibilityLabel}
+      accessibilityLabel={hasEffects || accessibilityLabel ? label : undefined}
+      accessibilityRole={hasEffects || accessibilityLabel ? 'image' : undefined}
+      accessibilityElementsHidden={!hasEffects && !accessibilityLabel}
+      importantForAccessibility={!hasEffects && !accessibilityLabel ? 'no-hide-descendants' : 'auto'}
     >
       {backEffects.map((effect) => {
         if (effect === 'breath_ring') return <BreathRingEffect key={effect} size={size} motionEnabled={motionEnabled} />;
@@ -299,7 +363,7 @@ export function Mascot({
 
       <Image
         source={POSE_ASSETS[pose]}
-        style={[styles.poseImage, { width: size * 0.62, height: size * 0.62 }]}
+        style={[styles.poseImage, { width: size * poseScale, height: size * poseScale }]}
         resizeMode="contain"
         accessible={false}
       />

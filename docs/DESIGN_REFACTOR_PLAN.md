@@ -10,7 +10,7 @@
 - İlerleme, Sığınak alanını küçük ve anlaşılır parçalarla kuracak. Her parça hangi davranışla, kaç ışıkla açılıyor kullanıcıya önceden gösterilecek.
 - Check-in günde en fazla bir ışık; tamamlanan her ayrı baş etme oturumu bir ışık kazandırır. Çift kayıt oluşmaz. Kayma, ışık veya açılmış parçaları geri almaz. Kullanıcı yanlış bir check-in/baş etme kaydını özellikle kaldırırsa ilgili ışık ve eşik görünümü yeniden hesaplanır.
 - Görsel dil `prototip.html` içindeki sıcak krem/obsidyen/terracotta ve dokunsal kart yaklaşımını benimser; kod prototipindeki eski ekonomi mekanikleri benimsenmez.
-- Eski prototipteki “irade kristali”, seri kalkanı, sağlık yüzdeleri ve harcama/loot ekonomisi MVP kapsamına girmez. Klinik dayanağı olmayan sağlık iddiaları gösterilmez.
+- Eski prototipteki “irade kristali”, seri kalkanı, sağlık yüzdeleri ve harcama/loot ekonomisi MVP kapsamına girmez. **Maskot efekt katmanları** (kalkan, kristaller, elmas vb.) **yalnızca görsel dekorasyon**; puan, seri, veya oyunlaştırma ekonomisine bağlı değil. Klinik dayanağı olmayan sağlık iddiaları gösterilmez.
 - Maskotun adı hâlâ seçilmedi; kodda geçici bir özel isim kullanılmaz.
 - Varsayılan Expo ikonları geliştirme önizlemesinde geçici tilki işaretiyle değiştirildi. Kaynak `mobile/assets/brand/fox-mark.svg`; PNG türevleri iOS, Android ve web tarafından kullanılıyor. Ürün adı, maskot adı ve son karakter illüstrasyonu onaylandığında ikon yeniden incelenip gerekirse yenilenecek.
 
