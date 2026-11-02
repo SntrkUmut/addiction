@@ -168,7 +168,7 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
                   <Text style={styles.inputUnit}>adet / paket</Text>
                 </View>
                 <Text style={styles.fieldHint}>
-                  Bu bilgiyi daha sonra Rotam'dan ekleyebilir veya değiştirebilirsin.
+                  Bu bilgiyi daha sonra Rotam&apos;dan ekleyebilir veya değiştirebilirsin.
                 </Text>
               </Card>
             </View>
@@ -179,7 +179,7 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
               <Eyebrow style={styles.eyebrow}>ADIM 3 · BAŞLANGIÇ TARİHİ</Eyebrow>
               <Text style={styles.title}>Sigarayı bırakmaya ne zaman başladın?</Text>
               <Text style={styles.subtitle}>
-                Bugün başlıyorsan "bugün" seç. Daha önce başladıysan o tarihi girebilirsin.
+                Bugün başlıyorsan &quot;bugün&quot; seç. Daha önce başladıysan o tarihi girebilirsin.
               </Text>
               <Card style={styles.inputCard}>
                 <Text style={styles.inputLabel}>BAŞLANGIÇ TARİHİ</Text>

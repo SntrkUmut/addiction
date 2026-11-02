@@ -1,86 +1,89 @@
-# Tilki Maskot Asset Paketi (React Native / Expo)
+# Tilki aksesuarları (katmanlı maskot sanatı)
 
-Onaylanan karakter sayfasına birebir uyumlu tilki maskotu + ayrı efekt (FX) katmanları.
-Tüm dosyalar **şeffaf PNG (RGBA)**, kare tuval, içerik ortalı ve küçük kenar boşluklu.
+Spec kaynağı: `addiction-figma/build-spec.md` §25 (tilki aksesuar listesi, id'ler), §22 (bölüm ödülleri: Bölüm 3 → Lastik çizme, Bölüm 4 → Sırt çantası), §19.1 (biyomlar). Dosya yalnızca okundu.
 
-## Klasör yapısı ve Expo adlandırması
+## Kapsam
 
-```
-mascot/
-  fox/   9 poz × 3 çözünürlük
-  fx/    6 efekt × 3 çözünürlük
-  preview.png   (tüm asset'lerin ve örnek katmanlamaların önizlemesi, #1b1f24 zemin)
-```
-
-| Ek | Boyut | Kullanım |
-|---|---|---|
-| `name.png` | 342×342 | @1x |
-| `name@2x.png` | 683×683 | @2x |
-| `name@3x.png` | 1024×1024 | @3x |
-
-Expo/Metro doğru yoğunluğu otomatik seçer: `require('../assets/mascot/fox/fox_idle.png')` yazmanız yeterli (@2x/@3x'i kendisi bulur).
-
-## Tilki pozları (`fox/`)
-
-| Dosya | Poz | Önerilen ekran / kullanım |
-|---|---|---|
-| `fox_idle` | Nötr, ayakta gülümseme | **Yuva (ana sayfa)** varsayılan durum, boş durumlar |
-| `fox_wave` | El sallayarak merhaba | **Onboarding** karşılama, günlük ilk açılış selamı |
-| `fox_happy` | Zıplayarak sevinç, kollar yukarıda | Hedef tamamlandı, seri (streak) artışı, **Sığınak ödülleri** kazanımı |
-| `fox_craving` | Kararlı, mavi kristal | **Craving (istek) akışı**: "Dayan, dönüştürüyorsun" adımları |
-| `fox_calm` | Bağdaş kurmuş meditasyon, gözler kapalı | **Nefes egzersizi** ekranı |
-| `fox_cheer` | Başparmak yukarı, cesaretlendirme | Craving akışı sonu ("Başardın!"), bildirim/teşvik kartları |
-| `fox_sleepy` | Esneyen, uykulu | Gece modu / uyku hatırlatıcısı, gece geç saat craving girişleri |
-| `fox_hero` | 30. Gün kahraman: pilot gözlüğü, yıldızlı lacivert pelerin, mavi elmas | **30. gün kilometre taşı**, Sığınak'ta en üst ödül rozeti |
-
-## Efekt katmanları (`fx/`)
-
-Siyah zeminde üretildi; alfa parlaklıktan türetildi (renkler un-premultiply edildi), yani koyu ve açık zeminlerde temiz görünür. Tilkiden **ayrı** katmanlardır; üst üste `position: 'absolute'` ile bindirin.
-
-| Dosya | İçerik | Kullanım | Katman sırası | Önerilen animasyon (react-native-reanimated) |
+| id (= slug) | Türkçe ad | Kaynak (§25) | Durum | Bu klasörde |
 |---|---|---|---|---|
-| `fx_shield` | Altın-mavi enerji kalkanı halkası (orta boş) | `fox_craving` | Arkada %100 + isteğe bağlı önde %35 opaklıkta 2. kopya ("içinde" hissi) | `rotate` 0 → 360° 20 sn linear sonsuz; `scale` 1 → 1.04 pulse 1.2 sn `withRepeat(..., -1, true)` |
-| `fx_breath_ring` | Turkuaz parlayan halka (orta boş) | `fox_calm`, nefes ekranı | Tilkinin **arkasında**, tilki ~%62 ölçekte ortada | Nefes ritmi: `scale` 0.85 → 1.0 **4 sn al**, 1.0 → 0.85 **4 sn ver** (`Easing.inOut(Easing.sin)`), opacity 0.7 ↔ 1 |
-| `fx_bubbles` | Dağınık küçük turkuaz baloncuklar | Nefes ekranı | Halkanın üstünde, tilkinin arkasında | `translateY` 0 → -40px + `opacity` 1 → 0, 5–6 sn döngü; iki kopyayı yarım faz kaydırın (float up) |
-| `fx_sparkles` | Altın/beyaz pırıltı yıldızları | `fox_hero`, `fox_happy`, ödül ekranları | Tilkinin arkasında (veya önde düşük opaklık) | Twinkle: `opacity` 0.4 ↔ 1 ve `scale` 0.95 ↔ 1.05, 1.5 sn, iki kopya farklı fazda; çok yavaş `rotate` (±3°) |
-| `fx_crystals` | Yüzen küçük mavi kristal kırıkları | `fox_craving` (kalkanla), dönüşüm anı | Kalkanla tilki arasında | Hafif süzülme: `translateY` ±6px 2.5 sn yoyo + `rotate` ±4° |
+| `it-yuvarlak-gozluk` | Yuvarlak gözlük | Bölüm 1 · Temel | manifest (pending) | ✅ üretildi |
+| `it-hasir-sapka` | Hasır şapka | Bölüm 2 · Bahçe | manifest (pending) | ✅ üretildi |
+| `it-lastik-cizme` | Lastik çizme | Bölüm 3 · Dere kenarı (tamamlama ödülü) | manifest (pending) | ✅ üretildi |
+| `it-sirt-cantasi` | Sırt çantası | Bölüm 4 · Orman yolu (tamamlama ödülü) | manifest (pending) | ✅ üretildi |
+| `it-atki` | Atkı ("Tilki için atkı") | Haftalık hedef "Sığınağında bir parçanın yerini değiştir" | manifestte | ✅ (eski `atki` → yeniden adlandırıldı) |
+| `it-semsiye` | Şemsiye | Bölüm 7 · Kıyı | öneri, kullanıcı aksesuar olarak onayladı | ✅ üretildi (yalnız `fox_cheer`) |
+| `it-bere` | Bere | spec'te yok | **isteğe bağlı öneri** (manifestte yok) | ✅ (eski `bere` → yeniden adlandırıldı) |
+| `it-yildizli-bere` | Yıldızlı bere | Bölüm 5 · Yıldız terası | öneri (taslak ad) | ⏸ üretilmedi |
+| `it-kapusonlu` | Kapüşonlu | Bölüm 6 · Kış odası | öneri (taslak ad) | ⏸ üretilmedi |
+| `it-ruzgarlik` | Rüzgârlık | Bölüm 8 · Tepe | öneri (taslak ad) | ⏸ üretilmedi |
 
-### Önerilen katman sırası (arkadan öne)
-1. Arka plan (ör. `#1b1f24`)
-2. Arka FX (`fx_breath_ring`, `fx_shield`, `fx_sparkles`)
-3. Orta FX (`fx_bubbles`, `fx_crystals`)
-4. Tilki (`fox_*`, konteynerin ~%60–68'i)
-5. Ön FX (isteğe bağlı yarı saydam `fx_shield` kopyası)
+Not: `it-yildizli-bere` netleşirse `it-bere` ile çakışabilir (aynı kafa tipi; bere ya düşer ya da onun tabanı olur). "Şemsiye" ayrıca bir Bölüm 7 sığınak parçası adı olarak da geçiyor (spec açık soru 20); bu klasördeki `it-semsiye` tilkinin tuttuğu aksesuardır.
 
-### Örnek (Reanimated – nefes halkası)
+## Dosyalar (her slug için)
+
+| Dosya | Boyut | Not |
+|---|---|---|
+| `<slug>.png` | 342×342 | `@1x` kopyası — Expo/Metro `require('./<slug>.png')` için (Metro `@2x/@3x`'i otomatik seçer) |
+| `<slug>@1x.png` / `@2x` / `@3x` | 342 / 683 / 1024 kare | RGBA, premultiplied küçültme, beyaz hale yok |
+| `<slug>-preview.png` | — | sol: şeffaf katman (kırmızı = bbox, artı = anchor, gri çerçeve = tilki tuvali), orta: ilk uyumlu poz, sağ: diğer uyumlu pozlar |
+| `accessories-overview.png` | — | 7 aksesuarın hepsi: katman tek başına + uyumlu pozda |
+| `accessories.json` | — | aşağıdaki tabloların makine-okunur hali (bbox, anchor, layer, region, poz dönüşümleri, önerilmeyen pozlar) |
+
+## Tuval ve katmanlama mantığı
+
+- Aksesuarlar **tilki pozlarıyla aynı kare tuvalde** (342/683/1024) ve **`fox_idle` ile piksel hizalı**. `fox_idle` için dönüşüm yok: tilki resminin üstüne aynı boyutta `absoluteFill`.
+- Diğer pozlarda RN sırasıyla: `translateX(tx·W) → translateY(ty·W) → rotate(rotate°) → scale(scale)`; merkez = tuval merkezi, pozitif açı = saat yönü, `W` = konteyner genişliği. Matematik: `p' = c + (tx,ty)·W + R(rotate)·scale·(p − c)`.
+- Katman sırası (arkadan öne): arka FX → **arka aksesuar (`layer: back`)** → tilki (`fox_*`) → **ön aksesuar (`layer: front`)** → ön FX.
+- **İstisna — Şemsiye (`it-semsiye`)**: `layer: back` ve tuvali tilki tuvalinden büyük (`region`): kare katmanın boyu `1.3125·W`, sol üst köşesi tilki tuvaline göre `(0, −0.166·W)`. Yani şemsiye görüntüsü `left: 0, top: −0.166·W, width = height = 1.3125·W` ile **tilkinin arkasına** konur; konteynerde `overflow: 'visible'` olmalı (şemsiye tuvalin üstüne ~0.13·W, sağına ~0.19·W taşar). Sap, `fox_cheer`'ın kalkık başparmak patisinin arkasından geçer; böylece tilki onu tutuyormuş gibi görünür ve pati örtülmez.
+- `anchor` tipleri (tilki tuvaline göre normalize 0–1): `neck` = yaka üst-ortası (çene altı), `crown` = şapka ağzının alt-ortası (alın üstü), `eyes` = köprü / göz hizası ortası, `ground` = taban alt-ortası (zemin teması), `shoulders` = iki askının üst kenarı ortası, `grip` = sapın patiye girdiği nokta. `anchor_on_pose` (JSON) = dönüşümden sonra anchor'ın o pozdaki yeri.
+
+## Anchor tablosu
+
+| Türkçe ad | slug | katman | bbox (x0,y0,x1,y1) | anchor | Uyduğu pozlar → `scale, rotate°, tx, ty` | Önerilmeyen pozlar |
+|---|---|---|---|---|---|---|
+| **Yuvarlak gözlük** | `it-yuvarlak-gozluk` | ön | 0.312, 0.280, 0.742, 0.429 | eyes (0.527, 0.355) | `fox_idle` 1, 0, 0, 0 · `fox_wave` 0.983, −9.7, −0.0001, 0.0172 · `fox_cheer` 0.936, −6.5, 0.0286, −0.0066 · `fox_happy` 0.953, −9.0, 0.0187, −0.0122 · `fox_craving` 0.967, 0, 0.0325, −0.0036 · `fox_sad_coal` 0.975, −2, 0.0352, 0 · `fox_calm` 1.075, 0, −0.0117, 0.043 | `fox_sleepy` (pati gözün üstünde, gözlük patinin önüne biner), `fox_hero` (pilot gözlüğü) |
+| **Hasır şapka** | `it-hasir-sapka` | ön | 0.385, 0.072, 0.685, 0.198 | crown (0.535, 0.175) | `fox_idle` 1, 0, 0, 0 · `fox_wave` 0.925, −12, 0, 0 · `fox_cheer` 0.875, −10, 0.0273, −0.0273 · `fox_sleepy` 0.95, −10, 0.0273, 0.0156 · `fox_calm` 1.075, 0, −0.0117, 0.043 · `fox_sad_coal` 0.975, −2, 0.0352, 0 · `fox_craving` 0.95, −4, 0.0391, −0.0078 · `fox_happy` 0.925, −12, 0.0156, −0.0039 | `fox_hero` (gözlük bandı) |
+| **Lastik çizme** | `it-lastik-cizme` | ön | 0.361, 0.838, 0.718, 0.994 | ground (0.540, 0.994) | `fox_idle` 1, 0, 0, 0 · `fox_wave` 1.025, 2, −0.0078, −0.0234 · `fox_cheer` 1.025, 2, 0, −0.0312 · `fox_sleepy` 1.075, 2, 0.0312, −0.0547 · `fox_sad_coal` 0.925, 2, 0.0273, 0.0195 · `fox_craving` 1.05, −2, 0, −0.0234 · `fox_hero` 0.975, 2, −0.0156, −0.0039 | `fox_calm` (bağdaş), `fox_happy` (zıplama, bacaklar ayrık) |
+| **Sırt çantası** | `it-sirt-cantasi` | ön (askılar + omuz arkasından görünen çanta üstü) | 0.372, 0.517, 0.710, 0.736 | shoulders (0.541, 0.517) | `fox_idle` 1, 0, 0, 0 · `fox_wave` 0.85, −2, −0.0391, 0.0352 · `fox_cheer` 0.85, 0, −0.0234, 0.0195 · `fox_sleepy` 0.85, −16, 0.0195, 0.0547 · `fox_calm` 1.075, 0, −0.0039, 0.0352 | `fox_sad_coal` / `fox_craving` (taş göğüste, askılar taşın/kolların üstüne biner), `fox_happy`, `fox_hero` (pelerin) |
+| **Atkı** | `it-atki` | ön | 0.383, 0.508, 0.698, 0.787 | neck (0.541, 0.536) | `fox_idle` 1, 0, 0, 0 · `fox_wave` 0.925, −6, 0, 0.030 · `fox_cheer` 0.90, −5, 0.020, 0.035 · `fox_calm` 1.075, 0, −0.0117, 0.043 · `fox_sleepy` 0.95, −10, 0.0273, 0.0156 | `fox_happy`, `fox_sad_coal`/`fox_craving` (taş atkının ucunu keser), `fox_hero` |
+| **Şemsiye** | `it-semsiye` | **arka**, region (0, −0.166, 1.3125) | 0.445, −0.131, 1.193, 0.588 | grip (0.761, 0.455) | yalnız `fox_cheer` 1, 0, 0, 0 (region ofsetiyle) | diğer tüm pozlar (tutan kalkık pati yok; ölçekle oturtulamaz) |
+| **Bere** (öneri) | `it-bere` | ön | 0.307, 0.002, 0.767, 0.355 | crown (0.537, 0.206) | `fox_idle` 1, 0, 0, 0 · `fox_wave` 0.925, −12, 0, 0 · `fox_cheer` 0.875, −10, 0.0273, −0.0273 · `fox_calm` 1.075, 0, −0.0117, 0.043 · `fox_sad_coal` 0.975, −2, 0.0352, 0 · `fox_craving` 0.95, −4, 0.0391, −0.0078 · `fox_happy` 0.925, −12, 0.0156, −0.0039 | `fox_sleepy`, `fox_hero` |
+
+Dönüşüm kaynakları (`fit_source`, JSON): kafa eşleşmesi (şapka, bere, atkı calm/sleepy, gözlük sad/calm), göz bebeği çifti (gözlük wave/cheer/happy/craving), ayak bölgesi eşleşmesi (çizme), gövde/omuz eşleşmesi (çanta); atkıda wave/cheer elle düzeltildi. 3/4 dönük kafalarda ve kollar farklı pozlarda bunlar **yaklaşık** hizalamadır; ön izlemelerle doğrulandı ama piksel-mükemmel değildir. Çanta ve çizmede en iyi sonuç `fox_idle`'dadır.
+
+Yüz ve patiler: gözlük camları tamamen şeffaf (gözler görünür); şapka/bere kulakları ve kaşları örtmez; çanta askıları ön patilerin arkasında kalır; şemsiye arka katmandır, patiyi örtmez. Çizme tanımı gereği arka ayakları kaplar (ön patiler serbest).
+
+Bere'nin ponponu tuvalin üst kenarına ~2 px kalıyor; `scale > 1` pozlarda (`fox_calm`) `overflow: 'hidden'` varsa kırpılmayı kontrol edin.
+
+### Örnek (React Native)
+
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-
-const s = useSharedValue(0.85);
-useEffect(() => {
-  s.value = withRepeat(withTiming(1, { duration: 4000, easing: Easing.inOut(Easing.sin) }), -1, true); // 4 sn al / 4 sn ver
-}, []);
-const ringStyle = useAnimatedStyle(() => ({ transform: [{ scale: s.value }], opacity: 0.7 + (s.value - 0.85) * 2 }));
-
-<View style={{ width: 300, height: 300 }}>
-  <Animated.Image source={require('./mascot/fx/fx_breath_ring.png')} style={[StyleSheet.absoluteFill, ringStyle]} />
-  <Image source={require('./mascot/fx/fx_bubbles.png')} style={StyleSheet.absoluteFill} />
-  <Image source={require('./mascot/fox/fox_calm.png')} style={{ position: 'absolute', width: '62%', height: '62%', left: '19%', top: '23%' }} />
+const W = 200;
+const t = ACC_TF[slug][pose];           // accessories.json → poses
+<View style={{ width: W, height: W, overflow: 'visible' }}>
+  {slug === 'it-semsiye' && pose === 'fox_cheer' && (
+    <Image source={require('./mascot/accessories/it-semsiye.png')}
+           style={{ position: 'absolute', left: 0, top: -0.166 * W, width: 1.3125 * W, height: 1.3125 * W }} />
+  )}
+  <Image source={foxImages[pose]} style={StyleSheet.absoluteFill} />
+  {slug !== 'it-semsiye' && (
+    <Image source={accImages[slug]}      // ör. require('./mascot/accessories/it-atki.png')
+           style={[StyleSheet.absoluteFill, { transform: [
+             { translateX: t.tx * W }, { translateY: t.ty * W },
+             { rotate: `${t.rotate}deg` }, { scale: t.scale } ] }]} />
+  )}
 </View>
 ```
 
-### Örnek (kalkan dönüşü + nabız)
-```tsx
-const rot = useSharedValue(0), pulse = useSharedValue(1);
-useEffect(() => {
-  rot.value = withRepeat(withTiming(360, { duration: 20000, easing: Easing.linear }), -1);
-  pulse.value = withRepeat(withTiming(1.04, { duration: 1200 }), -1, true);
-}, []);
-const shieldStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${rot.value}deg` }, { scale: pulse.value }] }));
-```
+## Renkler
 
-## Notlar
-- Tilki dekupajı rembg (isnet-general-use) ile yapıldı; kenarlar beyaz zeminden arındırıldı (decontamination), kol-gövde arası beyaz cepler temizlendi.
-- Kaynak görüntüler 1024 px idi; tilki içeriği ~750–850 px olduğundan @3x hafif (≈1.2–1.35×) Lanczos büyütme içerir. Telefon ekranlarında fark edilmez.
-- Tüm efektler tek renkli/additive yapıdadır; koyu temada en iyi sonuç verir. Açık temada `opacity` artırılabilir.
-- Animasyonlarda `useReducedMotion()` ile hareket azaltma tercihine saygı gösterin.
+- Yuvarlak gözlük: lacivert çerçeve `#2C3E6B`, şeffaf cam.
+- Hasır şapka: hasır `#E9D29A` + koyu teal kurdele `#2E7F7A` (`teal_deep`).
+- Lastik çizme: açık mavi `#5FA8D3` + krem taban/ağız `#F3E3C3`.
+- Sırt çantası: orman yeşili `#4F7A4A` + krem dikiş `#F3E3C3` + altın toka `#D9AC58` (`gold`).
+- Atkı: `#2E7F7A` + `#F3E3C3`. Şemsiye: `#2E7F7A` / `#F3E3C3` dilimler, altın uç `#D9AC58`, ahşap sap. Bere: `#2C3E6B` + `#D9AC58` + krem ponpon.
+- Hiçbir aksesuarda ateş/duman imgesi yok.
+
+## Üretim
+
+Her aksesuar, `mascot_work/raw/fox_idle.jpg` (şemsiye için `raw_pad/fox_cheer.jpg`, üstte boşluk bırakılmış) referansıyla **aynı tilkinin üzerinde** (aynı ışık, rim light, yumuşak gölge) üretildi. Sonra orijinal tilkiyle fark + renk tonu maskesi alındı, kenarlar 1 px yumuşatıldı, arka plana değen kenarlarda beyaz temizlendi ve premultiplied örnekleme ile 3 boyuta indirildi. Şemsiyede sapın patinin arkasındaki kısmı aynı sap profiliyle uzatıldı. Araçlar: `mascot_work/acc/` (`extract.py`, `match.py`/`match2.py`, `place.py`, `build2.py`, `post_semsiye*.py`, `export_raw.py`). Eski `atki*`/`bere*` dosyaları `mascot_work/old_outputs/` altına taşındı.
