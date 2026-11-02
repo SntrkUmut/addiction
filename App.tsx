@@ -19,6 +19,8 @@ import { Rotam } from './src/screens/Rotam';
 import { Ben } from './src/screens/Ben';
 import { Istek } from './src/screens/Istek';
 import { Milestone } from './src/screens/Milestone';
+import { ChapterCelebration } from './src/screens/ChapterCelebration';
+import { ChapterHandoff } from './src/screens/ChapterHandoff';
 import { typography } from './src/theme/typography';
 import { journeyDay } from './src/domain/journey';
 import { bundledManifest, getManifest, getPiece, type Manifest } from './src/domain/content';
@@ -33,6 +35,11 @@ import {
   hasLoggedSlip,
 } from './src/domain/progress';
 import { latestUnseenMilestone, milestoneByDay, type MilestoneCopy } from './src/domain/milestones';
+import {
+  chapterCompletedByLight,
+  nextUnseenChapterCompletion,
+  type ChapterFlow,
+} from './src/domain/chapters';
 import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
 import { House, MapTrifold, Tent, User } from './src/ui/icons';
@@ -64,10 +71,13 @@ function AppInner() {
   const [onboardingVisible, setOnboardingVisible] = useState(false);
   const [urgeVisible, setUrgeVisible] = useState(false);
   const [activeMilestone, setActiveMilestone] = useState<MilestoneCopy | null>(null);
+  const [chapterFlow, setChapterFlow] = useState<{ flow: ChapterFlow; phase: 'celebration' | 'handoff' } | null>(null);
+  const [siginakFocusChapterId, setSiginakFocusChapterId] = useState<string | null>(null);
   const [collectionVisible, setCollectionVisible] = useState(false);
   const [unlockedPieceName, setUnlockedPieceName] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('yuva');
   const [dialog, setDialog] = useState<DialogState>(null);
+  const pendingChapterRef = React.useRef<ChapterFlow | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -81,11 +91,21 @@ function AppInner() {
         if (!nextState.profile?.quitDate) {
           setOnboardingVisible(true);
         } else {
+          const seenKeys = nextState.milestones?.seen.map(item => item.key) ?? [];
           const unseen = latestUnseenMilestone(
             journeyDay(nextState.profile.quitDate),
-            nextState.milestones?.seen.map(item => item.key) ?? [],
+            seenKeys,
           );
-          if (unseen) setActiveMilestone(unseen);
+          if (unseen) {
+            setActiveMilestone(unseen);
+          } else {
+            const chapter = nextUnseenChapterCompletion(
+              bundledManifest,
+              earnedLight(nextState.events),
+              seenKeys,
+            );
+            if (chapter) setChapterFlow({ flow: chapter, phase: 'celebration' });
+          }
         }
       } finally {
         setLoading(false);
@@ -145,14 +165,29 @@ function AppInner() {
       setDialog({ title: 'Bugün tamam', message: 'Bugünkü check-in zaten kayıtlı.' });
       return;
     }
-    updateState(current => appendEvent(current, {
+    const content = manifest ?? bundledManifest;
+    const event = {
       id: newEventId('checkin'),
       at: new Date().toISOString(),
-      kind: 'checkin',
+      kind: 'checkin' as const,
       details: {},
-    }));
+    };
+    const before = earnedLight(state.events);
+    const after = earnedLight([event, ...state.events]);
+    const seenKeys = state.milestones?.seen.map(item => item.key) ?? [];
+    const completed = chapterCompletedByLight(content, before, after, seenKeys);
+    updateState(current => appendEvent(current, event));
     await haptic('light');
-    setDialog({ title: 'Check-in kaydedildi', message: '+1 ışık kazandın!' });
+    setDialog({
+      title: 'Check-in kaydedildi',
+      message: '+1 ışık kazandın!',
+      actions: [{
+        label: 'Tamam',
+        onPress: () => {
+          if (completed) setChapterFlow({ flow: completed, phase: 'celebration' });
+        },
+      }],
+    });
   };
 
   const openUrge = () => {
@@ -179,12 +214,15 @@ function AppInner() {
     };
     const before = earnedLight(state.events);
     const after = earnedLight([event, ...state.events]);
+    const seenKeys = state.milestones?.seen.map(item => item.key) ?? [];
+    const completed = chapterCompletedByLight(content, before, after, seenKeys);
     updateState(current => appendEvent(current, event));
     const perPiece = content.lightsPerPiece ?? 2;
     if (Math.floor(after / perPiece) > Math.floor(before / perPiece)) {
       const piece = getPiece(content, unlockedPieceCount(after, perPiece) - 1);
       setUnlockedPieceName(piece?.piece.name ?? null);
     }
+    pendingChapterRef.current = completed;
   };
 
   const handleUrgeResult = async (result: string) => {
@@ -261,6 +299,43 @@ function AppInner() {
     else setActiveTab('yuva');
   };
 
+  const markChapterSeen = (flow: ChapterFlow) => {
+    updateState(current => {
+      const seen = current.milestones?.seen ?? [];
+      if (seen.some(item => item.key === flow.key)) return current;
+      return {
+        ...current,
+        milestones: {
+          seen: [...seen, {
+            key: flow.key,
+            seenAt: new Date().toISOString(),
+            variant: hasLoggedSlip(current) ? 'slip' : 'default',
+          }],
+        },
+      };
+    });
+  };
+
+  const closeChapterCelebration = (goHandoff: boolean) => {
+    if (!chapterFlow) return;
+    markChapterSeen(chapterFlow.flow);
+    if (goHandoff) {
+      setChapterFlow({ flow: chapterFlow.flow, phase: 'handoff' });
+      return;
+    }
+    setChapterFlow(null);
+    setActiveTab('yuva');
+  };
+
+  const finishChapterHandoff = () => {
+    if (!chapterFlow) return;
+    markChapterSeen(chapterFlow.flow);
+    const nextId = chapterFlow.flow.next?.id ?? '__end__';
+    setChapterFlow(null);
+    setActiveTab('siginak');
+    setSiginakFocusChapterId(nextId);
+  };
+
   const handleCollectionTap = () => setCollectionVisible(true);
 
   const handleCalcTap = () => {
@@ -335,6 +410,7 @@ function AppInner() {
             onNodeTap={handleNodeTap}
             onMilestoneTap={handleMilestoneTap}
             onCollectionTap={handleCollectionTap}
+            focusChapterId={siginakFocusChapterId}
           />
         )}
         {activeTab === 'rotam' && (
@@ -401,7 +477,12 @@ function AppInner() {
           onCravingOpened={handleCravingOpened}
           onComplete={handleCopingComplete}
           onResult={handleUrgeResult}
-          onClose={() => setUrgeVisible(false)}
+          onClose={() => {
+            setUrgeVisible(false);
+            const pending = pendingChapterRef.current;
+            pendingChapterRef.current = null;
+            if (pending) setChapterFlow({ flow: pending, phase: 'celebration' });
+          }}
         />
       </Modal>
 
@@ -414,6 +495,32 @@ function AppInner() {
             onHome={() => closeMilestone(false)}
           />
         )}
+      </Modal>
+
+      <Modal
+        visible={!!chapterFlow}
+        animationType="fade"
+        presentationStyle="fullScreen"
+        onRequestClose={() => {
+          if (chapterFlow?.phase === 'handoff') finishChapterHandoff();
+          else closeChapterCelebration(false);
+        }}
+      >
+        {chapterFlow?.phase === 'celebration' ? (
+          <ChapterCelebration
+            flow={chapterFlow.flow}
+            lights={chapterFlow.flow.lightsAtCompletion}
+            onContinue={() => closeChapterCelebration(true)}
+            onHome={() => closeChapterCelebration(false)}
+          />
+        ) : chapterFlow?.phase === 'handoff' ? (
+          <ChapterHandoff
+            flow={chapterFlow.flow}
+            manifest={manifest ?? bundledManifest}
+            lights={earnedLight(state.events)}
+            onContinue={finishChapterHandoff}
+          />
+        ) : null}
       </Modal>
 
       <Modal visible={collectionVisible} animationType="slide" onRequestClose={() => setCollectionVisible(false)}>
