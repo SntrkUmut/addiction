@@ -15,7 +15,7 @@
 | Email and authentication identifiers | Create and manage an optional account | Supabase Auth session is stored on device; native session is encrypted | Supabase Auth | Supabase processes account/auth data |
 | Reminder preference (enabled state, local time, scheduled notification identifier) | Schedule or cancel an optional daily check-in reminder | Yes | No | No; notification content is generic and contains no plan or health details |
 
-The app does not request contacts, location, camera, microphone, or health platform APIs. Notification permission is requested only after the user chooses a reminder time and turns the reminder on; reminders are scheduled locally and can be cancelled in Settings. `@react-native-community/netinfo` reads connection status on device to retry a pending backup; the app does not send that status to an analytics service. No analytics or crash-reporting SDK is configured.
+The app does not request contacts, location, camera, microphone, or health platform APIs. Notification permission is requested only after the user chooses a reminder time and turns the reminder on; reminders are scheduled locally and can be cancelled in Settings. No analytics or crash-reporting SDK is configured.
 
 ## Storage and transfer
 

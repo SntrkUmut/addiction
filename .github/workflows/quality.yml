@@ -31,3 +31,13 @@ jobs:
 
       - name: Check Expo configuration and dependencies
         run: npx expo-doctor
+
+      - name: Check content manifest and editorial
+        run: |
+          python3 src/content/editorial.py src/content/manifest.example.json
+          python3 src/content/editorial.py src/content/manifest.bundled.json
+          python3 src/content/tr_spell.py src/content/manifest.example.json
+          python3 src/content/tr_spell.py src/content/manifest.bundled.json
+          python3 src/content/check_manifest.py src/content/manifest.example.json --channel prod
+          python3 src/content/check_manifest.py src/content/manifest.bundled.json --channel prod
+          python3 src/content/test_check_manifest.py

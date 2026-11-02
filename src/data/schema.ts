@@ -14,8 +14,49 @@ export type Profile = {
   reason: string;
   currency: string;
 };
-export type AppState = { profile: Profile | null; events: ProgressEvent[] };
-export type CopingChoice = { id: string; title: string; detail: string; icon: string; minutes: number };
+
+// Rev 4: Milestones sync to cloud
+export type MilestoneKey = 'day-1' | 'day-7' | 'day-14' | 'day-30' | 'day-60' | 'day-90' | 'day-180' | 'day-365' | `chapter-${number}`;
+export type MilestoneSeen = { 
+  key: MilestoneKey; 
+  seenAt: string; // ISO
+  variant: 'default' | 'slip'; 
+};
+
+// Rev 4: Collections (grow-only, synced)
+export type CollectionItem = {
+  id: string;
+  at: string; // ISO
+  source: 'goal' | 'milestone' | 'chapter' | 'season';
+};
+
+// Rev 4: Personalization (last-writer-wins by updatedAt, synced)
+export type Personalization = {
+  foxAccessory?: string;
+  slots?: Record<string, string>; // pieceId → itemId
+  updatedAt: string; // ISO
+};
+
+export type AppState = { 
+  schemaVersion?: 2; // absent = 1
+  profile: Profile | null; 
+  events: ProgressEvent[];
+  lights?: number; // Rev 5: total lights earned (calculated from check-ins)
+  milestones?: { seen: MilestoneSeen[] }; // Rev 4: synced
+  collection?: { earned: CollectionItem[] }; // Rev 4: synced, grow-only
+  personalization?: Personalization; // Rev 4: synced, LWW
+};
+export type CopingChoice = { id: string; title: string; detail: string; icon?: string; minutes: number };
+
+export function emptyAppState(): AppState {
+  return {
+    schemaVersion: 2,
+    profile: null,
+    events: [],
+    milestones: { seen: [] },
+    collection: { earned: [] },
+  };
+}
 
 const eventKinds = new Set<EventKind>(['checkin', 'craving', 'coping', 'slip', 'urge_result']);
 const MAX_EVENTS = 10_000;
@@ -46,28 +87,125 @@ export function parseAppState(value: unknown): AppState | null {
     events.push({ id: event.id, kind: event.kind as EventKind, at: event.at, details: event.details as Record<string, unknown> });
   }
 
-  if (candidate.profile === null) return { profile: null, events };
+  if (candidate.profile === null) {
+    return buildAppState(null, events, candidate);
+  }
   if (!candidate.profile || typeof candidate.profile !== 'object' || Array.isArray(candidate.profile)) return null;
   const profile = candidate.profile as Record<string, unknown>;
-  if (typeof profile.name !== 'string' || profile.name.length > 120
-    || typeof profile.reason !== 'string' || profile.reason.length > 2_000
+  const name = typeof profile.name === 'string' ? profile.name : profile.name == null ? '' : null;
+  const reason = typeof profile.reason === 'string' ? profile.reason : profile.reason == null ? '' : null;
+  const currency = normalizeCurrency(profile.currency);
+  if (name === null || name.length > 120
+    || reason === null || reason.length > 2_000
     || typeof profile.quitDate !== 'string' || !Number.isFinite(Date.parse(profile.quitDate))
-    || typeof profile.currency !== 'string' || !/^[A-Z]{3}$/.test(profile.currency)
+    || currency === null
     || typeof profile.cigarettesPerDay !== 'number' || !Number.isFinite(profile.cigarettesPerDay) || profile.cigarettesPerDay < 0 || profile.cigarettesPerDay > 100
     || typeof profile.packPrice !== 'number' || !Number.isFinite(profile.packPrice) || profile.packPrice < 0 || profile.packPrice > 10_000_000
     || typeof profile.packSize !== 'number' || !Number.isFinite(profile.packSize) || profile.packSize < 0 || profile.packSize > 100
     || ((profile.packPrice === 0) !== (profile.packSize === 0))) return null;
 
-  return {
-    profile: {
-      name: profile.name,
-      cigarettesPerDay: profile.cigarettesPerDay,
-      packPrice: profile.packPrice,
-      packSize: profile.packSize,
-      quitDate: profile.quitDate,
-      reason: profile.reason,
-      currency: profile.currency,
-    },
-    events,
-  };
+  return buildAppState({
+    name,
+    cigarettesPerDay: profile.cigarettesPerDay,
+    packPrice: profile.packPrice,
+    packSize: profile.packSize,
+    quitDate: profile.quitDate,
+    reason,
+    currency,
+  }, events, candidate);
+}
+
+function normalizeCurrency(value: unknown): string | null {
+  if (value == null || value === '' || value === '₺' || value === 'TL' || value === 'tl') return 'TRY';
+  if (typeof value !== 'string') return null;
+  if (/^[A-Z]{3}$/.test(value)) return value;
+  return null;
+}
+
+function buildAppState(profile: Profile | null, events: ProgressEvent[], candidate: Record<string, unknown>): AppState {
+  const state: AppState = { profile, events };
+  
+  // Rev 4: schemaVersion
+  if (typeof candidate.schemaVersion === 'number' && candidate.schemaVersion === 2) {
+    state.schemaVersion = 2;
+  }
+
+  // Rev 4: Parse milestones (optional, grow-only set)
+  if (candidate.milestones && typeof candidate.milestones === 'object' && !Array.isArray(candidate.milestones)) {
+    const milestonesObj = candidate.milestones as Record<string, unknown>;
+    if (Array.isArray(milestonesObj.seen)) {
+      const seen: MilestoneSeen[] = [];
+      for (const item of milestonesObj.seen) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+        const ms = item as Record<string, unknown>;
+        if (typeof ms.key !== 'string' || typeof ms.seenAt !== 'string' || !Number.isFinite(Date.parse(ms.seenAt))) continue;
+        const variant = (ms.variant === 'slip' || ms.variant === 'default') ? ms.variant : 'default';
+        // Drop unknown keys for forward compatibility
+        if (!ms.key.match(/^(day-\d+|chapter-\d+)$/)) continue;
+        // Dedupe by key, keep earliest
+        const existing = seen.find(s => s.key === ms.key);
+        if (!existing) {
+          seen.push({ key: ms.key as MilestoneKey, seenAt: ms.seenAt, variant });
+        } else if (ms.seenAt < existing.seenAt) {
+          existing.seenAt = ms.seenAt;
+          existing.variant = variant;
+        }
+      }
+      if (seen.length <= 64) {
+        state.milestones = { seen };
+      }
+    }
+  }
+  if (!state.milestones) {
+    state.milestones = { seen: [] };
+  }
+
+  // Rev 4: Parse collection (optional, grow-only set)
+  if (candidate.collection && typeof candidate.collection === 'object' && !Array.isArray(candidate.collection)) {
+    const collectionObj = candidate.collection as Record<string, unknown>;
+    if (Array.isArray(collectionObj.earned)) {
+      const earned: CollectionItem[] = [];
+      for (const item of collectionObj.earned) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+        const ci = item as Record<string, unknown>;
+        if (typeof ci.id !== 'string' || typeof ci.at !== 'string' || !Number.isFinite(Date.parse(ci.at))) continue;
+        const source = ['goal', 'milestone', 'chapter', 'season'].includes(ci.source as string) 
+          ? ci.source as CollectionItem['source'] 
+          : 'milestone';
+        // Dedupe by id
+        if (!earned.find(e => e.id === ci.id)) {
+          earned.push({ id: ci.id, at: ci.at, source });
+        }
+      }
+      if (earned.length <= 2000) {
+        state.collection = { earned };
+      }
+    }
+  }
+  if (!state.collection) {
+    state.collection = { earned: [] };
+  }
+
+  // Rev 4: Parse personalization (optional, LWW)
+  if (candidate.personalization && typeof candidate.personalization === 'object' && !Array.isArray(candidate.personalization)) {
+    const p = candidate.personalization as Record<string, unknown>;
+    if (typeof p.updatedAt === 'string' && Number.isFinite(Date.parse(p.updatedAt))) {
+      const personalization: Personalization = { updatedAt: p.updatedAt };
+      if (typeof p.foxAccessory === 'string') {
+        personalization.foxAccessory = p.foxAccessory;
+      }
+      if (p.slots && typeof p.slots === 'object' && !Array.isArray(p.slots)) {
+        const slots: Record<string, string> = {};
+        for (const [k, v] of Object.entries(p.slots)) {
+          if (typeof v === 'string') slots[k] = v;
+        }
+        if (Object.keys(slots).length > 0) {
+          personalization.slots = slots;
+        }
+      }
+      state.personalization = personalization;
+    }
+  }
+
+  return state;
 }

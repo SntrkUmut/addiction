@@ -3,16 +3,17 @@ import 'expo-sqlite/localStorage/install';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
 import { createAuthStorage } from './sessionStorage';
-import { parseAppState } from './schema';
-import type { AppState } from './schema';
+import { emptyAppState, parseAppState } from './schema';
+import type { AppState, MilestoneKey } from './schema';
 
-export { parseAppState } from './schema';
+export { emptyAppState, parseAppState } from './schema';
 export type { AppState, CopingChoice, EventKind, Profile, ProgressEvent } from './schema';
 
 const STORAGE_KEY = 'quit-companion-state-v1';
 const PENDING_SYNC_KEY = 'quit-companion-pending-sync-v1';
+const LEGACY_MILESTONES_KEY = 'quit-milestones-seen-v1';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 export const supabaseReady = Boolean(supabaseUrl && supabaseKey);
 
 let client: SupabaseClient | null = null;
@@ -28,13 +29,39 @@ if (supabaseUrl && supabaseKey) {
   });
 }
 
-export async function loadAppState(): Promise<AppState | null> {
+export async function loadAppState(): Promise<AppState> {
   try {
     const value = await localStorage.getItem(STORAGE_KEY);
-    if (!value) return null;
-    return parseAppState(JSON.parse(value));
+    if (!value) return emptyAppState();
+    const parsed = parseAppState(JSON.parse(value));
+    if (!parsed) return emptyAppState();
+    return importLegacyMilestones(parsed);
   } catch {
-    return null;
+    return emptyAppState();
+  }
+}
+
+async function importLegacyMilestones(state: AppState): Promise<AppState> {
+  if ((state.milestones?.seen.length ?? 0) > 0) return state;
+  try {
+    const raw = await localStorage.getItem(LEGACY_MILESTONES_KEY);
+    if (!raw) return state;
+    const value = JSON.parse(raw) as unknown;
+    const keys = Array.isArray(value)
+      ? value
+      : value && typeof value === 'object' && Array.isArray((value as { seen?: unknown }).seen)
+        ? (value as { seen: unknown[] }).seen
+        : [];
+    const seen = [];
+    for (const item of keys) {
+      const key = typeof item === 'string' ? item : item && typeof item === 'object' ? String((item as { key?: unknown }).key ?? '') : '';
+      if (!/^(day-\d+|chapter-\d+)$/.test(key)) continue;
+      seen.push({ key: key as MilestoneKey, seenAt: new Date(0).toISOString(), variant: 'default' as const });
+    }
+    if (seen.length === 0) return state;
+    return { ...state, milestones: { seen } };
+  } catch {
+    return state;
   }
 }
 

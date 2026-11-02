@@ -1,17 +1,44 @@
 {
+  "$schema": "https://json.schemastore.org/eas-build.json",
   "cli": {
-    "version": ">=16.0.0",
+    "version": ">= 14.0.0",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "environment": "development",
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "EXPO_PUBLIC_MANIFEST_CHANNEL": "beta"
+      },
+      "ios": {
+        "buildConfiguration": "Debug"
+      },
+      "android": {
+        "gradleCommand": ":app:assembleDebug"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "preview",
+        "EXPO_PUBLIC_MANIFEST_CHANNEL": "beta"
+      },
+      "ios": {
+        "simulator": false
+      }
     },
-    "production": {}
+    "production": {
+      "environment": "production",
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_MANIFEST_CHANNEL": "prod"
+      }
+    }
   },
   "submit": {
     "production": {}

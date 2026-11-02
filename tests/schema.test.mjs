@@ -25,11 +25,11 @@ test('accepts valid state and returns only the supported profile and event field
     unexpectedTopLevel: true,
   });
 
-  assert.deepEqual(parsed, { profile, events: [event] });
+  assert.deepEqual(parsed, { profile, events: [event], milestones: { seen: [] }, collection: { earned: [] } });
 });
 
 test('accepts an unconfigured profile with local events', () => {
-  assert.deepEqual(parseAppState({ profile: null, events: [event] }), { profile: null, events: [event] });
+  assert.deepEqual(parseAppState({ profile: null, events: [event] }), { profile: null, events: [event], milestones: { seen: [] }, collection: { earned: [] } });
 });
 
 test('rejects invalid event kinds, timestamps, and non-object details', () => {
@@ -41,6 +41,17 @@ test('rejects invalid event kinds, timestamps, and non-object details', () => {
 test('rejects impossible plans and incomplete package price pairs', () => {
   assert.equal(parseAppState({ profile: { ...profile, cigarettesPerDay: 101 }, events: [] }), null);
   assert.equal(parseAppState({ profile: { ...profile, packSize: 0 }, events: [] }), null);
+});
+
+test('migrates symbol currency and missing name/reason without dropping the snapshot', () => {
+  const parsed = parseAppState({
+    profile: { ...profile, name: undefined, reason: undefined, currency: '₺' },
+    events: [event],
+  });
+
+  assert.equal(parsed?.profile?.currency, 'TRY');
+  assert.equal(parsed?.profile?.name, '');
+  assert.equal(parsed?.profile?.reason, '');
 });
 
 test('rejects snapshots larger than the cloud snapshot limit', () => {

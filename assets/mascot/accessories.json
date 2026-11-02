@@ -1,0 +1,1043 @@
+{
+ "_notes": {
+  "canvas": "Her katman tilki pozlarıyla aynı kare tuvalde (342/683/1024), fox_idle ile piksel hizalı. region≠(0,0,1) ise katman tilki tuvaline göre x,y ofsetli ve size kat büyük bir karedir (bkz. README).",
+  "transform": "RN sırası: translateX(tx·W), translateY(ty·W), rotate(rotate deg), scale(scale); merkez=tuval merkezi, pozitif açı saat yönü. p' = c + (tx,ty)·W + R·scale·(p−c).",
+  "layer": "front = tilkinin önünde, back = tilkinin arkasında",
+  "per_pose_files": "per_pose_files=true olan aksesuarlarda (eldiven, rüzgârlık) her poz için ayrı çizilmiş dosya vardır: poses[p].files; transform kimliktir (1,0,0,0), dosya doğrudan tilki tuvaline piksel hizalıdır. Kök dosya (<slug>.png) fox_idle sürümüdür."
+ },
+ "it-yuvarlak-gozluk": {
+  "name": "Yuvarlak gözlük",
+  "id": "it-yuvarlak-gozluk",
+  "source": "Bölüm 1 · Temel (§25)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "eyes",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3115,
+   0.2803,
+   0.7422,
+   0.4287
+  ],
+  "anchor": [
+   0.5269,
+   0.3545
+  ],
+  "files": {
+   "": "it-yuvarlak-gozluk.png",
+   "@1x": "it-yuvarlak-gozluk@1x.png",
+   "@2x": "it-yuvarlak-gozluk@2x.png",
+   "@3x": "it-yuvarlak-gozluk@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.5269,
+     0.3545
+    ]
+   },
+   "fox_wave": {
+    "scale": 0.983,
+    "rotate": -9.7,
+    "tx": -0.0001,
+    "ty": 0.0172,
+    "fit_source": "eyes",
+    "anchor_on_pose": [
+     0.5019,
+     0.3718
+    ]
+   },
+   "fox_cheer": {
+    "scale": 0.936,
+    "rotate": -6.5,
+    "tx": 0.0286,
+    "ty": -0.0066,
+    "fit_source": "eyes",
+    "anchor_on_pose": [
+     0.5382,
+     0.3552
+    ]
+   },
+   "fox_happy": {
+    "scale": 0.953,
+    "rotate": -9.0,
+    "tx": 0.0187,
+    "ty": -0.0122,
+    "fit_source": "eyes",
+    "anchor_on_pose": [
+     0.5223,
+     0.3468
+    ]
+   },
+   "fox_craving": {
+    "scale": 0.967,
+    "rotate": -0.0,
+    "tx": 0.0325,
+    "ty": -0.0036,
+    "fit_source": "eyes",
+    "anchor_on_pose": [
+     0.5585,
+     0.3557
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.075,
+    "rotate": 0.0,
+    "tx": -0.0117,
+    "ty": 0.043,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.5172,
+     0.3866
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_sleepy": "pati sol gözün üstünde; gözlük patinin önüne biner",
+   "fox_hero": "pilot gözlüğüyle çakışır"
+  },
+  "colors": "lacivert çerçeve #2C3E6B, camlar tamamen şeffaf (göz görünür)"
+ },
+ "it-hasir-sapka": {
+  "name": "Hasır şapka",
+  "id": "it-hasir-sapka",
+  "source": "Bölüm 2 · Bahçe (§25)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "crown",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.2412,
+   0.0703,
+   0.832,
+   0.3828
+  ],
+  "anchor": [
+   0.5366,
+   0.1924
+  ],
+  "files": {
+   "": "it-hasir-sapka.png",
+   "@1x": "it-hasir-sapka@1x.png",
+   "@2x": "it-hasir-sapka@2x.png",
+   "@3x": "it-hasir-sapka@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.5366,
+     0.1924
+    ]
+   },
+   "fox_wave": {
+    "scale": 0.925,
+    "rotate": -12.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "hat",
+    "anchor_on_pose": [
+     0.474,
+     0.2146
+    ]
+   },
+   "fox_cheer": {
+    "scale": 0.875,
+    "rotate": -10.0,
+    "tx": 0.0273,
+    "ty": -0.0273,
+    "fit_source": "hat",
+    "anchor_on_pose": [
+     0.5121,
+     0.2021
+    ]
+   },
+   "fox_sleepy": {
+    "scale": 0.95,
+    "rotate": -10.0,
+    "tx": 0.0273,
+    "ty": 0.0156,
+    "fit_source": "hat",
+    "anchor_on_pose": [
+     0.5108,
+     0.2218
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.075,
+    "rotate": 0.0,
+    "tx": -0.0117,
+    "ty": 0.043,
+    "fit_source": "hat",
+    "anchor_on_pose": [
+     0.5276,
+     0.2123
+    ]
+   },
+   "fox_craving": {
+    "scale": 0.95,
+    "rotate": -4.0,
+    "tx": 0.0391,
+    "ty": -0.0078,
+    "fit_source": "hat",
+    "anchor_on_pose": [
+     0.5534,
+     0.1983
+    ]
+   },
+   "fox_happy": {
+    "scale": 0.925,
+    "rotate": -12.0,
+    "tx": 0.0156,
+    "ty": -0.0159,
+    "fit_source": "hat",
+    "anchor_on_pose": [
+     0.4896,
+     0.1987
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_hero": "pilot gözlüğü bandı şapkanın altına girer"
+  },
+  "colors": "hasır #E9D29A + koyu teal kurdele #2E7F7A",
+  "notes": {
+   "fox_sleepy": "kenarın sol ucu kalkık patinin üst kenarına hafifçe biner (kabul edilebilir)",
+   "fox_happy": "ty −0.0159 (baş tf'sinden 0.012 yukarı) — kalkık kaşlar kenarın altında görünsün diye"
+  }
+ },
+ "it-lastik-cizme": {
+  "name": "Lastik çizme",
+  "id": "it-lastik-cizme",
+  "source": "Bölüm 3 · Dere kenarı — bölüm tamamlama ödülü (§22/§25)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "ground",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3613,
+   0.8379,
+   0.7178,
+   0.9941
+  ],
+  "anchor": [
+   0.5396,
+   0.9941
+  ],
+  "files": {
+   "": "it-lastik-cizme.png",
+   "@1x": "it-lastik-cizme@1x.png",
+   "@2x": "it-lastik-cizme@2x.png",
+   "@3x": "it-lastik-cizme@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.5396,
+     0.9941
+    ]
+   },
+   "fox_wave": {
+    "scale": 1.025,
+    "rotate": 2.0,
+    "tx": -0.0078,
+    "ty": -0.0234,
+    "fit_source": "feet",
+    "anchor_on_pose": [
+     0.5151,
+     0.9842
+    ]
+   },
+   "fox_cheer": {
+    "scale": 1.025,
+    "rotate": 2.0,
+    "tx": 0.0,
+    "ty": -0.0312,
+    "fit_source": "feet",
+    "anchor_on_pose": [
+     0.5229,
+     0.9764
+    ]
+   },
+   "fox_sleepy": {
+    "scale": 1.075,
+    "rotate": 2.0,
+    "tx": 0.0312,
+    "ty": -0.0547,
+    "fit_source": "feet",
+    "anchor_on_pose": [
+     0.5552,
+     0.9776
+    ]
+   },
+   "fox_craving": {
+    "scale": 1.05,
+    "rotate": -2.0,
+    "tx": 0.0,
+    "ty": -0.0234,
+    "fit_source": "feet",
+    "anchor_on_pose": [
+     0.5597,
+     0.9936
+    ]
+   },
+   "fox_hero": {
+    "scale": 0.975,
+    "rotate": 2.0,
+    "tx": -0.0156,
+    "ty": -0.0039,
+    "fit_source": "feet",
+    "anchor_on_pose": [
+     0.5062,
+     0.9789
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_calm": "bağdaş kurmuş; ayaklar farklı açıda",
+   "fox_happy": "zıplıyor; bacaklar ayrık/kalkık"
+  },
+  "colors": "açık mavi #5FA8D3 + krem taban/ağız #F3E3C3"
+ },
+ "it-sirt-cantasi": {
+  "name": "Sırt çantası",
+  "id": "it-sirt-cantasi",
+  "source": "Bölüm 4 · Orman yolu — bölüm tamamlama ödülü (§22/§25)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "shoulders",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3721,
+   0.5166,
+   0.71,
+   0.7363
+  ],
+  "anchor": [
+   0.541,
+   0.5166
+  ],
+  "files": {
+   "": "it-sirt-cantasi.png",
+   "@1x": "it-sirt-cantasi@1x.png",
+   "@2x": "it-sirt-cantasi@2x.png",
+   "@3x": "it-sirt-cantasi@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.541,
+     0.5166
+    ]
+   },
+   "fox_wave": {
+    "scale": 0.85,
+    "rotate": -2.0,
+    "tx": -0.0391,
+    "ty": 0.0352,
+    "fit_source": "torso",
+    "anchor_on_pose": [
+     0.4962,
+     0.5481
+    ]
+   },
+   "fox_cheer": {
+    "scale": 0.85,
+    "rotate": 0.0,
+    "tx": -0.0234,
+    "ty": 0.0195,
+    "fit_source": "torso",
+    "anchor_on_pose": [
+     0.5115,
+     0.5336
+    ]
+   },
+   "fox_sleepy": {
+    "scale": 0.85,
+    "rotate": -16.0,
+    "tx": 0.0195,
+    "ty": 0.0547,
+    "fit_source": "torso",
+    "anchor_on_pose": [
+     0.5569,
+     0.5587
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.075,
+    "rotate": 0.0,
+    "tx": -0.0039,
+    "ty": 0.0352,
+    "fit_source": "torso",
+    "anchor_on_pose": [
+     0.5402,
+     0.553
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_craving": "parlayan taş göğsün önünde, askılar taşın/kolların üstüne biner",
+   "fox_happy": "zıplama, gövde eğik",
+   "fox_hero": "pelerin omuzları kapatır"
+  },
+  "colors": "orman yeşili #4F7A4A + krem dikiş #F3E3C3 + altın toka #D9AC58"
+ },
+ "it-atki": {
+  "name": "Atkı (\"Tilki için atkı\")",
+  "id": "it-atki",
+  "source": "Haftalık hedef \"Sığınağında bir parçanın yerini değiştir\" (§25)",
+  "status": "manifestte",
+  "layer": "front",
+  "anchor_type": "neck",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3828,
+   0.5078,
+   0.6982,
+   0.7871
+  ],
+  "anchor": [
+   0.5405,
+   0.5361
+  ],
+  "files": {
+   "": "it-atki.png",
+   "@1x": "it-atki@1x.png",
+   "@2x": "it-atki@2x.png",
+   "@3x": "it-atki@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.5405,
+     0.5361
+    ]
+   },
+   "fox_wave": {
+    "scale": 0.925,
+    "rotate": -6.0,
+    "tx": 0.0,
+    "ty": 0.03,
+    "fit_source": "elle",
+    "anchor_on_pose": [
+     0.5407,
+     0.5593
+    ]
+   },
+   "fox_cheer": {
+    "scale": 0.9,
+    "rotate": -5.0,
+    "tx": 0.02,
+    "ty": 0.035,
+    "fit_source": "elle",
+    "anchor_on_pose": [
+     0.5591,
+     0.5642
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.075,
+    "rotate": 0.0,
+    "tx": -0.0117,
+    "ty": 0.043,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.5318,
+     0.5818
+    ]
+   },
+   "fox_sleepy": {
+    "scale": 0.95,
+    "rotate": -10.0,
+    "tx": 0.0273,
+    "ty": 0.0156,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.5711,
+     0.5427
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_happy": "zıplama, gövde eğik",
+   "fox_craving": "taş atkının sarkan ucunu keser",
+   "fox_hero": "pelerin yakası"
+  },
+  "colors": "koyu teal #2E7F7A + krem #F3E3C3"
+ },
+ "it-semsiye": {
+  "name": "Şemsiye",
+  "id": "it-semsiye",
+  "source": "Bölüm 7 · Kıyı (§25 öneri; kullanıcı aksesuar olarak onayladı)",
+  "status": "proposal (onaylı)",
+  "layer": "back",
+  "anchor_type": "grip",
+  "region": {
+   "x": 0.0,
+   "y": -0.166,
+   "size": 1.3125
+  },
+  "bbox": [
+   0.4448,
+   -0.1314,
+   1.1933,
+   0.5876
+  ],
+  "anchor": [
+   0.7611,
+   0.4547
+  ],
+  "files": {
+   "": "it-semsiye.png",
+   "@1x": "it-semsiye@1x.png",
+   "@2x": "it-semsiye@2x.png",
+   "@3x": "it-semsiye@3x.png"
+  },
+  "poses": {
+   "fox_cheer": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.7611,
+     0.4547
+    ]
+   }
+  },
+  "not_recommended": {
+   "diğer tüm pozlar": "şemsiye sapı fox_cheer'ın kalkık (başparmak) patisinin arkasından geçecek şekilde çizildi; başka pozda tutan pati yok"
+  },
+  "colors": "koyu teal #2E7F7A / krem #F3E3C3 dilimler, altın uç #D9AC58, ahşap sap"
+ },
+ "it-bere": {
+  "name": "Bere (öneri, isteğe bağlı)",
+  "id": "it-bere",
+  "source": "spec'te yok — ilk turda öneri olarak üretildi",
+  "status": "öneri (manifestte yok)",
+  "layer": "front",
+  "anchor_type": "crown",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3066,
+   0.002,
+   0.7666,
+   0.3545
+  ],
+  "anchor": [
+   0.5366,
+   0.2061
+  ],
+  "files": {
+   "": "it-bere.png",
+   "@1x": "it-bere@1x.png",
+   "@2x": "it-bere@2x.png",
+   "@3x": "it-bere@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.5366,
+     0.2061
+    ]
+   },
+   "fox_wave": {
+    "scale": 0.925,
+    "rotate": -12.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.4766,
+     0.227
+    ]
+   },
+   "fox_cheer": {
+    "scale": 0.875,
+    "rotate": -10.0,
+    "tx": 0.0273,
+    "ty": -0.0273,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.5142,
+     0.2139
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.075,
+    "rotate": 0.0,
+    "tx": -0.0117,
+    "ty": 0.043,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.5276,
+     0.2271
+    ]
+   },
+   "fox_craving": {
+    "scale": 0.95,
+    "rotate": -4.0,
+    "tx": 0.0391,
+    "ty": -0.0078,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.5543,
+     0.2112
+    ]
+   },
+   "fox_happy": {
+    "scale": 0.925,
+    "rotate": -12.0,
+    "tx": 0.0156,
+    "ty": -0.0039,
+    "fit_source": "head",
+    "anchor_on_pose": [
+     0.4922,
+     0.2231
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_sleepy": "pati alnında; bere patinin önüne biner",
+   "fox_hero": "pilot gözlüğü"
+  },
+  "colors": "lacivert #2C3E6B + altın şerit #D9AC58 + krem ponpon"
+ },
+ "it-yildiz-rozeti": {
+  "name": "Yıldız rozeti",
+  "id": "it-yildiz-rozeti",
+  "source": "Bölüm 5 · tamamlama ödülü (§25/§25.1)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "chest",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.5693,
+   0.5498,
+   0.6445,
+   0.627
+  ],
+  "anchor": [
+   0.6055,
+   0.5854
+  ],
+  "files": {
+   "": "it-yildiz-rozeti.png",
+   "@1x": "it-yildiz-rozeti@1x.png",
+   "@2x": "it-yildiz-rozeti@2x.png",
+   "@3x": "it-yildiz-rozeti@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.6055,
+     0.5854
+    ]
+   },
+   "fox_wave": {
+    "scale": 1.0,
+    "rotate": -2.0,
+    "tx": -0.0103,
+    "ty": 0.023,
+    "fit_source": "göğüs, elle (ölçek 1.0)",
+    "anchor_on_pose": [
+     0.5981,
+     0.6047
+    ]
+   },
+   "fox_cheer": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0058,
+    "ty": 0.0067,
+    "fit_source": "göğüs, elle (ölçek 1.0)",
+    "anchor_on_pose": [
+     0.6113,
+     0.5921
+    ]
+   },
+   "fox_happy": {
+    "scale": 1.0,
+    "rotate": -4.0,
+    "tx": 0.0223,
+    "ty": 0.0661,
+    "fit_source": "göğüs, elle (ölçek 1.0)",
+    "anchor_on_pose": [
+     0.6335,
+     0.6439
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.004,
+    "ty": 0.0416,
+    "fit_source": "göğüs, elle (ölçek 1.0)",
+    "anchor_on_pose": [
+     0.6095,
+     0.627
+    ]
+   },
+   "fox_sleepy": {
+    "scale": 1.0,
+    "rotate": -16.0,
+    "tx": 0.0408,
+    "ty": 0.0468,
+    "fit_source": "göğüs, elle (ölçek 1.0)",
+    "anchor_on_pose": [
+     0.6658,
+     0.5998
+    ]
+   },
+   "fox_hero": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0192,
+    "ty": 0.0552,
+    "fit_source": "göğüs, elle (ölçek 1.0)",
+    "anchor_on_pose": [
+     0.6247,
+     0.6406
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_craving": "patiler/taş göğsü kapatır"
+  },
+  "colors": "lacivert disk #2C3E6B, altın kenar ve yıldız #D9AC58, krem parlama #F3E3C3, %20 yumuşak gölge; 8° saat yönü eğik",
+  "notes": {
+   "fox_hero": "pelerin yakasının ve yıldız tokanın altında, krem göğüste — tokayla/FX ile çakışmaz"
+  }
+ },
+ "it-orgu-eldiven": {
+  "name": "Örgü eldiven",
+  "id": "it-orgu-eldiven",
+  "source": "Bölüm 6 · tamamlama ödülü (§25/§25.1)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "paws",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3057,
+   0.6631,
+   0.7812,
+   0.8379
+  ],
+  "anchor": {
+   "left": [
+    0.3636,
+    0.7504
+   ],
+   "right": [
+    0.7221,
+    0.7509
+   ]
+  },
+  "files": {
+   "": "it-orgu-eldiven.png",
+   "@1x": "it-orgu-eldiven@1x.png",
+   "@2x": "it-orgu-eldiven@2x.png",
+   "@3x": "it-orgu-eldiven@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.3636,
+     0.7504
+    ],
+    "files": {
+     "": "it-orgu-eldiven.png",
+     "@1x": "it-orgu-eldiven@1x.png",
+     "@2x": "it-orgu-eldiven@2x.png",
+     "@3x": "it-orgu-eldiven@3x.png"
+    }
+   },
+   "fox_calm": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-orgu-eldiven-calm@1x.png",
+     "@2x": "it-orgu-eldiven-calm@2x.png",
+     "@3x": "it-orgu-eldiven-calm@3x.png",
+     "": "it-orgu-eldiven-calm.png"
+    },
+    "bbox": [
+     0.2363,
+     0.6826,
+     0.8584,
+     0.8516
+    ]
+   },
+   "fox_wave": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-orgu-eldiven-wave@1x.png",
+     "@2x": "it-orgu-eldiven-wave@2x.png",
+     "@3x": "it-orgu-eldiven-wave@3x.png",
+     "": "it-orgu-eldiven-wave.png"
+    },
+    "bbox": [
+     0.3457,
+     0.3418,
+     0.874,
+     0.8096
+    ]
+   },
+   "fox_happy": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-orgu-eldiven-happy@1x.png",
+     "@2x": "it-orgu-eldiven-happy@2x.png",
+     "@3x": "it-orgu-eldiven-happy@3x.png",
+     "": "it-orgu-eldiven-happy.png"
+    },
+    "bbox": [
+     0.1357,
+     0.2939,
+     0.8955,
+     0.5264
+    ]
+   },
+   "fox_sleepy": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-orgu-eldiven-sleepy@1x.png",
+     "@2x": "it-orgu-eldiven-sleepy@2x.png",
+     "@3x": "it-orgu-eldiven-sleepy@3x.png",
+     "": "it-orgu-eldiven-sleepy.png"
+    },
+    "bbox": [
+     0.3291,
+     0.3477,
+     0.8037,
+     0.8252
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_cheer": "başparmak yukarı; eldiven başparmağı saklar",
+   "fox_hero": "kalkık pati mücevheri tutuyor",
+   "fox_craving": "patiler taşı tutuyor"
+  },
+  "colors": "krem örgü gövde #F3E3C3 (gölge #D9C7A2), teal ribanalı manşet #2E7F7A, altın dikiş bandı #D9AC58",
+  "per_pose_files": true
+ },
+ "it-ruzgarlik": {
+  "name": "Rüzgârlık",
+  "id": "it-ruzgarlik",
+  "source": "Bölüm 8 · tamamlama ödülü (§25/§25.1)",
+  "status": "manifest (pending)",
+  "layer": "front",
+  "anchor_type": "shoulders",
+  "region": {
+   "x": 0.0,
+   "y": 0.0,
+   "size": 1.0
+  },
+  "bbox": [
+   0.3301,
+   0.5146,
+   0.7529,
+   0.8213
+  ],
+  "anchor": [
+   0.5415,
+   0.5146
+  ],
+  "files": {
+   "": "it-ruzgarlik.png",
+   "@1x": "it-ruzgarlik@1x.png",
+   "@2x": "it-ruzgarlik@2x.png",
+   "@3x": "it-ruzgarlik@3x.png"
+  },
+  "poses": {
+   "fox_idle": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "—",
+    "anchor_on_pose": [
+     0.5415,
+     0.5146
+    ],
+    "files": {
+     "": "it-ruzgarlik.png",
+     "@1x": "it-ruzgarlik@1x.png",
+     "@2x": "it-ruzgarlik@2x.png",
+     "@3x": "it-ruzgarlik@3x.png"
+    }
+   },
+   "fox_wave": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-ruzgarlik-wave@1x.png",
+     "@2x": "it-ruzgarlik-wave@2x.png",
+     "@3x": "it-ruzgarlik-wave@3x.png",
+     "": "it-ruzgarlik-wave.png"
+    },
+    "bbox": [
+     0.3076,
+     0.4277,
+     0.8086,
+     0.8379
+    ]
+   },
+   "fox_calm": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-ruzgarlik-calm@1x.png",
+     "@2x": "it-ruzgarlik-calm@2x.png",
+     "@3x": "it-ruzgarlik-calm@3x.png",
+     "": "it-ruzgarlik-calm.png"
+    },
+    "bbox": [
+     0.2842,
+     0.5557,
+     0.7939,
+     0.8438
+    ]
+   },
+   "fox_happy": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-ruzgarlik-happy@1x.png",
+     "@2x": "it-ruzgarlik-happy@2x.png",
+     "@3x": "it-ruzgarlik-happy@3x.png",
+     "": "it-ruzgarlik-happy.png"
+    },
+    "bbox": [
+     0.2354,
+     0.3955,
+     0.8193,
+     0.8125
+    ]
+   },
+   "fox_cheer": {
+    "scale": 1.0,
+    "rotate": 0.0,
+    "tx": 0.0,
+    "ty": 0.0,
+    "fit_source": "poza özel dosya",
+    "files": {
+     "@1x": "it-ruzgarlik-cheer@1x.png",
+     "@2x": "it-ruzgarlik-cheer@2x.png",
+     "@3x": "it-ruzgarlik-cheer@3x.png",
+     "": "it-ruzgarlik-cheer.png"
+    },
+    "bbox": [
+     0.3164,
+     0.5176,
+     0.791,
+     0.8174
+    ]
+   }
+  },
+  "not_recommended": {
+   "fox_sleepy": "kalkık kol/esneme; kol yeniden çizilmeli",
+   "fox_hero": "pelerinle çakışır",
+   "fox_craving": "patiler/taş göğsün önünde"
+  },
+  "colors": "gök mavisi gövde #5FA8D3, lacivert yaka/etek/manşet #2C3E6B, krem fermuar kenarı #F3E3C3, altın fermuar çekeceği #D9AC58",
+  "per_pose_files": true
+ }
+}
