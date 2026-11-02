@@ -41,6 +41,8 @@ import {
 } from './src/data/store';
 import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
+import { journeyDay, formatTurkishDateSince, formatEventTime } from './src/domain/journey';
+import { initHaptics, haptic } from './src/ui/haptics';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
@@ -165,6 +167,9 @@ export default function App() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    // Rev 4: Initialize haptics
+    initHaptics().catch(() => {});
+    
     loadReminderSettings().then((value) => { setReminder(value); setReminderTime(value.time); }).catch(() => {});
     loadAppState().then((loaded) => {
       setClock(Date.now());

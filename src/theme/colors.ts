@@ -37,6 +37,7 @@ export const primitives = {
     200: '#C9C3B8',
     400: '#A4A79F',
     500: '#666C66',
+    600: '#6E726A', // rev 5: tertiary text
   },
   gold: {
     100: '#F7F0DC',
@@ -54,7 +55,7 @@ export const primitives = {
 
 // Semantic tokens (light theme)
 // Components should use only these tokens
-export const semantic = {
+export const semanticLight = {
   bg: {
     canvas: primitives.cream[100],
     dark: primitives.obsidian[900],
@@ -75,6 +76,7 @@ export const semantic = {
   text: {
     primary: primitives.ink[900],
     secondary: primitives.neutral[500],
+    tertiary: primitives.neutral[600], // rev 5: #6E726A for locked/faded text
     accent: primitives.terracotta[700],
     onAccent: primitives.white,
     onDark: primitives.cream[50],
@@ -94,6 +96,53 @@ export const semantic = {
     tealDeep: primitives.teal[700],
   },
 } as const;
+
+// Semantic tokens (dark theme - rev 5 mock5)
+// Uses dusk scene for main screens, keeps night scene for focus screens
+export const semanticDark = {
+  bg: {
+    canvas: primitives.obsidian[900],
+    dark: primitives.obsidian[950],
+  },
+  surface: {
+    card: primitives.obsidian[800],
+    sunken: primitives.obsidian[700],
+    hero: primitives.obsidian[600],
+    rewardSoft: 'rgba(217, 172, 88, 0.12)', // gold with low opacity
+    calmSoft: 'rgba(94, 214, 207, 0.12)', // teal with low opacity
+    glassDark: 'rgba(255, 255, 255, 0.08)',
+  },
+  border: {
+    default: primitives.obsidian[700],
+    accent: primitives.obsidian[600],
+    glassDark: 'rgba(255, 255, 255, 0.18)',
+  },
+  text: {
+    primary: primitives.cream[50],
+    secondary: primitives.neutral[400],
+    tertiary: '#8C8F87', // rev 5: darker tertiary for dark mode
+    accent: primitives.terracotta[600], // brighter on dark
+    onAccent: primitives.white,
+    onDark: primitives.cream[50],
+    onDarkMuted: primitives.neutral[200],
+  },
+  action: {
+    primary: primitives.terracotta[600],
+    primaryPressed: primitives.terracotta[700],
+    primaryEdge: primitives.terracotta[800],
+    secondary: primitives.obsidian[700],
+  },
+  accent: {
+    gold: primitives.gold[500],
+    goldDeep: primitives.gold[600],
+    goldEdge: primitives.gold[700],
+    teal: primitives.teal[400],
+    tealDeep: primitives.teal[700],
+  },
+} as const;
+
+// Default export for backward compatibility
+export const semantic = semanticLight;
 
 // Scene gradients
 export const sceneDay = {

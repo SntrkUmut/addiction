@@ -6,9 +6,16 @@
     {
       "id": "ch-temel",
       "order": 1,
+      "copyStatus": "approved",
       "eyebrow": "BÖLÜM 1 · TEMEL",
       "title": "Sığınağın ilk odası",
       "theme": { "scene": "day" },
+      "completion": {
+        "eyebrow": "BÖLÜM 1 TAMAMLANDI",
+        "title": "Sığınağın ilk odası hazır.",
+        "body": "On iki ışıkla altı parçayı yerine koydun. Hepsi burada kalıyor; şimdi yol bahçeye uzanıyor.",
+        "cta": "Bölüm 2'ye bak"
+      },
       "pieces": [
         { "id": "pc-temel", "name": "Sığınak temeli", "icon": "house-simple" },
         { "id": "pc-isiklar", "name": "Sıcak ışıklar", "icon": "lamp" },
@@ -17,16 +24,30 @@
         { "id": "pc-yesil", "name": "Yeşil köşe", "icon": "plant" },
         { "id": "pc-kitaplik", "name": "Kitaplık", "icon": "books" }
       ],
-      "completionReward": "it-atki"
+      "completionReward": "it-yuvarlak-gozluk"
     },
     {
       "id": "ch-bahce",
       "order": 2,
+      "copyStatus": "approved",
       "eyebrow": "BÖLÜM 2 · BAHÇE",
       "title": "Sığınağın bahçesi",
       "theme": { "scene": "day" },
       "teaser": {
+        "line": "Kapının ardında bir bahçe var.",
         "previewIcons": ["door-open", "flower-tulip", "bird"]
+      },
+      "intro": {
+        "eyebrow": "BÖLÜM 2 · BAHÇE",
+        "title": "Sırada sığınağın bahçesi var.",
+        "body": "Aynı yol devam ediyor: her 2 ışık bahçeye yeni bir parça ekler. İlk odan olduğu gibi yerinde kalır.",
+        "cta": "Yola devam et"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 2 TAMAMLANDI",
+        "title": "Sığınağın bahçesi hazır.",
+        "body": "Bahçeye altı parça yerleştirdin. Hepsi yerinde duruyor; yol şimdi bir derenin sesine doğru iniyor.",
+        "cta": "Bölüm 3'e bak"
       },
       "pieces": [
         { "id": "pc-bahce-kapisi", "name": "Bahçe kapısı", "icon": "door-open" },
@@ -41,32 +62,83 @@
     {
       "id": "ch-dere",
       "order": 3,
+      "copyStatus": "approved",
       "eyebrow": "BÖLÜM 3 · DERE KENARI",
       "title": "Suyun sesi",
       "theme": { "scene": "day" },
       "teaser": {
+        "line": "Bir derenin sesine doğru iniyorsun.",
         "previewIcons": ["bridge", "drop", "waves"]
       },
+      "intro": {
+        "eyebrow": "BÖLÜM 3 · DERE KENARI",
+        "title": "Yol bir derenin sesine doğru iniyor.",
+        "body": "Bahçenin ötesinde berrak bir dere akıyor. Her 2 ışık yola yeni bir parça ekler; geriye bıraktığın her şey yerinde kalıyor.",
+        "cta": "Dereye in"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 3 TAMAMLANDI",
+        "title": "Dere kenarı hazır.",
+        "body": "Suyun yanına altı parça yerleştirdin. Bu sessiz akış artık senin.",
+        "cta": "Bölüm 4'e bak"
+      },
       "pieces": [
-        { "id": "pc-kucuk-kopru", "name": "Küçük köprü", "icon": "bridge" },
-        { "id": "pc-su-birikintisi", "name": "Su birikintisi", "icon": "drop" },
-        { "id": "pc-nilufer", "name": "Nilüfer", "icon": "flower-lotus" },
-        { "id": "pc-kayik", "name": "Kayık", "icon": "boat" },
-        { "id": "pc-balik-havuzu", "name": "Balık havuzu", "icon": "fish" },
-        { "id": "pc-dalga-taslari", "name": "Dalga taşları", "icon": "waves" }
-      ]
+        { "id": "pc-kucuk-kopru", "name": "Küçük köprü", "icon": "bridge", "line": "İki tarafı birbirine bağlıyor." },
+        { "id": "pc-berrak-golet", "name": "Berrak gölet", "icon": "drop", "line": "Suyun yüzeyinde her şey durgun." },
+        { "id": "pc-nilufer", "name": "Nilüfer", "icon": "flower-lotus", "line": "Sessizce suyun üstünde duruyor." },
+        { "id": "pc-kayik", "name": "Kayık", "icon": "boat", "line": "Küçük bir kayık kıyıda bekliyor." },
+        { "id": "pc-balik-havuzu", "name": "Balık havuzu", "icon": "fish", "line": "Balıklar yavaşça dönüyor." },
+        { "id": "pc-dalga-taslari", "name": "Dalga taşları", "icon": "waves", "line": "Taşlar suyun akışını yumuşatıyor." }
+      ],
+      "completionReward": "it-ipek-atki"
+    },
+    {
+      "id": "ch-orman",
+      "order": 4,
+      "copyStatus": "approved",
+      "eyebrow": "BÖLÜM 4 · ORMAN YOLU",
+      "title": "Ağaçların arası",
+      "theme": { "scene": "day" },
+      "teaser": {
+        "line": "Uzaktan yaprak hışırtısı geliyor.",
+        "previewIcons": ["tree-evergreen", "tent", "feather"]
+      },
+      "intro": {
+        "eyebrow": "BÖLÜM 4 · ORMAN YOLU",
+        "title": "Yol ağaçların arasına giriyor.",
+        "body": "Derenin ötesinde sessiz bir orman yolu başlıyor. Her 2 ışık yola yeni bir parça ekler; geride bıraktığın her yer olduğu gibi duruyor.",
+        "cta": "Ormana gir"
+      },
+      "completion": {
+        "eyebrow": "BÖLÜM 4 TAMAMLANDI",
+        "title": "Orman yolu hazır.",
+        "body": "Ağaçların arasına altı parça yerleştirdin. Bu sessiz yol artık senin.",
+        "cta": "Bölüm 5'e bak"
+      },
+      "pieces": [
+        { "id": "pc-cam-agaci", "name": "Çam ağacı", "icon": "tree-evergreen", "line": "Yolun başında, her mevsim yeşil." },
+        { "id": "pc-yaprak-yolu", "name": "Yaprak yolu", "icon": "leaf", "line": "Yumuşak yapraklar adımlarını karşılıyor." },
+        { "id": "pc-kucuk-cadir", "name": "Küçük çadır", "icon": "tent", "line": "Dinlenmek istediğinde hep bir yer var." },
+        { "id": "pc-gozlem-noktasi", "name": "Gözlem noktası", "icon": "binoculars", "line": "Buradan bakınca yol daha net görünüyor." },
+        { "id": "pc-kus-tuyu", "name": "Kuş tüyü", "icon": "feather", "line": "Yolda bulduğun küçük bir hatıra." },
+        { "id": "pc-orman-acikligi", "name": "Orman açıklığı", "icon": "park", "line": "Ağaçlar arasında sessiz bir alan." }
+      ],
+      "completionReward": "it-orman-celengi"
     }
   ],
   "upcoming": {
-    "chapterOrder": 4,
-    "eyebrow": "BÖLÜM 4 · ORMAN YOLU",
-    "title": "Ağaçların arası",
+    "chapterOrder": 5,
+    "copyStatus": "approved",
+    "eyebrow": "BÖLÜM 5 · YILDIZ TERASI",
+    "title": "Gece göğü",
+    "teaserLine": "Uzaktan gökyüzünün parladığı bir yer görünüyor.",
     "opensAt": null
   },
   "milestones": [
     {
       "key": "day-60",
       "day": 60,
+      "copyStatus": "approved",
       "reward": "it-aytasi",
       "copy": {
         "eyebrow": "İKİ AY OLDU",
@@ -76,11 +148,26 @@
         "slipLead": "60 gün oldu.",
         "slipBody": "Kaymalar oldu ama yolun kesilmedi. Önemli olan, her seferinde yeniden devam etmen."
       }
+    },
+    {
+      "key": "day-90",
+      "day": 90,
+      "copyStatus": "approved",
+      "reward": "it-akuamarin",
+      "copy": {
+        "eyebrow": "ÜÇ AY OLDU",
+        "lead": "90 gün boyunca bu yoldasın.",
+        "body": "Üç aydır kendine alan açıyorsun. Her küçük adım seni buraya getirdi.",
+        "slipEyebrow": "YOLCULUĞUN DEVAM EDİYOR",
+        "slipLead": "90 gün oldu.",
+        "slipBody": "Zor günler oldu ama yolun kesilmedi. Devam etmen önemli olan."
+      }
     }
   ],
   "goalPool": [
     {
       "id": "g-checkin-3",
+      "copyStatus": "approved",
       "metric": "checkinDays",
       "target": 3,
       "title": "3 gün check-in yap",
@@ -88,6 +175,7 @@
     },
     {
       "id": "g-coping-2",
+      "copyStatus": "approved",
       "metric": "copingSessions",
       "target": 2,
       "title": "2 kez bir baş etme aracı dene",
@@ -95,49 +183,148 @@
     },
     {
       "id": "g-rearrange-1",
+      "copyStatus": "approved",
       "metric": "rearrange",
       "target": 1,
       "title": "Sığınağında bir parçanın yerini değiştir",
-      "reward": "it-ametist"
+      "reward": "it-atki"
+    },
+    {
+      "id": "g-dere-checkin-4",
+      "copyStatus": "approved",
+      "chapterId": "ch-dere",
+      "metric": "checkinDays",
+      "target": 4,
+      "title": "Dere kenarında dinlen: bu hafta 4 gün check-in yap",
+      "reward": "it-deniz-kabugu"
+    },
+    {
+      "id": "g-dere-reason-1",
+      "copyStatus": "approved",
+      "chapterId": "ch-dere",
+      "metric": "reasonRead",
+      "target": 1,
+      "title": "Kendi nedenini bir kez daha oku",
+      "reward": "it-mavi-tasi"
+    },
+    {
+      "id": "g-orman-coping-2",
+      "copyStatus": "approved",
+      "chapterId": "ch-orman",
+      "metric": "copingSessions",
+      "target": 2,
+      "title": "Ağaçların arasında mola: bu hafta 2 kez bir baş etme aracı dene",
+      "reward": "it-mese-yapragi"
+    },
+    {
+      "id": "g-orman-walk-2",
+      "copyStatus": "approved",
+      "chapterId": "ch-orman",
+      "metric": "walkSessions",
+      "target": 2,
+      "title": "Ormanda yürü: bu hafta 2 kez yürüyüş yap",
+      "reward": "it-cam-kozalagi"
     }
   ],
   "seasons": [],
   "items": [
     {
       "id": "it-ametist",
+      "copyStatus": "approved",
       "set": "crystals",
       "name": "Ametist",
       "icon": "diamond"
     },
     {
       "id": "it-kuvars",
+      "copyStatus": "approved",
       "set": "crystals",
       "name": "Kuvars",
       "icon": "diamonds-four"
     },
     {
       "id": "it-kristal-lamba",
+      "copyStatus": "approved",
       "set": "crystals",
       "name": "Kristal lamba",
       "icon": "lamp"
     },
     {
       "id": "it-atki",
+      "copyStatus": "approved",
       "set": "fox-accessories",
       "name": "Tilki için atkı",
-      "icon": "t-shirt"
+      "icon": "scarf"
     },
     {
       "id": "it-bere",
+      "copyStatus": "approved",
       "set": "fox-accessories",
       "name": "Tilki için bere",
       "icon": "baseball-cap"
     },
     {
+      "id": "it-yuvarlak-gozluk",
+      "copyStatus": "approved",
+      "set": "fox-accessories",
+      "name": "Yuvarlak gözlük",
+      "icon": "eyeglasses"
+    },
+    {
+      "id": "it-ipek-atki",
+      "copyStatus": "approved",
+      "set": "fox-accessories",
+      "name": "İpek atkı",
+      "icon": "scarf"
+    },
+    {
+      "id": "it-orman-celengi",
+      "copyStatus": "approved",
+      "set": "fox-accessories",
+      "name": "Orman çelengi",
+      "icon": "flower"
+    },
+    {
       "id": "it-aytasi",
+      "copyStatus": "approved",
       "set": "crystals",
       "name": "Ay taşı",
       "icon": "moon-stars"
+    },
+    {
+      "id": "it-akuamarin",
+      "copyStatus": "approved",
+      "set": "crystals",
+      "name": "Akuamarin",
+      "icon": "diamond"
+    },
+    {
+      "id": "it-deniz-kabugu",
+      "copyStatus": "approved",
+      "set": "decor",
+      "name": "Deniz kabuğu",
+      "icon": "spiral"
+    },
+    {
+      "id": "it-mavi-tasi",
+      "copyStatus": "approved",
+      "set": "decor",
+      "name": "Mavi taşı",
+      "icon": "circle"
+    },
+    {
+      "id": "it-mese-yapragi",
+      "copyStatus": "approved",
+      "set": "decor",
+      "name": "Meşe yaprağı",
+      "icon": "leaf"
+    },
+    {
+      "id": "it-cam-kozalagi",
+      "copyStatus": "approved",
+      "set": "decor",
+      "name": "Çam kozalağı",
+      "icon": "tree-evergreen"
     }
   ]
 }
