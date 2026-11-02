@@ -3,8 +3,8 @@
  * Supports light/dark modes with system detection and manual override.
  */
 
-import React, { useColorScheme } from 'react-native';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useColorScheme } from 'react-native';
+import * as React from 'react';
 import { semanticLight, semanticDark } from '../theme/colors';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
@@ -99,7 +99,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMode,
   };
   
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return React.createElement(ThemeContext.Provider, { value }, children);
 }
 
 /**

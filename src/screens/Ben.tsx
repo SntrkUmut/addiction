@@ -5,12 +5,11 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
-import { useTheme } from '../ui/theme';
+import { useTheme , getThemeMode, setThemeMode } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, Eyebrow } from '../ui/components';
 import { journeyDay } from '../domain/journey';
 import { getHapticsEnabled, setHapticsEnabled } from '../ui/haptics';
-import { getThemeMode, setThemeMode } from '../ui/theme';
 
 interface Props {
   state: any;
@@ -34,7 +33,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
   };
 
   const cycleTheme = async () => {
-    const modes: Array<'system' | 'light' | 'dark'> = ['system', 'light', 'dark'];
+    const modes: ('system' | 'light' | 'dark')[] = ['system', 'light', 'dark'];
     const currentIndex = modes.indexOf(themeMode);
     const nextMode = modes[(currentIndex + 1) % modes.length];
     await setThemeMode(nextMode);
