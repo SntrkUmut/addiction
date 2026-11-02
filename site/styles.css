@@ -1,0 +1,165 @@
+:root {
+  --terracotta: #C84F2E;
+  --link: #8E3623;
+  --cream: #F8F6F1;
+  --ink: #1C1917;
+  --muted: #5C5652;
+  --card: #ffffff;
+  --line: #e6e1d8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #14171B;
+    --ink: #f8f6f1;
+    --muted: #c4beb6;
+    --card: #1c2128;
+    --line: #2a3038;
+    --link: #E8A090;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font: 18px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+a {
+  color: var(--link);
+}
+
+a:hover,
+a:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
+.wrap {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 4rem;
+}
+
+header {
+  padding: 0.75rem 0 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: inline-block;
+  color: var(--link);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.75rem;
+}
+
+nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  font-weight: 650;
+}
+
+h1 {
+  font-size: 1.85rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 2rem 0 0.6rem;
+}
+
+h3 {
+  font-size: 1.05rem;
+  margin: 1.4rem 0 0.4rem;
+}
+
+.lede {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.meta,
+.placeholder {
+  font-size: 0.95rem;
+}
+
+.meta p {
+  margin: 0.35rem 0;
+}
+
+.placeholder {
+  display: inline-block;
+  background: color-mix(in srgb, var(--terracotta) 14%, transparent);
+  border: 1px dashed var(--terracotta);
+  color: var(--ink);
+  padding: 0.05em 0.4em;
+  border-radius: 4px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.1rem 1.2rem;
+  margin: 1rem 0;
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+
+.links li {
+  margin: 0.6rem 0;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+}
+
+.faq dt {
+  font-weight: 650;
+  margin-top: 1rem;
+}
+
+.faq dd {
+  margin: 0.25rem 0 0;
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+}

@@ -4,6 +4,7 @@
 
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, PrimaryButton, TextButton, DayChip } from '../ui/components';
@@ -20,6 +21,7 @@ interface Props {
 
 export function Milestone({ milestone, slipped, onShelter, onHome }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const copy = resolveMilestoneCopy(milestone, slipped);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export function Milestone({ milestone, slipped, onShelter, onHome }: Props) {
 
   return (
     <Scene variant="night" height={520} horizonY={200}>
-      <View style={styles.wrap}>
+      <View style={[styles.wrap, { paddingTop: Math.max(insets.top, 24) + 12, paddingBottom: Math.max(insets.bottom, 24) }]}>
         <DayChip day={copy.day} variant="night" />
         <Mascot pose="joyful" size={140} darkScene effects={['sparkles']} />
         <Text style={[styles.eyebrow, { color: colors.accent.gold }]}>{copy.eyebrow}</Text>
@@ -48,8 +50,6 @@ const styles = StyleSheet.create({
   wrap: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 32,
     alignItems: 'center',
     gap: 12,
   },
