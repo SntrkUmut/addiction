@@ -17,7 +17,10 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import accessoryData from '../../assets/mascot/accessories.json';
+import {
+  accessoryPose,
+  MASCOT_ACCESSORIES,
+} from './mascotAccessories';
 import {
   isMascotMotionEnabled,
   layerMascotEffects,
@@ -46,7 +49,7 @@ const POSE_MAP: Record<Pose, number> = {
   wistful: require('../../assets/mascot/wistful.png'),
 };
 
-const POSE_TO_ACCESSORY_POSE: Record<Pose, string> = {
+export const POSE_TO_ACCESSORY_POSE: Record<Pose, string> = {
   asleep: 'fox_sleepy',
   content: 'fox_calm',
   hopeful: 'fox_idle',
@@ -92,14 +95,65 @@ const EFFECT_ASSETS: Record<MascotEffect, number> = {
   crystals: require('../../assets/mascot/fx/fx_crystals.png'),
 };
 
-type AccessoryData = {
-  name: string;
-  id: string;
-  bbox: number[];
-  layer: string;
-  per_pose_files?: boolean;
-  [key: string]: unknown;
-};
+function accessorySource(slug: string, poseName: string): number | undefined {
+  const data = MASCOT_ACCESSORIES[slug];
+  if (!data) return undefined;
+  if (data.perPoseFiles) return PER_POSE_ACCESSORY_MAPS[slug]?.[poseName];
+  return BASE_ACCESSORY_MAP[slug];
+}
+
+function AccessoryLayer({
+  slug,
+  poseName,
+  size,
+}: {
+  slug: string;
+  poseName: string;
+  size: number;
+}) {
+  const data = MASCOT_ACCESSORIES[slug];
+  const pose = accessoryPose(slug, poseName);
+  const source = accessorySource(slug, poseName);
+  if (!data || !pose || !source) return null;
+
+  const region = data.region;
+  const { fit } = pose;
+  const identity = fit.scale === 1 && fit.rotate === 0 && fit.tx === 0 && fit.ty === 0;
+
+  return (
+    <Image
+      source={source}
+      accessible={false}
+      accessibilityElementsHidden
+      importantForAccessibility="no"
+      style={[
+        styles.accessory,
+        region
+          ? {
+              left: region.x * size,
+              top: region.y * size,
+              width: region.size * size,
+              height: region.size * size,
+            }
+          : {
+              left: 0,
+              top: 0,
+              width: size,
+              height: size,
+              transform: identity
+                ? undefined
+                : [
+                    { translateX: fit.tx * size },
+                    { translateY: fit.ty * size },
+                    { rotate: `${fit.rotate}deg` },
+                    { scale: fit.scale },
+                  ],
+            },
+      ]}
+      resizeMode="contain"
+    />
+  );
+}
 
 function useReduceMotion(): boolean | null {
   const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
@@ -358,6 +412,10 @@ export function Mascot({
   const shownEffects = darkScene ? sanitizeMascotEffects(effects) : [];
   const { back, mid } = layerMascotEffects(shownEffects);
   const poseScale = shownEffects.length > 0 ? 0.62 : 1;
+  const layerSize = size * poseScale;
+  const equipped = accessories.filter(slug => accessoryPose(slug, accessoryPoseName));
+  const backAccessories = equipped.filter(slug => MASCOT_ACCESSORIES[slug]?.layer === 'back');
+  const frontAccessories = equipped.filter(slug => MASCOT_ACCESSORIES[slug]?.layer !== 'back');
 
   return (
     <View
@@ -368,54 +426,23 @@ export function Mascot({
     >
       {back.map(effect => renderEffect(effect, size, motionEnabled))}
       {mid.map(effect => renderEffect(effect, size, motionEnabled))}
+      <View style={[styles.poseLayer, { width: layerSize, height: layerSize }]}>
+        {backAccessories.map(slug => (
+          <AccessoryLayer key={slug} slug={slug} poseName={accessoryPoseName} size={layerSize} />
+        ))}
 
-      <Image
-        source={POSE_MAP[pose]}
-        style={[styles.pose, { width: size * poseScale, height: size * poseScale }]}
-        resizeMode="contain"
-        accessible={false}
-        importantForAccessibility="no"
-      />
+        <Image
+          source={POSE_MAP[pose]}
+          style={[styles.pose, { width: layerSize, height: layerSize }]}
+          resizeMode="contain"
+          accessible={false}
+          importantForAccessibility="no"
+        />
 
-      {accessories.map((slug) => {
-        const data = accessoryData[slug as keyof typeof accessoryData] as AccessoryData;
-        if (!data || !data.bbox) return null;
-
-        let accessorySource;
-        if (data.per_pose_files && PER_POSE_ACCESSORY_MAPS[slug]) {
-          accessorySource = PER_POSE_ACCESSORY_MAPS[slug][accessoryPoseName];
-          if (!accessorySource) return null;
-        } else {
-          accessorySource = BASE_ACCESSORY_MAP[slug];
-        }
-
-        if (!accessorySource) return null;
-
-        const [left, top, right, bottom] = data.bbox;
-        const width = (right - left) * 100;
-        const height = (bottom - top) * 100;
-        const isUmbrella = slug === 'it-semsiye';
-
-        return (
-          <Image
-            key={slug}
-            source={accessorySource}
-            accessible={false}
-            importantForAccessibility="no"
-            style={[
-              styles.accessory,
-              {
-                left: `${left * 100}%`,
-                top: `${top * 100}%`,
-                width: `${width}%`,
-                height: `${height}%`,
-                overflow: isUmbrella ? 'visible' : 'hidden',
-              },
-            ]}
-            resizeMode="contain"
-          />
-        );
-      })}
+        {frontAccessories.map(slug => (
+          <AccessoryLayer key={slug} slug={slug} poseName={accessoryPoseName} size={layerSize} />
+        ))}
+      </View>
     </View>
   );
 }
@@ -423,6 +450,11 @@ export function Mascot({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+  poseLayer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
