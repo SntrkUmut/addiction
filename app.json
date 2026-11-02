@@ -4,12 +4,13 @@
     "slug": "quit-smoking",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.quit.addiction",
       "buildNumber": "1",
+      "icon": "./assets/app-icon/icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -18,10 +19,10 @@
       "package": "com.quit.addiction",
       "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#F8F3E9",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/app-icon/adaptive-foreground.png",
+        "backgroundImage": "./assets/app-icon/adaptive-background.png",
+        "backgroundColor": "#C84F2E",
+        "monochromeImage": "./assets/app-icon/adaptive-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -38,13 +39,14 @@
       [
         "expo-splash-screen",
         {
-        "backgroundColor": "#F8F6F1",
-        "image": "./assets/splash.png",
-        "imageWidth": 200,
-        "resizeMode": "contain",
-        "dark": {
-          "backgroundColor": "#14171B"
-        }
+          "image": "./assets/app-icon/splash-icon-light.png",
+          "backgroundColor": "#F8F6F1",
+          "dark": {
+            "image": "./assets/app-icon/splash-icon-dark.png",
+            "backgroundColor": "#14171B"
+          },
+          "imageWidth": 240,
+          "resizeMode": "contain"
         }
       ]
     ],
