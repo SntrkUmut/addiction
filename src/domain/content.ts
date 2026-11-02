@@ -11,11 +11,27 @@
 import 'expo-sqlite/localStorage/install';
 import bundledManifest from '../content/manifest.bundled.json';
 
+export { bundledManifest };
+
 const MANIFEST_CACHE_KEY = 'quit-content-manifest-v1';
 const MANIFEST_FETCH_INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
 const LAST_FETCH_KEY = 'quit-content-last-fetch-v1';
+const FETCH_TIMEOUT_MS = 4000;
 
 export type Manifest = typeof bundledManifest;
+
+function isUsableManifest(value: unknown): value is Manifest {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as { version?: unknown; chapters?: unknown };
+  if (typeof candidate.version !== 'number' || !Number.isFinite(candidate.version)) return false;
+  if (!Array.isArray(candidate.chapters) || candidate.chapters.length === 0) return false;
+  return candidate.chapters.every(chapter => (
+    !!chapter
+    && typeof chapter === 'object'
+    && Array.isArray((chapter as { pieces?: unknown }).pieces)
+    && (chapter as { pieces: unknown[] }).pieces.length > 0
+  ));
+}
 
 /**
  * Get manifest channel (beta or prod)
@@ -32,20 +48,24 @@ function getManifestChannel(): 'beta' | 'prod' {
  * Fetch manifest from Supabase content_manifests table
  * Silently fails if credentials are missing. Bundled fallback is full v11 (8 chapters).
  */
-async function fetchRemoteManifest(): Promise<Manifest | null> {
+type RemoteFetch = { attempted: true; manifest: Manifest | null } | { attempted: false };
+
+async function fetchRemoteManifest(): Promise<RemoteFetch> {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
   
   if (!supabaseUrl || !supabaseKey) {
-    // No credentials: silently use bundled manifest
-    return null;
+    return { attempted: false };
   }
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
     const channel = getManifestChannel();
     const response = await fetch(
       `${supabaseUrl}/rest/v1/content_manifests?channel=eq.${channel}&order=version.desc&limit=1`,
       {
+        signal: controller.signal,
         headers: {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`,
@@ -54,18 +74,20 @@ async function fetchRemoteManifest(): Promise<Manifest | null> {
     );
 
     if (!response.ok) {
-      return null;
+      return { attempted: true, manifest: null };
     }
 
     const data = await response.json();
     if (!Array.isArray(data) || data.length === 0) {
-      // No manifest for this channel: fall back to bundled
-      return null;
+      return { attempted: true, manifest: null };
     }
 
-    return data[0].manifest;
+    const remote = data[0]?.manifest;
+    return { attempted: true, manifest: isUsableManifest(remote) ? remote : null };
   } catch {
-    return null;
+    return { attempted: false };
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -115,11 +137,12 @@ export async function getManifest(): Promise<Manifest> {
 
     if (shouldFetch) {
       const remote = await fetchRemoteManifest();
-      if (remote && remote.version > bundledManifest.version) {
-        // Cache the remote manifest
-        await localStorage.setItem(MANIFEST_CACHE_KEY, JSON.stringify(remote));
+      if (remote.attempted) {
         await localStorage.setItem(LAST_FETCH_KEY, Date.now().toString());
-        return filterManifest(remote, isProd);
+        if (remote.manifest && remote.manifest.version > bundledManifest.version) {
+          await localStorage.setItem(MANIFEST_CACHE_KEY, JSON.stringify(remote.manifest));
+          return filterManifest(remote.manifest, isProd);
+        }
       }
     }
 
@@ -127,7 +150,7 @@ export async function getManifest(): Promise<Manifest> {
     const cachedStr = await localStorage.getItem(MANIFEST_CACHE_KEY);
     if (cachedStr) {
       const cached = JSON.parse(cachedStr);
-      if (cached.version >= bundledManifest.version) {
+      if (isUsableManifest(cached) && cached.version >= bundledManifest.version) {
         return filterManifest(cached, isProd);
       }
     }

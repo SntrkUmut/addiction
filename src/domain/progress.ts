@@ -36,8 +36,12 @@ export function hasLoggedSlip(state: AppState): boolean {
   return state.events.some(event => event.kind === 'slip');
 }
 
+export function eventOnLocalDay(event: { at: string }, dayIso: string): boolean {
+  return todayIso(new Date(event.at)) === dayIso;
+}
+
 export function checkedInOn(state: AppState, dayIso: string): boolean {
-  return state.events.some(event => event.kind === 'checkin' && event.at.startsWith(dayIso));
+  return state.events.some(event => event.kind === 'checkin' && eventOnLocalDay(event, dayIso));
 }
 
 export function todayIso(now = new Date()): string {

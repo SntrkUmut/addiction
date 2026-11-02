@@ -50,6 +50,16 @@ export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollecti
         </Text>
 
         <View style={styles.chaptersSection}>
+          {chapters.length === 0 ? (
+            <Card style={styles.chapterCard}>
+              <Text style={[styles.chapterTitle, { color: colors.text.primary }]}>
+                Sığınak henüz yüklenemedi.
+              </Text>
+              <Text style={[styles.chapterProgress, { color: colors.text.secondary }]}>
+                Çevrimdışı kopya birazdan açılır. Açtığın duraklar yerinde kalır.
+              </Text>
+            </Card>
+          ) : null}
           {chapters.map((chapter, index) => {
             const offset = chapterOffsets[index];
             return (

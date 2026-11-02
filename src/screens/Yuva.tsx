@@ -20,6 +20,7 @@ import {
   checkedInOn,
   cigarettesAvoided,
   estimatedSavings,
+  eventOnLocalDay,
   formatMoney,
   foxAccessories,
   lightsFrom,
@@ -44,9 +45,9 @@ export function Yuva({ state, onCheckIn, onCraving, onQuestTap, onSlip }: Props)
   const lightsEarned = lightsFrom(state);
   const avoided = cigarettesAvoided(state);
   const saved = estimatedSavings(state);
-  const copingToday = state.events.some(event => event.kind === 'coping' && event.at.startsWith(today));
+  const copingToday = state.events.some(event => event.kind === 'coping' && eventOnLocalDay(event, today));
   const breathToday = state.events.some(event =>
-    event.kind === 'coping' && event.at.startsWith(today) && event.details.tool === 'Yavaş nefes',
+    event.kind === 'coping' && eventOnLocalDay(event, today) && event.details.tool === 'Yavaş nefes',
   );
   const accessories = foxAccessories(state);
 

@@ -1,7 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/eas-build.json",
   "cli": {
-    "version": ">= 14.0.0"
+    "version": ">= 14.0.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -32,6 +33,7 @@
     },
     "production": {
       "environment": "production",
+      "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_APP_ENV": "production",
         "EXPO_PUBLIC_MANIFEST_CHANNEL": "prod"

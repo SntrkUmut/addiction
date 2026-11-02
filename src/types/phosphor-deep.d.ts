@@ -10,10 +10,10 @@ declare module 'phosphor-react-native/lib/module/icons/MapTrifold' {
   export const MapTrifoldIcon: Icon;
 }
 
-declare module 'phosphor-react-native/lib/module/icons/Campfire' {
+declare module 'phosphor-react-native/lib/module/icons/Tent' {
   import type { Icon } from 'phosphor-react-native';
-  export const Campfire: Icon;
-  export const CampfireIcon: Icon;
+  export const Tent: Icon;
+  export const TentIcon: Icon;
 }
 
 declare module 'phosphor-react-native/lib/module/icons/User' {

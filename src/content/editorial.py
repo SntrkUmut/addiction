@@ -20,3 +20,27 @@ YAN = re.compile(r"\byan(?:dı\w*|dığ\w*|ıyor\w*|an|anlar\w*|ar|arak|mak\w*|m
 def burn_verbs(text: str):
     t = tr_lower(text)
     return sorted({("yak", m.group(0)) for m in YAK.finditer(t)} | {("yan", m.group(0)) for m in YAN.finditer(t)})
+
+if __name__ == "__main__":
+    import json, sys
+    if len(sys.argv) < 2:
+        sys.stderr.write("usage: editorial.py MANIFEST.json\n")
+        sys.exit(2)
+    path = sys.argv[1]
+    manifest = json.load(open(path, encoding="utf-8"))
+    blob = tr_lower(json.dumps(manifest, ensure_ascii=False))
+    errs = []
+    banned = ["nikotin", "kanser", "akciğer", "sağlık", "tedavi", "yoksunluk", "bağımlı", "başarısız", "kaybettin", "sıfırla", "tilki adı"]
+    for word in banned:
+        if word in blob:
+            errs.append(f"editorial: banned word '{word}'")
+    cue = re.compile(r"\b(ateş\w*|alev\w*|şömine\w*|kamp ateşi|köz\w*|kor|korlar\w*|mum|mumlar\w*|mumu\w*|tütsü\w*|kül|külü\w*|küller\w*|duman\w*|is|isli|sigara\w*|çakmak\w*|kibrit\w*|buhar\w*)\b")
+    for found in sorted(set(cue.findall(blob))):
+        errs.append(f"editorial: fire/smoke cue word '{found}' in content")
+    for root, word in burn_verbs(blob):
+        why = "yak- evokes sigara yakmak" if root == "yak" else "yan- burn sense"
+        errs.append(f"editorial: banned verb '{word}' ({why}); use parla- / kazan / açıl-")
+    if errs:
+        print("\n".join(errs))
+        sys.exit(1)
+    print(f"OK  {path}  editorial")

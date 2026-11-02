@@ -38,7 +38,7 @@ const POSE_MAP: Record<Pose, any> = {
   content: require('../../assets/mascot/content.png'),
   hopeful: require('../../assets/mascot/hopeful.png'),
   joyful: require('../../assets/mascot/joyful.png'),
-  neutral: require('../../assets/mascot/neutral.png'),
+  neutral: require('../../assets/mascot/hopeful.png'),
   smug: require('../../assets/mascot/smug.png'),
   wistful: require('../../assets/mascot/wistful.png'),
 };
@@ -98,12 +98,18 @@ export function Mascot({ pose, accessories = [], size = 200, darkScene = false, 
   const accessoryPoseName = POSE_TO_ACCESSORY_POSE[pose];
 
   return (
-    <View style={[styles.container, { width: size, height: size }, style]}>
+    <View
+      style={[styles.container, { width: size, height: size }, style]}
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+    >
       {/* Base pose */}
       <Image
         source={POSE_MAP[pose]}
         style={styles.pose}
         resizeMode="contain"
+        accessible={false}
+        importantForAccessibility="no"
       />
 
       {/* Accessories overlay the pose. darkScene is kept for callers that tint FX later. */}
@@ -131,6 +137,8 @@ export function Mascot({ pose, accessories = [], size = 200, darkScene = false, 
           <Image
             key={slug}
             source={accessorySource}
+            accessible={false}
+            importantForAccessibility="no"
             style={[
               styles.accessory,
               {

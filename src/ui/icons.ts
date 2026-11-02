@@ -4,7 +4,7 @@
  */
 export { House } from 'phosphor-react-native/lib/module/icons/House';
 export { MapTrifold } from 'phosphor-react-native/lib/module/icons/MapTrifold';
-export { Campfire } from 'phosphor-react-native/lib/module/icons/Campfire';
+export { Tent } from 'phosphor-react-native/lib/module/icons/Tent';
 export { User } from 'phosphor-react-native/lib/module/icons/User';
 export { Sparkle } from 'phosphor-react-native/lib/module/icons/Sparkle';
 export { MapPin } from 'phosphor-react-native/lib/module/icons/MapPin';

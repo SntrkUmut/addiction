@@ -21,12 +21,12 @@ import { Istek } from './src/screens/Istek';
 import { Milestone } from './src/screens/Milestone';
 import { typography } from './src/theme/typography';
 import { journeyDay } from './src/domain/journey';
-import { getManifest, getPiece, type Manifest } from './src/domain/content';
+import { bundledManifest, getManifest, getPiece, type Manifest } from './src/domain/content';
 import {
   appendEvent,
+  checkedInOn,
   estimatedSavings,
   formatMoney,
-  lightsFrom,
   todayIso,
   unlockedPieceCount,
   withSyncedCollection,
@@ -35,7 +35,7 @@ import {
 import { latestUnseenMilestone, milestoneByDay, type MilestoneCopy } from './src/domain/milestones';
 import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
-import { House, MapTrifold, Campfire, User } from './src/ui/icons';
+import { House, MapTrifold, Tent, User } from './src/ui/icons';
 
 type Tab = 'yuva' | 'siginak' | 'rotam' | 'ben';
 type DialogAction = { label: string; onPress: () => void; destructive?: boolean };
@@ -71,26 +71,35 @@ function AppInner() {
 
   useEffect(() => {
     const init = async () => {
-      await initHaptics();
-      await initTheme();
-      const [loaded, remoteManifest] = await Promise.all([
-        loadAppState(),
-        getManifest().catch(() => null),
-      ]);
-      const nextManifest = remoteManifest;
-      const nextState = nextManifest ? withSyncedCollection(loaded, nextManifest) : loaded;
-      setManifest(nextManifest);
-      setState(nextState);
-      if (!nextState.profile?.quitDate) {
-        setOnboardingVisible(true);
-      } else {
-        const unseen = latestUnseenMilestone(
-          journeyDay(nextState.profile.quitDate),
-          nextState.milestones?.seen.map(item => item.key) ?? [],
-        );
-        if (unseen) setActiveMilestone(unseen);
+      try {
+        await initHaptics();
+        await initTheme();
+        const loaded = await loadAppState();
+        const nextState = withSyncedCollection(loaded, bundledManifest);
+        setManifest(bundledManifest);
+        setState(nextState);
+        if (!nextState.profile?.quitDate) {
+          setOnboardingVisible(true);
+        } else {
+          const unseen = latestUnseenMilestone(
+            journeyDay(nextState.profile.quitDate),
+            nextState.milestones?.seen.map(item => item.key) ?? [],
+          );
+          if (unseen) setActiveMilestone(unseen);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
+
+      try {
+        const remoteManifest = await getManifest();
+        if (remoteManifest && remoteManifest.version >= bundledManifest.version) {
+          setManifest(remoteManifest);
+          setState(current => withSyncedCollection(current, remoteManifest));
+        }
+      } catch (error) {
+        if (__DEV__) console.warn('[App] Remote manifest refresh failed', error);
+      }
     };
     init();
   }, []);
@@ -161,22 +170,21 @@ function AppInner() {
   }, [updateState]);
 
   const handleCopingComplete = (tool: { title: string }) => {
-    const before = lightsFrom(state);
-    updateState(current => {
-      const next = appendEvent(current, {
-        id: newEventId('coping'),
-        at: new Date().toISOString(),
-        kind: 'coping',
-        details: { tool: tool.title },
-      });
-      const after = earnedLight(next.events);
-      const perPiece = manifest?.lightsPerPiece ?? 2;
-      if (manifest && Math.floor(after / perPiece) > Math.floor(before / perPiece)) {
-        const piece = getPiece(manifest, unlockedPieceCount(after, perPiece) - 1);
-        setUnlockedPieceName(piece?.piece.name ?? null);
-      }
-      return next;
-    });
+    const content = manifest ?? bundledManifest;
+    const event = {
+      id: newEventId('coping'),
+      at: new Date().toISOString(),
+      kind: 'coping' as const,
+      details: { tool: tool.title },
+    };
+    const before = earnedLight(state.events);
+    const after = earnedLight([event, ...state.events]);
+    updateState(current => appendEvent(current, event));
+    const perPiece = content.lightsPerPiece ?? 2;
+    if (Math.floor(after / perPiece) > Math.floor(before / perPiece)) {
+      const piece = getPiece(content, unlockedPieceCount(after, perPiece) - 1);
+      setUnlockedPieceName(piece?.piece.name ?? null);
+    }
   };
 
   const handleUrgeResult = async (result: string) => {
@@ -320,10 +328,10 @@ function AppInner() {
             onSlip={handleSlip}
           />
         )}
-        {activeTab === 'siginak' && manifest && (
+        {activeTab === 'siginak' && (
           <Siginak
             state={state}
-            manifest={manifest}
+            manifest={manifest ?? bundledManifest}
             onNodeTap={handleNodeTap}
             onMilestoneTap={handleMilestoneTap}
             onCollectionTap={handleCollectionTap}
@@ -358,7 +366,7 @@ function AppInner() {
       >
         {([
           ['yuva', 'Yuva', House],
-          ['siginak', 'Sığınak', Campfire],
+          ['siginak', 'Sığınak', Tent],
           ['rotam', 'Rotam', MapTrifold],
           ['ben', 'Ben', User],
         ] as const).map(([id, label, Icon]) => {
@@ -479,7 +487,7 @@ function AppInner() {
 }
 
 function checkedInAlready(state: AppState, today: string) {
-  return state.events.some(event => event.kind === 'checkin' && event.at.startsWith(today));
+  return checkedInOn(state, today);
 }
 
 const styles = StyleSheet.create({

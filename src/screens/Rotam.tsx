@@ -11,6 +11,7 @@ import { journeyDay, formatTurkishDateSince, formatEventTime } from '../domain/j
 import {
   cigarettesAvoided,
   estimatedSavings,
+  eventOnLocalDay,
   eventTitle,
   formatMoney,
   lightsFrom,
@@ -40,7 +41,7 @@ export function Rotam({ state, onMilestoneTap, onCalcTap, onSlip }: Props) {
     date.setDate(date.getDate() - (6 - i));
     const dateStr = todayIso(date);
     const hasLight = state.events.some(event =>
-      (event.kind === 'checkin' || event.kind === 'coping') && event.at.startsWith(dateStr),
+      (event.kind === 'checkin' || event.kind === 'coping') && eventOnLocalDay(event, dateStr),
     );
     return { date, hasLight };
   });

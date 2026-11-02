@@ -53,3 +53,18 @@ def check(manifest, words=None):
 def unknown(manifest, words=None):
     words = words if words is not None else load_words()
     return sorted({t for _, s in copy_strings(manifest) for t in tokens(s)} - words)
+
+if __name__ == "__main__":
+    import json, sys
+    if len(sys.argv) < 2:
+        sys.stderr.write("usage: tr_spell.py MANIFEST.json\n")
+        sys.exit(2)
+    path = sys.argv[1]
+    manifest = json.load(open(path, encoding="utf-8"))
+    hits = check(manifest)
+    if hits:
+        for loc, token, suggestion, kind in hits:
+            kind_label = "ASCII-fied" if kind == "ascii" else "a diacritic swap of"
+            print(f"spelling: '{token}' at {loc} looks like {kind_label} '{suggestion}'")
+        sys.exit(1)
+    print(f"OK  {path}  spelling")

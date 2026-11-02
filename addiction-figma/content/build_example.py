@@ -37,7 +37,7 @@ ch4=dict(id="ch-orman",order=4,copyStatus="pending",eyebrow="BÖLÜM 4 · ORMAN 
 G=lambda i,m,t,title,r,st="approved",ch=None: {k:v for k,v in dict(id=i,copyStatus=st,chapterId=ch,metric=m,target=t,title=title,reward=r).items() if v}
 I=lambda i,s,n,ic,h: dict(id=i,set=s,name=n,icon=ic,hint=h)
 M=dict(schemaVersion=1,version=7,lightsPerPiece=2,chapters=[ch1,ch2,ch3,ch4],
- upcoming=dict(chapterOrder=5,eyebrow="BÖLÜM 5 · YILDIZ TERASI",title="Gece göğü",teaserLine="Yukarıda bir terasın ışıkları yanıyor.",opensAt="2026-11-16T09:00:00+03:00"),
+ upcoming=dict(chapterOrder=5,eyebrow="BÖLÜM 5 · YILDIZ TERASI",title="Gece göğü",teaserLine="Yukarıda bir terasın ışıkları parlıyor.",opensAt="2026-11-16T09:00:00+03:00"),
  milestones=[
   dict(key="day-60",day=60,copyStatus="pending",reward="it-aytasi",copy=dict(eyebrow="İKİ AY OLDU",lead="İki aydır kendine alan açıyorsun.",
     body="Altmış gün boyunca attığın her küçük adım burada duruyor.",slipEyebrow="YOLCULUĞUN DEVAM EDİYOR",slipLead="İki aydır bu yoldasın.",
