@@ -124,6 +124,7 @@ function AccessoryLayer({
     <Image
       source={source}
       accessible={false}
+      accessibilityElementsHidden
       importantForAccessibility="no"
       style={[
         styles.accessory,
@@ -411,6 +412,7 @@ export function Mascot({
   const shownEffects = darkScene ? sanitizeMascotEffects(effects) : [];
   const { back, mid } = layerMascotEffects(shownEffects);
   const poseScale = shownEffects.length > 0 ? 0.62 : 1;
+  const layerSize = size * poseScale;
   const equipped = accessories.filter(slug => accessoryPose(slug, accessoryPoseName));
   const backAccessories = equipped.filter(slug => MASCOT_ACCESSORIES[slug]?.layer === 'back');
   const frontAccessories = equipped.filter(slug => MASCOT_ACCESSORIES[slug]?.layer !== 'back');
@@ -424,21 +426,23 @@ export function Mascot({
     >
       {back.map(effect => renderEffect(effect, size, motionEnabled))}
       {mid.map(effect => renderEffect(effect, size, motionEnabled))}
-      {backAccessories.map(slug => (
-        <AccessoryLayer key={slug} slug={slug} poseName={accessoryPoseName} size={size} />
-      ))}
+      <View style={[styles.poseLayer, { width: layerSize, height: layerSize }]}>
+        {backAccessories.map(slug => (
+          <AccessoryLayer key={slug} slug={slug} poseName={accessoryPoseName} size={layerSize} />
+        ))}
 
-      <Image
-        source={POSE_MAP[pose]}
-        style={[styles.pose, { width: size * poseScale, height: size * poseScale }]}
-        resizeMode="contain"
-        accessible={false}
-        importantForAccessibility="no"
-      />
+        <Image
+          source={POSE_MAP[pose]}
+          style={[styles.pose, { width: layerSize, height: layerSize }]}
+          resizeMode="contain"
+          accessible={false}
+          importantForAccessibility="no"
+        />
 
-      {frontAccessories.map(slug => (
-        <AccessoryLayer key={slug} slug={slug} poseName={accessoryPoseName} size={size} />
-      ))}
+        {frontAccessories.map(slug => (
+          <AccessoryLayer key={slug} slug={slug} poseName={accessoryPoseName} size={layerSize} />
+        ))}
+      </View>
     </View>
   );
 }
@@ -449,6 +453,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
+  },
+  poseLayer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pose: {
     position: 'absolute',

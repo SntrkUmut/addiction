@@ -70,6 +70,15 @@ test('Mascot require map uses the base windbreaker file for idle', () => {
   assert.equal(mascot.includes('accessories.json'), false);
 });
 
+test('accessories scale and center with the pose, and stay hidden from iOS VoiceOver', () => {
+  const mascot = readFileSync(join(import.meta.dirname, '../src/ui/Mascot.tsx'), 'utf8');
+  assert.match(mascot, /const layerSize = size \* poseScale/);
+  assert.match(mascot, /<AccessoryLayer key=\{slug\} slug=\{slug\} poseName=\{accessoryPoseName\} size=\{layerSize\} \/>/);
+  const accessoryLayer = mascot.slice(mascot.indexOf('function AccessoryLayer'), mascot.indexOf('function useReduceMotion'));
+  assert.match(accessoryLayer, /accessibilityElementsHidden/);
+  assert.match(accessoryLayer, /importantForAccessibility="no"/);
+});
+
 test('shipped accessory pngs keep Metro density names and omit @1x and idle leftovers', () => {
   const files = readdirSync(MASCOT_DIR).filter(name => name.startsWith('it-') && name.endsWith('.png'));
   assert.equal(files.some(name => name.includes('@1x')), false);
