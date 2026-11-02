@@ -44,6 +44,7 @@ export const primitives = {
     500: '#D9AC58',
     600: '#B98A2E', // rev 3
     700: '#A9822F', // rev 3
+    text: '#866018', // rev 5.1: gold_text for light mode, ONLY token for gold-coloured text
   },
   teal: {
     100: '#E3F7F5',
@@ -136,6 +137,7 @@ export const semanticDark = {
     gold: primitives.gold[500],
     goldDeep: primitives.gold[600],
     goldEdge: primitives.gold[700],
+    goldText: '#D9AC58', // rev 5.1: gold text on dark (same as gold/500)
     teal: primitives.teal[400],
     tealDeep: primitives.teal[700],
   },

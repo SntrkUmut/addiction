@@ -24,8 +24,14 @@ if not errs:
     banned=["nikotin","kanser","akciğer","sağlık","tedavi","yoksunluk","bağımlı","başarısız","kaybettin","sıfırla","tilki adı"]
     blob=json.dumps(m,ensure_ascii=False).lower()
     for b in banned: b in blob and errs.append(f"editorial: banned word '{b}'")
-    for f in ("ateş","sigara","duman","çakmak","kül"):  # smoking cues in decorative copy
-        f in blob and errs.append(f"editorial: smoking-cue word '{f}' in content")
+    # fire / smoke / smoking cues in any copy or icon (rev 5.1: no fire imagery anywhere)
+    import re
+    cue=re.compile(r"\b(ateş\w*|alev\w*|şömine\w*|kamp ateşi|köz\w*|kor|korlar\w*|mum|mumlar\w*|mumu\w*|tütsü\w*|kül|külü\w*|küller\w*|duman\w*|is|isli|sigara\w*|çakmak\w*|kibrit\w*|buhar\w*)\b")
+    for f in sorted(set(cue.findall(blob))): errs.append(f"editorial: fire/smoke cue word '{f}' in content")
+    icons=re.findall(r'"(?:icon|previewIcons)":\s*(?:"([a-z0-9-]+)"|\[([^\]]*)\])', blob)
+    names={x for a,b in icons for x in ([a] if a else re.findall(r'"([a-z0-9-]+)"', b))}
+    for f in sorted(names & {"fire","fire-simple","flame","campfire","candle","cigarette","cigarette-slash","coffee","fire-extinguisher","fire-truck"}):
+        errs.append(f"editorial: fire/smoke/steam icon '{f}'")
     if a.channel=="prod":
         pend=[o.get("id") or o.get("key") for o in m["chapters"]+m.get("milestones",[])+m.get("goalPool",[])+m.get("seasons",[]) if o["copyStatus"]=="pending"]
         pend and errs.append(f"prod channel: copy still PENDING APPROVAL: {pend}")

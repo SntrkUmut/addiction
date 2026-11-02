@@ -1,18 +1,18 @@
 import json
 P=lambda i,n,ic,line=None,art=None: {k:v for k,v in dict(id=i,name=n,icon=ic,line=line,art=art).items() if v}
-ch1=dict(id="ch-temel",order=1,copyStatus="pending",eyebrow="BÖLÜM 1 · TEMEL",title="Sığınağın ilk odası",theme={"scene":"day"},
+ch1=dict(id="ch-temel",order=1,copyStatus="approved",eyebrow="BÖLÜM 1 · TEMEL",title="Sığınağın ilk odası",theme={"scene":"day"},
  completion=dict(eyebrow="BÖLÜM 1 TAMAMLANDI",title="Sığınağın ilk odası hazır.",body="On iki ışıkla altı parçayı yerine koydun. Hepsi burada kalıyor; şimdi yol bahçeye uzanıyor.",cta="Bölüm 2’ye bak"),
  pieces=[P("pc-temel","Sığınak temeli","house-simple"),P("pc-isiklar","Sıcak ışıklar","lamp"),P("pc-dinlenme","Dinlenme köşesi","armchair"),
          P("pc-pencere","Pencere","grid-four"),P("pc-yesil","Yeşil köşe","plant"),P("pc-kitaplik","Kitaplık","books")],
  completionReward="it-yuvarlak-gozluk")
-ch2=dict(id="ch-bahce",order=2,copyStatus="pending",eyebrow="BÖLÜM 2 · BAHÇE",title="Sığınağın bahçesi",theme={"scene":"day"},
+ch2=dict(id="ch-bahce",order=2,copyStatus="approved",eyebrow="BÖLÜM 2 · BAHÇE",title="Sığınağın bahçesi",theme={"scene":"day"},
  teaser=dict(line="Kapının ardında bir bahçe var.",previewIcons=["door-open","flower-tulip","bird"]),
  intro=dict(eyebrow="BÖLÜM 2 · BAHÇE",title="Sırada sığınağın bahçesi var.",body="Aynı yol devam ediyor: her 2 ışık bahçeye yeni bir parça ekler. İlk odan olduğu gibi yerinde kalır.",cta="Yola devam et"),
- completion=dict(eyebrow="BÖLÜM 2 TAMAMLANDI",title="Sığınağının bahçesi hazır.",body="Bahçeye altı parça yerleştirdin. Hepsi yerinde duruyor; yol şimdi bir derenin sesine doğru iniyor.",cta="Bölüm 3’e bak"),
+ completion=dict(eyebrow="BÖLÜM 2 TAMAMLANDI",title="Sığınağın bahçesi hazır.",body="Bahçeye altı parça yerleştirdin. Hepsi yerinde duruyor; yol şimdi bir derenin sesine doğru iniyor.",cta="Bölüm 3’e bak"),
  pieces=[P("pc-bahce-kapisi","Bahçe kapısı","door-open",art="chapters/ch-bahce/bahce-kapisi.3f9a1c@2x.png"),P("pc-tas-yol","Taş yol","footprints"),
          P("pc-cicek-tarhi","Çiçek tarhı","flower-tulip"),P("pc-kus-evi","Kuş evi","bird"),P("pc-bahce-feneri","Bahçe feneri","lightbulb"),P("pc-golge-agaci","Gölge ağacı","tree")],
  completionReward="it-hasir-sapka")
-ch3=dict(id="ch-dere",order=3,copyStatus="pending",eyebrow="BÖLÜM 3 · DERE KENARI",title="Suyun sesi",theme={"scene":"day"},
+ch3=dict(id="ch-dere",order=3,copyStatus="approved",eyebrow="BÖLÜM 3 · DERE KENARI",title="Suyun sesi",theme={"scene":"day"},
  teaser=dict(line="Uzaktan bir su sesi geliyor.",previewIcons=["bridge","flower-lotus","boat"]),
  intro=dict(eyebrow="BÖLÜM 3 · DERE KENARI",title="Yol bir derenin kıyısına iniyor.",body="Bahçenin ötesinde yavaşça akan bir dere var. Her 2 ışık kıyıya yeni bir parça ekler; bahçen ve ilk odan olduğu gibi yerinde kalır.",cta="Kıyıya in"),
  completion=dict(eyebrow="BÖLÜM 3 TAMAMLANDI",title="Dere kenarı hazır.",body="Kıyıya altı parçayı tek tek yerleştirdin. Suyun sesi artık sığınağının bir parçası.",cta="Bölüm 4’e bak"),
@@ -23,7 +23,7 @@ ch3=dict(id="ch-dere",order=3,copyStatus="pending",eyebrow="BÖLÜM 3 · DERE KE
          P("pc-balik-kosesi","Balıkların köşesi","fish","Küçük balıklar kendi ritminde yüzüyor."),
          P("pc-kiyi-taslari","Kıyı taşları","waves","Suyun yıllar içinde yumuşattığı taşlar.")],
  completionReward="it-lastik-cizme")
-ch4=dict(id="ch-orman",order=4,copyStatus="pending",eyebrow="BÖLÜM 4 · ORMAN YOLU",title="Ağaçların arası",theme={"scene":"day"},
+ch4=dict(id="ch-orman",order=4,copyStatus="approved",eyebrow="BÖLÜM 4 · ORMAN YOLU",title="Ağaçların arası",theme={"scene":"day"},
  teaser=dict(line="Uzaktan yaprak hışırtısı geliyor.",previewIcons=["tree-evergreen","tent","feather"]),
  intro=dict(eyebrow="BÖLÜM 4 · ORMAN YOLU",title="Yol ağaçların arasına giriyor.",body="Derenin ötesinde sessiz bir orman yolu başlıyor. Her 2 ışık yola yeni bir parça ekler; geride bıraktığın her yer olduğu gibi duruyor.",cta="Ormana gir"),
  completion=dict(eyebrow="BÖLÜM 4 TAMAMLANDI",title="Orman yolu hazır.",body="Ağaçların arasına altı parça yerleştirdin. Bu sessiz yol artık senin.",cta="Bölüm 5’e bak"),
@@ -36,23 +36,23 @@ ch4=dict(id="ch-orman",order=4,copyStatus="pending",eyebrow="BÖLÜM 4 · ORMAN 
  completionReward="it-sirt-cantasi")
 G=lambda i,m,t,title,r,st="approved",ch=None: {k:v for k,v in dict(id=i,copyStatus=st,chapterId=ch,metric=m,target=t,title=title,reward=r).items() if v}
 I=lambda i,s,n,ic,h: dict(id=i,set=s,name=n,icon=ic,hint=h)
-M=dict(schemaVersion=1,version=7,lightsPerPiece=2,chapters=[ch1,ch2,ch3,ch4],
+M=dict(schemaVersion=1,version=8,lightsPerPiece=2,chapters=[ch1,ch2,ch3,ch4],
  upcoming=dict(chapterOrder=5,eyebrow="BÖLÜM 5 · YILDIZ TERASI",title="Gece göğü",teaserLine="Yukarıda bir terasın ışıkları yanıyor.",opensAt="2026-11-16T09:00:00+03:00"),
  milestones=[
-  dict(key="day-60",day=60,copyStatus="pending",reward="it-aytasi",copy=dict(eyebrow="İKİ AY OLDU",lead="İki aydır kendine alan açıyorsun.",
+  dict(key="day-60",day=60,copyStatus="approved",reward="it-aytasi",copy=dict(eyebrow="İKİ AY OLDU",lead="İki aydır kendine alan açıyorsun.",
     body="Altmış gün boyunca attığın her küçük adım burada duruyor.",slipEyebrow="YOLCULUĞUN DEVAM EDİYOR",slipLead="İki aydır bu yoldasın.",
     slipBody="Kolay ve zor günler oldu; hiçbiri kurduğun şeyi silmedi.")),
-  dict(key="day-90",day=90,copyStatus="pending",reward="it-akuamarin",copy=dict(eyebrow="ÜÇ AY OLDU",lead="Üç aydır bu yolu kendin için seçiyorsun.",
+  dict(key="day-90",day=90,copyStatus="approved",reward="it-akuamarin",copy=dict(eyebrow="ÜÇ AY OLDU",lead="Üç aydır bu yolu kendin için seçiyorsun.",
     body="Doksan günün emeği burada, seninle. Sığınağın da bu sürede seninle büyüdü.",slipEyebrow="YOLCULUĞUN DEVAM EDİYOR",slipLead="Üç aydır bu yoldasın.",
     slipBody="Bu doksan günde zor anlar da oldu; hiçbiri attığın adımları silmedi."))],
  goalPool=[G("g-checkin-3","checkinDays",3,"3 gün check-in yap","it-kristal-lamba"),
   G("g-coping-2","copingSessions",2,"2 kez bir baş etme aracı dene","it-kuvars"),
   G("g-rearrange-1","rearrange",1,"Sığınağında bir parçanın yerini değiştir","it-atki"),
   G("g-reason-1","reasonRead",1,"Bırakma nedenini bir kez yeniden oku","it-ametist"),
-  G("g-dere-checkin-3","checkinDays",3,"Kıyıya uğra: bu hafta 3 gün check-in yap","it-nehir-cakili","pending","ch-dere"),
-  G("g-dere-coping-2","copingSessions",2,"Suyun ritmine uy: bu hafta 2 kez bir baş etme aracı dene","it-nilufer-yapragi","pending","ch-dere"),
-  G("g-orman-checkin-3","checkinDays",3,"Ormana uğra: bu hafta 3 gün check-in yap","it-cam-kozalagi","pending","ch-orman"),
-  G("g-orman-coping-2","copingSessions",2,"Ağaçların arasında mola: 2 kez bir baş etme aracı dene","it-mese-yapragi","pending","ch-orman")],
+  G("g-dere-checkin-3","checkinDays",3,"Kıyıya uğra: bu hafta 3 gün check-in yap","it-nehir-cakili","approved","ch-dere"),
+  G("g-dere-coping-2","copingSessions",2,"Suyun ritmine uy: bu hafta 2 kez bir baş etme aracı dene","it-nilufer-yapragi","approved","ch-dere"),
+  G("g-orman-checkin-3","checkinDays",3,"Ormana uğra: bu hafta 3 gün check-in yap","it-cam-kozalagi","approved","ch-orman"),
+  G("g-orman-coping-2","copingSessions",2,"Ağaçların arasında mola: bu hafta 2 kez bir baş etme aracı dene","it-mese-yapragi","approved","ch-orman")],
  seasons=[dict(id="s-sonbahar-2026",copyStatus="approved",title="Sonbahar şenliği",icon="leaf",startsAt="2026-11-01T00:00:00+03:00",
    endsAt="2026-11-30T23:59:59+03:00",lightTarget=5,reward="it-yaprak-susu")],
  items=[I("it-ametist","crystals","Ametist","diamond","Haftalık hedef"),I("it-kuvars","crystals","Kuvars","diamonds-four","Haftalık hedef"),

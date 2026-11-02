@@ -27,8 +27,7 @@ Expo/Metro doğru yoğunluğu otomatik seçer: `require('../assets/mascot/fox/fo
 | `fox_idle` | Nötr, ayakta gülümseme | **Yuva (ana sayfa)** varsayılan durum, boş durumlar |
 | `fox_wave` | El sallayarak merhaba | **Onboarding** karşılama, günlük ilk açılış selamı |
 | `fox_happy` | Zıplayarak sevinç, kollar yukarıda | Hedef tamamlandı, seri (streak) artışı, **Sığınak ödülleri** kazanımı |
-| `fox_sad_coal` | Üzgün, kömür taşı tutuyor, hafif isli kürk (1. Gün "Smog") | Onboarding "başlangıç noktası", 1. gün, kayma (relapse) sonrası şefkatli ekran |
-| `fox_craving` | Kararlı, mavi kristal çatlaklı kömür taşı | **Craving (istek) akışı**: "Dayan, dönüştürüyorsun" adımları |
+| `fox_craving` | Kararlı, mavi kristal | **Craving (istek) akışı**: "Dayan, dönüştürüyorsun" adımları |
 | `fox_calm` | Bağdaş kurmuş meditasyon, gözler kapalı | **Nefes egzersizi** ekranı |
 | `fox_cheer` | Başparmak yukarı, cesaretlendirme | Craving akışı sonu ("Başardın!"), bildirim/teşvik kartları |
 | `fox_sleepy` | Esneyen, uykulu | Gece modu / uyku hatırlatıcısı, gece geç saat craving girişleri |
@@ -40,7 +39,6 @@ Siyah zeminde üretildi; alfa parlaklıktan türetildi (renkler un-premultiply e
 
 | Dosya | İçerik | Kullanım | Katman sırası | Önerilen animasyon (react-native-reanimated) |
 |---|---|---|---|---|
-| `fx_smoke` | Kıvrımlı gri duman | `fox_sad_coal` (1. gün) | Tilkinin **üstünde**, başın üzerine kaydırılmış (~%55 ölçek, translateY ≈ -%27) | `translateY` 0 → -24px ve `opacity` 0.9 → 0, 3–4 sn, `withRepeat`; 2 kopyayı faz farkıyla oynatın (drift up + fade) |
 | `fx_shield` | Altın-mavi enerji kalkanı halkası (orta boş) | `fox_craving` | Arkada %100 + isteğe bağlı önde %35 opaklıkta 2. kopya ("içinde" hissi) | `rotate` 0 → 360° 20 sn linear sonsuz; `scale` 1 → 1.04 pulse 1.2 sn `withRepeat(..., -1, true)` |
 | `fx_breath_ring` | Turkuaz parlayan halka (orta boş) | `fox_calm`, nefes ekranı | Tilkinin **arkasında**, tilki ~%62 ölçekte ortada | Nefes ritmi: `scale` 0.85 → 1.0 **4 sn al**, 1.0 → 0.85 **4 sn ver** (`Easing.inOut(Easing.sin)`), opacity 0.7 ↔ 1 |
 | `fx_bubbles` | Dağınık küçük turkuaz baloncuklar | Nefes ekranı | Halkanın üstünde, tilkinin arkasında | `translateY` 0 → -40px + `opacity` 1 → 0, 5–6 sn döngü; iki kopyayı yarım faz kaydırın (float up) |
@@ -52,7 +50,7 @@ Siyah zeminde üretildi; alfa parlaklıktan türetildi (renkler un-premultiply e
 2. Arka FX (`fx_breath_ring`, `fx_shield`, `fx_sparkles`)
 3. Orta FX (`fx_bubbles`, `fx_crystals`)
 4. Tilki (`fox_*`, konteynerin ~%60–68'i)
-5. Ön FX (`fx_smoke`, isteğe bağlı yarı saydam `fx_shield` kopyası)
+5. Ön FX (isteğe bağlı yarı saydam `fx_shield` kopyası)
 
 ### Örnek (Reanimated – nefes halkası)
 ```tsx
