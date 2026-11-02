@@ -58,16 +58,26 @@ function filterManifest(manifest: Manifest, isProd: boolean): Manifest {
   }
 
   // Production: filter out non-approved content
-  return {
+  const filtered: Manifest = {
     ...manifest,
     chapters: manifest.chapters.filter(ch => ch.copyStatus === 'approved'),
-    milestones: manifest.milestones?.filter(m => !m.copyStatus || m.copyStatus === 'approved') || [],
-    goalPool: manifest.goalPool?.filter(g => !g.copyStatus || g.copyStatus === 'approved') || [],
-    items: manifest.items?.filter(i => !i.copyStatus || i.copyStatus === 'approved') || [],
-    upcoming: (manifest.upcoming?.copyStatus === 'approved' || !manifest.upcoming?.copyStatus) 
-      ? manifest.upcoming 
-      : undefined,
   };
+  
+  if (manifest.milestones) {
+    filtered.milestones = manifest.milestones.filter(m => !m.copyStatus || m.copyStatus === 'approved');
+  }
+  if (manifest.goalPool) {
+    filtered.goalPool = manifest.goalPool.filter(g => !(g as any).copyStatus || (g as any).copyStatus === 'approved');
+  }
+  if (manifest.items) {
+    filtered.items = manifest.items.filter(i => !(i as any).copyStatus || (i as any).copyStatus === 'approved');
+  }
+  if (manifest.upcoming) {
+    // upcoming may not have copyStatus in schema yet, always include if present
+    filtered.upcoming = manifest.upcoming;
+  }
+  
+  return filtered;
 }
 
 /**
