@@ -1,6 +1,11 @@
 /**
  * Content manifest fetch and caching (rev 5).
- * Fetches from beta channel, caches locally, validates, falls back to bundled.
+ * Fetches from beta/prod channel, caches locally, validates, falls back to bundled.
+ * 
+ * Channel selection:
+ * - beta: non-prod/TestFlight builds (default)
+ * - prod: App Store builds
+ * - Controlled by EXPO_PUBLIC_MANIFEST_CHANNEL env var
  */
 
 import bundledManifest from '../content/manifest.bundled.json';
@@ -12,19 +17,30 @@ const LAST_FETCH_KEY = 'quit-content-last-fetch-v1';
 export type Manifest = typeof bundledManifest;
 
 /**
- * Fetch manifest from Supabase content_manifests table (beta channel)
+ * Get manifest channel (beta or prod)
+ */
+function getManifestChannel(): 'beta' | 'prod' {
+  const channel = process.env.EXPO_PUBLIC_MANIFEST_CHANNEL;
+  return channel === 'prod' ? 'prod' : 'beta';
+}
+
+/**
+ * Fetch manifest from Supabase content_manifests table
+ * Silently fails if credentials are missing
  */
 async function fetchRemoteManifest(): Promise<Manifest | null> {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
   
   if (!supabaseUrl || !supabaseKey) {
+    // No credentials: silently use bundled manifest
     return null;
   }
 
   try {
+    const channel = getManifestChannel();
     const response = await fetch(
-      `${supabaseUrl}/rest/v1/content_manifests?channel=eq.beta&order=version.desc&limit=1`,
+      `${supabaseUrl}/rest/v1/content_manifests?channel=eq.${channel}&order=version.desc&limit=1`,
       {
         headers: {
           'apikey': supabaseKey,
@@ -39,6 +55,7 @@ async function fetchRemoteManifest(): Promise<Manifest | null> {
 
     const data = await response.json();
     if (!Array.isArray(data) || data.length === 0) {
+      // No manifest for this channel: fall back to bundled
       return null;
     }
 

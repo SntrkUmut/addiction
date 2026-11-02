@@ -1,147 +1,129 @@
-# Supabase Setup Guide (Owner Only)
+# Supabase Setup
 
-This document describes how the owner can connect the app to a live Supabase project **after PR #2 is merged**. The app works fully offline without any Supabase connection.
+This document describes how the app connects to Supabase for remote content manifests and user state sync.
 
-## Current State (PR #2)
+## Overview
 
-- ✅ Migrations are tested locally (see "Testing Migrations" below)
-- ✅ App works with no Supabase config (remote fetch and cloud sync are silently disabled)
-- ✅ App uses bundled manifest v8 when offline
-- ❌ No live Supabase project connected
-- ❌ No env vars set
-- ❌ No beta or prod content published yet
+The app uses Supabase for:
+- **Remote content manifests** (content_manifests table, beta/prod channels)
+- **User state sync** (user_snapshots table, optional backup)
 
-## Owner's Manual Setup Steps
+**No credentials = no problem:** The app works fully offline if Supabase env vars are not set. Remote features silently turn off.
 
-### 1. Create Supabase Project
+---
 
-1. Go to [supabase.com](https://supabase.com) and create a new project
-2. Note your project URL and publishable (anon) key from Settings → API
+## Environment Variables
 
-### 2. Apply Migrations
-
-Run the migrations in order against your new project:
+The app reads two environment variables for Supabase access:
 
 ```bash
-# Install Supabase CLI if needed
-npm install -g supabase
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_your_key_here
+```
 
-# Link to your project
-supabase link --project-ref <your-project-ref>
+### Key Format
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY` uses Supabase's new **publishable key format** (`sb_publishable_...`)
+- The client accepts this format natively (supabase-js v2)
+- **Never commit real credentials** to the repo (not in `.env`, `.env.example`, `app.json`, `eas.json`, or code)
 
-# Apply migrations (in order)
+### Setting Environment Variables
+
+#### Local Development
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Fill in your Supabase project URL and anon key
+3. `.env` is gitignored and never committed
+
+#### EAS Builds (TestFlight/App Store)
+Set environment variables in EAS using one of:
+
+**Option 1: EAS CLI**
+```bash
+eas env:create EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co"
+eas env:create EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here"
+```
+
+**Option 2: Expo Dashboard**
+1. Go to https://expo.dev/accounts/[account]/projects/[project]/secrets
+2. Add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+3. Secrets are injected into builds automatically
+
+---
+
+## Channel Selection
+
+The app fetches content manifests from different channels:
+
+- **`beta`**: Non-production builds (TestFlight, development)
+- **`prod`**: App Store production builds
+
+Channel is controlled by:
+```bash
+EXPO_PUBLIC_MANIFEST_CHANNEL=beta  # or "prod"
+```
+
+**Default:** `beta` if not set
+
+**Fallback behavior:**
+- If the requested channel has no manifest rows, the app falls back to the bundled v8/v11 manifest without errors
+- If Supabase env vars are missing, remote fetch is skipped entirely (bundled manifest always used)
+
+---
+
+## Database Migrations
+
+The Supabase project has the following migrations applied (in order):
+
+| Timestamp | File | Description |
+|-----------|------|-------------|
+| `20261102160803` | `20261020000001_user_snapshots.sql` | Initial user_snapshots table |
+| `20261102160815` | `20261102000001_user_snapshots_v2.sql` | user_snapshots v2 schema |
+| `20261102160819` | `20261102000002_content_manifests.sql` | content_manifests table |
+| `20261102160821` | `20261102000003_content_storage.sql` | content_storage table |
+
+### Using Supabase CLI
+
+If you're using the Supabase CLI locally and have different migration file names, you need to repair the migration history before running `supabase db push`:
+
+```bash
+# Repair migration timestamps to match remote
+supabase migration repair 20261102160803 --status applied
+supabase migration repair 20261102160815 --status applied
+supabase migration repair 20261102160819 --status applied
+supabase migration repair 20261102160821 --status applied
+
+# Now you can push new migrations
 supabase db push
 ```
 
-The migrations are in `supabase/migrations/`:
-- `202611020001_user_snapshots_v2.sql` — Snapshot table with milestones support
-- `202611020002_content_manifests.sql` — Content manifest table
-- `202611020003_content_storage.sql` — Content storage bucket + RLS
+**Note:** Migration files in this repo are **not renamed** to match the remote timestamps. This is intentional to avoid breaking existing local dev setups.
 
-All migrations are idempotent and have been tested locally.
+---
 
-### 3. Set Environment Variables
+## Security
 
-Copy `.env.example` to `.env.local` and fill in your values:
+- **Anon key only:** The app uses the Supabase anon/publishable key for all operations
+- **No service-role key:** Never use or commit the service-role key (server-side only)
+- **Row Level Security (RLS):** All tables have RLS enabled
+  - `user_snapshots`: Users can only read/write their own rows
+  - `content_manifests`: Read-only for all users
+  - `content_storage`: Read-only for all users
 
-```bash
-cp .env.example .env.local
-```
+---
 
-Edit `.env.local`:
+## Testing Without Supabase
 
-```
-EXPO_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-```
+The app works fully offline without Supabase credentials:
 
-**Security Note:** The app only uses the publishable (anon) key for read-only operations. Write operations (content publishing, snapshot writes) are done manually by the owner via Supabase Dashboard or CLI.
+1. Don't set `EXPO_PUBLIC_SUPABASE_*` env vars (or leave `.env` empty)
+2. The app will:
+   - Use bundled manifest (no remote fetch)
+   - Store state locally only (no cloud sync)
+   - Function normally for all core flows
 
-### 4. Upload Beta Content (Optional)
-
-To publish content to the beta channel:
-
-1. Go to Supabase Dashboard → Table Editor → `content_manifests`
-2. Insert a new row:
-   - `channel`: `"beta"`
-   - `version`: `8` (or higher)
-   - `manifest`: Paste your manifest JSON
-   - `notes`: "Initial beta release" (optional)
-
-The app will fetch this manifest automatically (every 6 hours) for users with the beta build.
-
-### 5. Publish Production Content
-
-When content is approved for production:
-
-1. Update the row in `content_manifests`:
-   - Change `channel` from `"beta"` to `"prod"`
-   - OR insert a new row with `channel: "prod"` and the same version
-
-2. Verify all copy has `copyStatus: "approved"` in the manifest JSON
-
-The production app filters out any content without `copyStatus: "approved"`.
-
-## Testing Migrations Locally
-
-### Option 1: Local Supabase (Recommended)
-
-```bash
-# Install Docker and Supabase CLI
-npm install -g supabase
-
-# Start local Supabase
-supabase start
-
-# Apply migrations
-supabase db push
-
-# View local dashboard
-supabase status  # Get URLs
-```
-
-This creates a local Postgres instance with all Supabase services. Clean up with `supabase stop`.
-
-### Option 2: CI with Ephemeral Postgres
-
-The migrations can be tested in CI using PGlite or a Postgres service container:
-
-```yaml
-# Example GitHub Actions step
-- uses: ikalnytskyi/action-setup-postgres@v4
-- run: |
-    psql -f supabase/migrations/202611020001_user_snapshots_v2.sql
-    psql -f supabase/migrations/202611020002_content_manifests.sql
-    psql -f supabase/migrations/202611020003_content_storage.sql
-```
-
-## Graceful Degradation
-
-The app behavior when Supabase is **not** configured:
-
-- ✅ **Works fully offline** with bundled manifest v8
-- ✅ **No errors or warnings** shown to users
-- ✅ Check-ins, lights, chapters, milestones all work locally
-- ❌ **Remote manifest fetch** silently disabled (uses bundled only)
-- ❌ **Cloud sync** not available (Ben → Veri ve Eşitleme shows neutral "not connected" state)
-
-## Content Manifest Schema
-
-See `src/content/manifest.schema.json` for the full JSON Schema.
-
-The manifest includes:
-- `chapters` — Chapter definitions with pieces, themes, copy
-- `milestones` — Day 1, 7, 14, 30, 60, 90 milestone screens
-- `goalPool` — Weekly goal definitions
-- `items` — Collection items (crystals, accessories)
-- `seasons` — Seasonal events (future)
-- `upcoming` — Next chapter teaser
-
-Each element has an optional `copyStatus` field:
-- `"approved"` — Shown in production
-- `"pending"` — Shown only in dev/beta (awaiting owner approval)
-- `"draft"` — Shown only in dev (early WIP)
-
-## Support
-
-For questions about the Supabase setup, contact the repository owner.
+This is useful for:
+- Local development without credentials
+- TestFlight builds before Supabase is set up
+- Users who prefer fully local/offline operation
