@@ -44,7 +44,7 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
+        <Eyebrow style={styles.eyebrow}>
           SENİN YOLCULUĞUN
         </Eyebrow>
 
@@ -60,7 +60,7 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
 
         {/* Milestones track */}
         <View style={styles.milestonesSection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
+          <Eyebrow style={styles.sectionEyebrow}>
             KİLOMETRE TAŞLARI
           </Eyebrow>
           <View style={[
@@ -78,7 +78,7 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
 
         {/* Last 7 days strip */}
         <View style={styles.last7DaysSection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={styles.sectionEyebrow}>
             SON 7 GÜN
           </Eyebrow>
           <View style={styles.daysStrip}>
@@ -131,7 +131,7 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
 
         {/* Recent history */}
         <View style={styles.historySection}>
-          <Eyebrow style={[styles.sectionEyebrow as any, { color: colors.text.accent }]}>
+          <Eyebrow style={styles.sectionEyebrow}>
             SON KAYITLARIN
           </Eyebrow>
           {recentEvents.map((event, i) => (

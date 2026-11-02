@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { semantic, sceneDay, sceneNight } from '../theme/colors';
 import { textStyles, spacing, radii, heights } from '../theme/typography';
@@ -97,7 +97,7 @@ export function Scene({ variant, height, horizonY, sparkles, fadeBottom, childre
  */
 interface SheetProps {
   fromY: number;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   children: React.ReactNode;
 }
 
@@ -129,7 +129,7 @@ export function Sheet({ fromY, style, children }: SheetProps) {
  * Card component
  */
 interface CardProps {
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   children: React.ReactNode;
 }
 

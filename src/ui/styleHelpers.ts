@@ -5,7 +5,7 @@
 
 import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
 
-type StyleArray<T> = ReadonlyArray<T | null | undefined | false>;
+type StyleArray<T> = readonly (T | null | undefined | false)[];
 
 /**
  * Helper to flatten style arrays for View components

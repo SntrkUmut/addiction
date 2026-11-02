@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { semanticLight as colors } from '../theme/colors';
 import { typography } from '../theme/typography';
-import { Scene, Card, PrimaryButton, SecondaryButton, TextButton, Eyebrow } from '../ui/components';
+import { Scene, Card, PrimaryButton, TextButton, Eyebrow } from '../ui/components';
 
 type OnboardingStep = 'welcome' | 'cigs' | 'price' | 'date' | 'summary';
 

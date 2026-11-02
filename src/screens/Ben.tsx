@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
-import { useTheme , getThemeMode, setThemeMode } from '../ui/theme';
+import { useTheme, setThemeMode } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, Eyebrow } from '../ui/components';
 import { journeyDay } from '../domain/journey';
@@ -49,7 +49,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
+        <Eyebrow style={styles.eyebrow}>
           PROFİL
         </Eyebrow>
 
@@ -65,7 +65,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
 
         {/* Plan section */}
         <View style={styles.section}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
+          <Eyebrow style={styles.sectionEyebrow}>
             PLAN
           </Eyebrow>
           <TouchableOpacity onPress={onEditPlan} activeOpacity={0.7}>
@@ -87,7 +87,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
 
         {/* Reminders section */}
         <View style={styles.section}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={styles.sectionEyebrow}>
             HATIRLATMALAR
           </Eyebrow>
           <TouchableOpacity onPress={onReminders} activeOpacity={0.7}>
@@ -109,7 +109,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
 
         {/* Experience section */}
         <View style={styles.section}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={styles.sectionEyebrow}>
             DENEYİM
           </Eyebrow>
 
@@ -155,7 +155,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
 
         {/* Cloud sync section */}
         <View style={styles.section}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={styles.sectionEyebrow}>
             VERİ VE EŞİTLEME
           </Eyebrow>
           <Card style={styles.settingCard}>
@@ -174,7 +174,7 @@ export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
 
         {/* Support section */}
         <View style={styles.section}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }]}>
+          <Eyebrow style={styles.sectionEyebrow}>
             DESTEK VE BİLGİ
           </Eyebrow>
           <TouchableOpacity onPress={onSupport} activeOpacity={0.7}>

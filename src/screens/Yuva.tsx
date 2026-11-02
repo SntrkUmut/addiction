@@ -10,12 +10,10 @@ import { typography } from '../theme/typography';
 import {
   Scene,
   Card,
-  PrimaryButton,
   SecondaryButton,
   Eyebrow,
   LightChip,
   DayChip,
-  ProgressRing,
 } from '../ui/components';
 import { journeyDay, formatTurkishDateSince } from '../domain/journey';
 
