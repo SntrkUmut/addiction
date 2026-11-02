@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { AccessibilityInfo, Image, StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
   withSequence,
   Easing,
-  useReducedMotion,
+  cancelAnimation,
 } from 'react-native-reanimated';
 
 // Currently used poses. To re-enable unused poses, add them back to this union
@@ -28,7 +28,32 @@ type MascotProps = {
   size?: number;
   effects?: MascotEffect[];
   accessibilityLabel?: string;
+  decorative?: boolean;
 };
+
+// Custom hook to track reduce motion setting with live updates
+function useReduceMotion(): boolean {
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    // Get initial value
+    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
+      setReduceMotion(enabled ?? false);
+    });
+
+    // Subscribe to changes
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      (enabled) => {
+        setReduceMotion(enabled);
+      }
+    );
+
+    return () => subscription.remove();
+  }, []);
+
+  return reduceMotion;
+}
 
 // Only currently used poses are imported. Unused poses (happy, sad_coal, sleepy, hero)
 // remain in assets/mascot/fox/ but are not bundled until re-enabled above.
@@ -64,6 +89,8 @@ function SmokeEffect({ size, motionEnabled }: { size: number; motionEnabled: boo
 
   useEffect(() => {
     if (!motionEnabled) {
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
       translateY.value = 0;
       opacity.value = 0;
       return;
@@ -85,6 +112,8 @@ function SmokeEffect({ size, motionEnabled }: { size: number; motionEnabled: boo
       false
     );
     return () => {
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
       translateY.value = 0;
       opacity.value = 0;
     };
@@ -111,6 +140,8 @@ function ShieldEffect({ size, motionEnabled }: { size: number; motionEnabled: bo
 
   useEffect(() => {
     if (!motionEnabled) {
+      cancelAnimation(rotate);
+      cancelAnimation(scale);
       rotate.value = 0;
       scale.value = 1;
       return;
@@ -126,6 +157,8 @@ function ShieldEffect({ size, motionEnabled }: { size: number; motionEnabled: bo
       true
     );
     return () => {
+      cancelAnimation(rotate);
+      cancelAnimation(scale);
       rotate.value = 0;
       scale.value = 1;
     };
@@ -151,6 +184,8 @@ function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled
 
   useEffect(() => {
     if (!motionEnabled) {
+      cancelAnimation(scale);
+      cancelAnimation(opacity);
       scale.value = 0.85;
       opacity.value = 0.7;
       return;
@@ -172,6 +207,8 @@ function BreathRingEffect({ size, motionEnabled }: { size: number; motionEnabled
       false
     );
     return () => {
+      cancelAnimation(scale);
+      cancelAnimation(opacity);
       scale.value = 0.85;
       opacity.value = 0.7;
     };
@@ -198,6 +235,8 @@ function BubblesEffect({ size, motionEnabled }: { size: number; motionEnabled: b
 
   useEffect(() => {
     if (!motionEnabled) {
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
       translateY.value = 0;
       opacity.value = 0;
       return;
@@ -219,6 +258,8 @@ function BubblesEffect({ size, motionEnabled }: { size: number; motionEnabled: b
       false
     );
     return () => {
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
       translateY.value = 0;
       opacity.value = 0;
     };
@@ -245,6 +286,8 @@ function SparklesEffect({ size, motionEnabled }: { size: number; motionEnabled: 
 
   useEffect(() => {
     if (!motionEnabled) {
+      cancelAnimation(opacity);
+      cancelAnimation(scale);
       opacity.value = 0.4;
       scale.value = 0.95;
       return;
@@ -260,6 +303,8 @@ function SparklesEffect({ size, motionEnabled }: { size: number; motionEnabled: 
       true
     );
     return () => {
+      cancelAnimation(opacity);
+      cancelAnimation(scale);
       opacity.value = 0.4;
       scale.value = 0.95;
     };
@@ -285,6 +330,7 @@ function CrystalsEffect({ size, motionEnabled }: { size: number; motionEnabled: 
 
   useEffect(() => {
     if (!motionEnabled) {
+      cancelAnimation(translateY);
       translateY.value = 0;
       return;
     }
@@ -297,6 +343,7 @@ function CrystalsEffect({ size, motionEnabled }: { size: number; motionEnabled: 
       false
     );
     return () => {
+      cancelAnimation(translateY);
       translateY.value = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,8 +367,9 @@ export function Mascot({
   size = 92,
   effects = [],
   accessibilityLabel,
+  decorative = true,
 }: MascotProps) {
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useReduceMotion();
 
   const motionEnabled = !reducedMotion;
   const label = POSE_LABELS[pose];
@@ -334,14 +382,18 @@ export function Mascot({
   const midEffects = uniqueEffects.filter((e) => ['bubbles', 'crystals'].includes(e));
   const frontEffects = uniqueEffects.filter((e) => e === 'smoke');
 
+  // Only accessible when decorative=false; effects do not make it accessible by themselves
+  const isAccessible = !decorative;
+  const finalLabel = accessibilityLabel ?? label;
+
   return (
     <View
       style={[styles.container, { width: size, height: size }]}
-      accessible={hasEffects || !!accessibilityLabel}
-      accessibilityLabel={hasEffects || accessibilityLabel ? accessibilityLabel ?? label : undefined}
-      accessibilityRole={hasEffects || accessibilityLabel ? 'image' : undefined}
-      accessibilityElementsHidden={!hasEffects && !accessibilityLabel}
-      importantForAccessibility={!hasEffects && !accessibilityLabel ? 'no-hide-descendants' : 'auto'}
+      accessible={isAccessible}
+      accessibilityLabel={isAccessible ? finalLabel : undefined}
+      accessibilityRole={isAccessible ? 'image' : undefined}
+      accessibilityElementsHidden={!isAccessible}
+      importantForAccessibility={!isAccessible ? 'no-hide-descendants' : 'auto'}
     >
       {backEffects.map((effect) => {
         if (effect === 'breath_ring') return <BreathRingEffect key={effect} size={size} motionEnabled={motionEnabled} />;
