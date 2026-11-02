@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { sceneDay, sceneDusk, sceneNight } from '../theme/colors';
 import { useTheme } from './theme';
 import { textStyles, spacing, radii, heights } from '../theme/typography';
-import { Sparkle, MapPin } from 'phosphor-react-native';
+import { Sparkle, MapPin } from './icons';
 
 // Icon type for dynamic usage
 type IconComponent = typeof Sparkle;

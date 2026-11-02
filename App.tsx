@@ -35,7 +35,7 @@ import {
 import { latestUnseenMilestone, milestoneByDay, type MilestoneCopy } from './src/domain/milestones';
 import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
-import { House, MapTrifold, Campfire, User } from 'phosphor-react-native';
+import { House, MapTrifold, Campfire, User } from './src/ui/icons';
 
 type Tab = 'yuva' | 'siginak' | 'rotam' | 'ben';
 type DialogAction = { label: string; onPress: () => void; destructive?: boolean };
