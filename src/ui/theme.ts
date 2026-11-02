@@ -7,6 +7,7 @@ import { useColorScheme } from 'react-native';
 import * as React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { semanticLight, semanticDark } from '../theme/colors';
+import { THEME_MODE_KEY } from '../data/wipe';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type ResolvedTheme = 'light' | 'dark';
@@ -21,8 +22,6 @@ type ThemeContextValue = {
 };
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
-
-const THEME_MODE_KEY = 'quit-theme-mode-v1';
 
 // Global state
 let currentMode: ThemeMode = 'system';
@@ -47,6 +46,11 @@ export async function initTheme(): Promise<ThemeMode> {
  */
 export function getThemeMode(): ThemeMode {
   return currentMode;
+}
+
+/** First-run default after a local wipe. Persistence is handled by the wipe. */
+export function resetThemeMemory() {
+  currentMode = 'system';
 }
 
 /**

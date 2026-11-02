@@ -3,7 +3,17 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Switch,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useTheme } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, Eyebrow } from '../ui/components';
@@ -29,9 +39,12 @@ interface Props {
   onEditPlan: () => void;
   onSupport: () => void;
   onExport: () => void;
+  onDeleteData: () => Promise<void>;
 }
 
-export function Ben({ state, onEditPlan, onSupport, onExport }: Props) {
+const WIPE_ERROR_MESSAGE = 'Silinemedi. Lütfen tekrar dene.';
+
+export function Ben({ state, onEditPlan, onSupport, onExport, onDeleteData }: Props) {
   const { colors, isDark, themeMode, setMode } = useTheme();
   const days = journeyDay(state.profile?.quitDate ?? todayIso());
   const [hapticsOn, setHapticsOn] = React.useState(() => getHapticsEnabled());
@@ -39,6 +52,8 @@ export function Ben({ state, onEditPlan, onSupport, onExport }: Props) {
   const [reminderTime, setReminderTime] = React.useState('19:00');
   const [reminderBusy, setReminderBusy] = React.useState(false);
   const [reminderError, setReminderError] = React.useState<string | null>(null);
+  const [wiping, setWiping] = React.useState(false);
+  const wipingRef = React.useRef(false);
 
   React.useEffect(() => {
     loadReminderSettings().then(value => {
@@ -50,6 +65,32 @@ export function Ben({ state, onEditPlan, onSupport, onExport }: Props) {
   const toggleHaptics = async (value: boolean) => {
     setHapticsOn(value);
     await setHapticsEnabled(value);
+  };
+
+  const runDelete = async () => {
+    if (wipingRef.current) return;
+    wipingRef.current = true;
+    setWiping(true);
+    try {
+      await onDeleteData();
+    } catch {
+      Alert.alert(WIPE_ERROR_MESSAGE);
+    } finally {
+      wipingRef.current = false;
+      setWiping(false);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (wipingRef.current) return;
+    Alert.alert(
+      'Tüm verilerin silinsin mi?',
+      'Yolculuğun, ışıkların, rozetlerin ve ayarların bu cihazdan kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        { text: 'Sil', style: 'destructive', onPress: () => { runDelete(); } },
+      ],
+    );
   };
 
   const cycleTheme = async () => {
@@ -231,6 +272,25 @@ export function Ben({ state, onEditPlan, onSupport, onExport }: Props) {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.deleteSection}>
+          <TouchableOpacity
+            onPress={confirmDelete}
+            disabled={wiping}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Verilerimi sil"
+            accessibilityHint="Bu cihazdaki tüm verileri kalıcı olarak siler"
+            accessibilityState={{ busy: wiping, disabled: wiping }}
+            style={styles.deleteButton}
+          >
+            {wiping ? (
+              <ActivityIndicator color={colors.text.accent} />
+            ) : (
+              <Text style={[styles.deleteLabel, { color: colors.text.accent }]}>Verilerimi sil</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </Scene>
@@ -299,5 +359,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 8,
     textAlign: 'center',
+  },
+  deleteSection: {
+    marginTop: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  deleteButton: {
+    minHeight: 44,
+    minWidth: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  deleteLabel: {
+    ...typography.label.textButton,
   },
 });

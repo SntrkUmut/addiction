@@ -10,13 +10,12 @@
 
 import 'expo-sqlite/localStorage/install';
 import bundledManifest from '../content/manifest.bundled.json';
+import { LAST_FETCH_KEY, MANIFEST_CACHE_KEY } from '../data/wipe';
 import { isUsableManifestShape } from './manifestGuard';
 
 export { bundledManifest, isUsableManifestShape };
 
-const MANIFEST_CACHE_KEY = 'quit-content-manifest-v1';
 const MANIFEST_FETCH_INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
-const LAST_FETCH_KEY = 'quit-content-last-fetch-v1';
 const FETCH_TIMEOUT_MS = 4000;
 
 export type Manifest = typeof bundledManifest;
