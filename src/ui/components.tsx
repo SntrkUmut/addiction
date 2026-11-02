@@ -6,7 +6,8 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { semantic, sceneDay, sceneNight } from '../theme/colors';
+import { sceneDay, sceneDusk, sceneNight } from '../theme/colors';
+import { useTheme } from './theme';
 import { textStyles, spacing, radii, heights } from '../theme/typography';
 import { Sparkle, MapPin } from 'phosphor-react-native';
 
@@ -26,67 +27,66 @@ interface SceneProps {
 }
 
 export function Scene({ variant, height, horizonY, sparkles, fadeBottom, children }: SceneProps) {
-  const colors = variant === 'day' ? sceneDay : variant === 'dusk' ? { sky: ['#2C3440', '#202B37', '#1B1F24'], horizon: '#2C3440', innerHill: '#3A4350' } : sceneNight;
-  
+  const { colors: themeColors } = useTheme();
+  const colors = variant === 'day' ? sceneDay : variant === 'dusk' ? sceneDusk : sceneNight;
+
   return (
-    <View style={{ height, position: 'relative', overflow: 'hidden' }}>
-      <LinearGradient
-        colors={colors.sky as any}
-        locations={[0, 0.55, 1]}
-        style={StyleSheet.absoluteFill}
-      />
-      {/* Horizon hill */}
-      <View
-        style={{
-          position: 'absolute',
-          top: horizonY,
-          left: -80,
-          width: 550,
-          height: 260,
-          borderRadius: 275,
-          backgroundColor: colors.horizon,
-        }}
-      />
-      {/* Inner hill */}
-      <View
-        style={{
-          position: 'absolute',
-          top: horizonY + 22,
-          left: 50,
-          width: 290,
-          height: 54,
-          borderRadius: 145,
-          backgroundColor: colors.innerHill,
-          opacity: 0.75,
-        }}
-      />
-      {sparkles && (
+    <View style={{ flex: 1, position: 'relative' }}>
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: height || 420, overflow: 'hidden' }} pointerEvents="none">
+        <LinearGradient
+          colors={colors.sky as [string, string, string]}
+          locations={[0, 0.55, 1]}
+          style={StyleSheet.absoluteFill}
+        />
         <View
           style={{
             position: 'absolute',
-            left: sparkles.x,
-            top: sparkles.y,
-            width: sparkles.width,
-            height: sparkles.width,
-            opacity: sparkles.opacity,
-          }}
-        >
-          {/* Placeholder for sparkles FX - would use actual asset */}
-        </View>
-      )}
-      {fadeBottom && (
-        <LinearGradient
-          colors={['transparent', semantic.bg.canvas]}
-          locations={[0.7, 1]}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: height * 0.3,
+            top: horizonY,
+            left: -80,
+            width: 550,
+            height: 260,
+            borderRadius: 275,
+            backgroundColor: colors.horizon,
           }}
         />
-      )}
+        <View
+          style={{
+            position: 'absolute',
+            top: horizonY + 22,
+            left: 50,
+            width: 290,
+            height: 54,
+            borderRadius: 145,
+            backgroundColor: colors.innerHill,
+            opacity: 0.75,
+          }}
+        />
+        {sparkles && (
+          <View
+            style={{
+              position: 'absolute',
+              left: sparkles.x,
+              top: sparkles.y,
+              width: sparkles.width,
+              height: sparkles.width,
+              opacity: sparkles.opacity,
+            }}
+          />
+        )}
+        {fadeBottom && (
+          <LinearGradient
+            colors={['transparent', themeColors.bg.canvas]}
+            locations={[0.7, 1]}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: (height || 420) * 0.3,
+            }}
+          />
+        )}
+      </View>
       {children}
     </View>
   );
@@ -102,6 +102,7 @@ interface SheetProps {
 }
 
 export function Sheet({ fromY, style, children }: SheetProps) {
+  const { colors } = useTheme();
   return (
     <View
       style={[
@@ -111,7 +112,7 @@ export function Sheet({ fromY, style, children }: SheetProps) {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: semantic.bg.canvas,
+          backgroundColor: colors.bg.canvas,
           borderTopLeftRadius: radii.sheetTop,
           borderTopRightRadius: radii.sheetTop,
           paddingHorizontal: spacing.xl,
@@ -134,14 +135,15 @@ interface CardProps {
 }
 
 export function Card({ style, children }: CardProps) {
+  const { colors } = useTheme();
   return (
     <View
       style={[
         {
-          backgroundColor: semantic.surface.card,
+          backgroundColor: colors.surface.card,
           borderRadius: radii.card,
           borderWidth: 1,
-          borderColor: semantic.border.default,
+          borderColor: colors.border.default,
         },
         style,
       ]}
@@ -162,12 +164,13 @@ interface PrimaryButtonProps {
 }
 
 export function PrimaryButton({ label, onPress, icon: IconComp, disabled }: PrimaryButtonProps) {
+  const { colors } = useTheme();
   const [pressed, setPressed] = React.useState(false);
-  
+
   return (
     <View
       style={{
-        backgroundColor: semantic.action.primaryEdge,
+        backgroundColor: colors.action.primaryEdge,
         borderRadius: radii.pill,
         paddingBottom: pressed ? 0 : 4,
       }}
@@ -179,7 +182,7 @@ export function PrimaryButton({ label, onPress, icon: IconComp, disabled }: Prim
         disabled={disabled}
         style={{
           height: heights.primaryButton,
-          backgroundColor: pressed ? semantic.action.primaryPressed : semantic.action.primary,
+          backgroundColor: pressed ? colors.action.primaryPressed : colors.action.primary,
           borderRadius: radii.pill,
           flexDirection: 'row',
           alignItems: 'center',
@@ -193,7 +196,7 @@ export function PrimaryButton({ label, onPress, icon: IconComp, disabled }: Prim
         <Text
           style={[
             textStyles.labelButton,
-            { color: semantic.text.onAccent },
+            { color: colors.text.onAccent },
           ]}
         >
           {label}
@@ -201,7 +204,7 @@ export function PrimaryButton({ label, onPress, icon: IconComp, disabled }: Prim
         {IconComp && (
           <IconComp
             size={20}
-            color={semantic.text.onAccent}
+            color={colors.text.onAccent}
             weight="regular"
           />
         )}
@@ -220,12 +223,13 @@ interface SecondaryButtonProps {
 }
 
 export function SecondaryButton({ label, onPress, icon: IconComp }: SecondaryButtonProps) {
+  const { colors } = useTheme();
   return (
     <Pressable
       onPress={onPress}
       style={{
         height: heights.secondaryButton,
-        backgroundColor: semantic.action.secondary,
+        backgroundColor: colors.action.secondary,
         borderRadius: radii.pill,
         flexDirection: 'row',
         alignItems: 'center',
@@ -234,13 +238,13 @@ export function SecondaryButton({ label, onPress, icon: IconComp }: SecondaryBut
         gap: spacing.md,
       }}
     >
-      <Text style={[textStyles.labelButton, { color: semantic.text.primary }]}>
+      <Text style={[textStyles.labelButton, { color: colors.text.primary }]}>
         {label}
       </Text>
       {IconComp && (
         <IconComp
           size={20}
-          color={semantic.text.primary}
+          color={colors.text.primary}
           weight="regular"
         />
       )}
@@ -258,6 +262,7 @@ interface TextButtonProps {
 }
 
 export function TextButton({ label, onPress, secondary }: TextButtonProps) {
+  const { colors } = useTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -270,7 +275,7 @@ export function TextButton({ label, onPress, secondary }: TextButtonProps) {
       <Text
         style={[
           textStyles.labelTextButton,
-          { color: secondary ? semantic.text.secondary : semantic.text.accent },
+          { color: secondary ? colors.text.secondary : colors.text.accent },
         ]}
       >
         {label}
@@ -288,12 +293,13 @@ interface EyebrowProps {
   style?: TextStyle;
 }
 
-export function Eyebrow({ children, color = semantic.text.accent, style }: EyebrowProps) {
+export function Eyebrow({ children, color, style }: EyebrowProps) {
+  const { colors } = useTheme();
   return (
     <Text
       style={[
         textStyles.eyebrow,
-        { color, textTransform: 'uppercase' },
+        { color: color ?? colors.text.accent, textTransform: 'uppercase' },
         style,
       ]}
     >
@@ -311,24 +317,25 @@ interface LightTokenProps {
 }
 
 export function LightToken({ size, withRing = true }: LightTokenProps) {
+  const { colors } = useTheme();
   const iconSize = Math.floor(size * 0.62);
-  
+
   return (
     <View
       style={{
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: semantic.surface.rewardSoft,
+        backgroundColor: colors.surface.rewardSoft,
         borderWidth: withRing && size > 16 ? 1.5 : 0,
-        borderColor: semantic.accent.gold,
+        borderColor: colors.accent.gold,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
       <Sparkle
         size={iconSize}
-        color={semantic.accent.goldDeep}
+        color={colors.accent.goldDeep}
         weight="fill"
       />
     </View>
@@ -344,14 +351,15 @@ interface LightChipProps {
 }
 
 export function LightChip({ count, variant = 'day' }: LightChipProps) {
+  const { colors } = useTheme();
   const isDark = variant === 'night';
-  
+
   return (
     <View
       style={{
         height: heights.chip,
         borderRadius: radii.pill,
-        backgroundColor: isDark ? semantic.surface.glassDark : 'rgba(255, 255, 255, 0.92)',
+        backgroundColor: isDark ? colors.surface.glassDark : 'rgba(255, 255, 255, 0.92)',
         flexDirection: 'row',
         alignItems: 'center',
         paddingLeft: 6,
@@ -363,7 +371,7 @@ export function LightChip({ count, variant = 'day' }: LightChipProps) {
       <Text
         style={[
           textStyles.smStrongValue,
-          { color: isDark ? semantic.text.onDark : semantic.text.primary },
+          { color: isDark ? colors.text.onDark : colors.text.primary },
         ]}
       >
         {count} ışık
@@ -381,14 +389,15 @@ interface DayChipProps {
 }
 
 export function DayChip({ day, variant = 'day' }: DayChipProps) {
+  const { colors } = useTheme();
   const isDark = variant === 'night';
-  
+
   return (
     <View
       style={{
         height: heights.chip,
         borderRadius: radii.pill,
-        backgroundColor: isDark ? semantic.surface.glassDark : 'rgba(255, 255, 255, 0.92)',
+        backgroundColor: isDark ? colors.surface.glassDark : 'rgba(255, 255, 255, 0.92)',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: spacing.md,
@@ -397,13 +406,13 @@ export function DayChip({ day, variant = 'day' }: DayChipProps) {
     >
       <MapPin
         size={18}
-        color={isDark ? semantic.text.onDark : semantic.text.accent}
+        color={isDark ? colors.text.onDark : colors.text.accent}
         weight="regular"
       />
       <Text
         style={[
           textStyles.smStrongValue,
-          { color: isDark ? semantic.text.onDark : semantic.text.primary },
+          { color: isDark ? colors.text.onDark : colors.text.primary },
         ]}
       >
         {day}. gün
@@ -434,9 +443,8 @@ export function ProgressRing({
   variant = 'gold',
   onDark = false,
 }: ProgressRingProps) {
-  // This would use react-native-svg for actual circular progress
-  // For now, a simplified version
-  const trackColor = onDark ? semantic.border.glassDark : semantic.surface.sunken;
+  const { colors } = useTheme();
+  const trackColor = onDark ? colors.border.glassDark : colors.surface.sunken;
   
   return (
     <View
@@ -467,7 +475,7 @@ export function ProgressRing({
         <Text
           style={[
             textStyles.smStrongValue,
-            { color: onDark ? semantic.text.onDark : semantic.text.primary },
+            { color: onDark ? colors.text.onDark : colors.text.primary },
           ]}
         >
           {current}/{total}

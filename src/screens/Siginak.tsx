@@ -1,6 +1,5 @@
 /**
- * Sığınak (Chapters/Path) screen (rev 5.1 §5.2)
- * Shows chapter path with nodes, milestones, and collection
+ * Sığınak — chapters, pieces, milestones, collection from the bundled manifest.
  */
 
 import React from 'react';
@@ -8,31 +7,32 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useTheme } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, Eyebrow, LightChip } from '../ui/components';
+import { journeyDay } from '../domain/journey';
+import { chapterProgress, lightsFrom, todayIso } from '../domain/progress';
+import { DAY_MILESTONES } from '../domain/milestones';
+import type { AppState } from '../data/schema';
+import type { Manifest } from '../domain/content';
 
 interface Props {
-  state: any;
-  onNodeTap: (pieceIndex: number) => void;
+  state: AppState;
+  manifest: Manifest;
+  onNodeTap: (pieceIndex: number, pieceName: string) => void;
   onMilestoneTap: (day: number) => void;
   onCollectionTap: () => void;
 }
 
-export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: Props) {
+export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollectionTap }: Props) {
   const { colors, isDark } = useTheme();
-  const lightsEarned = state.lights || 0;
+  const lightsEarned = lightsFrom(state);
+  const days = journeyDay(state.profile?.quitDate ?? todayIso());
+  const chapters = chapterProgress(manifest, lightsEarned);
+  const upcoming = manifest.upcoming;
+  const earnedCount = state.collection?.earned.length ?? 0;
+  const itemTotal = manifest.items?.length ?? earnedCount;
 
-  // Mock chapters data
-  const chapters = [
-    { id: 'ch-temel', title: 'Sığınağın ilk odası', pieces: 6, unlocked: 6, theme: 'day' },
-    { id: 'ch-bahce', title: 'Sığınağın bahçesi', pieces: 6, unlocked: 3, theme: 'day' },
-    { id: 'ch-dere', title: 'Dere kenarı', pieces: 6, unlocked: 0, theme: 'day' },
-  ];
-
-  const milestones = [
-    { day: 1, unlocked: true },
-    { day: 7, unlocked: true },
-    { day: 14, unlocked: false },
-    { day: 30, unlocked: false },
-  ];
+  const chapterOffsets = chapters.map((_, index) => (
+    chapters.slice(0, index).reduce((sum, chapter) => sum + chapter.total, 0)
+  ));
 
   return (
     <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
@@ -40,122 +40,106 @@ export function Siginak({ state, onNodeTap, onMilestoneTap, onCollectionTap }: P
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
-          <Eyebrow style={[styles.eyebrow, { color: colors.text.accent }] as any}>
-            SIĞINAK
-          </Eyebrow>
+          <Eyebrow style={styles.eyebrow}>SIĞINAK</Eyebrow>
           <LightChip count={lightsEarned} variant={isDark ? 'night' : 'day'} />
         </View>
 
-        {/* Path visualization */}
-        <View style={[
-          styles.pathContainer,
-          { backgroundColor: colors.surface.card, borderColor: colors.border.default }
-        ] as any}>
-          <Text style={[styles.pathPlaceholder, { color: colors.text.tertiary }]}>
-            📍 Path visualization
-          </Text>
-          <Text style={[styles.pathSubtitle, { color: colors.text.secondary }]}>
-            Milestone stops, chapter nodes with 3D edges
-          </Text>
-        </View>
+        <Text style={[styles.caption, { color: colors.text.secondary }]}>
+          Her 2 ışık yolda yeni bir durak açar. Kayma yolu geri sarmaz; açtığın duraklar hep yerinde kalır.
+        </Text>
 
-        {/* Chapters list */}
         <View style={styles.chaptersSection}>
           {chapters.map((chapter, index) => {
-            const locked = chapter.unlocked === 0;
+            const offset = chapterOffsets[index];
             return (
-              <TouchableOpacity
-                key={chapter.id}
-                onPress={() => !locked && onNodeTap(index)}
-                activeOpacity={0.7}
-                disabled={locked}
-              >
-                <Card style={[
-                  styles.chapterCard,
-                  locked ? { opacity: 0.5 } : null
-                ] as any}>
-                  <View style={styles.chapterRow}>
-                    <View style={styles.chapterLeft}>
-                      <Text style={[
-                        styles.chapterNumber,
-                        { color: colors.accent.goldText }
-                      ]}>
-                        {index + 1}
-                      </Text>
-                      <View style={styles.chapterInfo}>
-                        <Text style={[styles.chapterTitle, { color: colors.text.primary }]}>
-                          {chapter.title}
-                        </Text>
-                        <Text style={[styles.chapterProgress, { color: colors.text.secondary }]}>
-                          {chapter.unlocked} / {chapter.pieces} parça
-                        </Text>
-                      </View>
-                    </View>
-                    {chapter.unlocked === chapter.pieces && (
-                      <Text style={[styles.checkmark, { color: colors.action.primary }]}>✓</Text>
-                    )}
+              <View key={chapter.id} style={styles.chapterBlock}>
+                <Card style={[styles.chapterCard, chapter.locked ? { opacity: 0.5 } : null]}>
+                  <Text style={[styles.chapterNumber, { color: colors.accent.goldText }]}>{index + 1}</Text>
+                  <View style={styles.chapterInfo}>
+                    <Text style={[styles.chapterEyebrow, { color: colors.text.accent }]}>{chapter.eyebrow}</Text>
+                    <Text style={[styles.chapterTitle, { color: colors.text.primary }]}>{chapter.title}</Text>
+                    <Text style={[styles.chapterProgress, { color: colors.text.secondary }]}>
+                      {chapter.unlockedCount} / {chapter.total} parça
+                    </Text>
                   </View>
+                  {chapter.complete && (
+                    <Text style={[styles.checkmark, { color: colors.action.primary }]}>✓</Text>
+                  )}
                 </Card>
-              </TouchableOpacity>
+                {!chapter.locked && chapter.pieces.map((piece, pieceIndex) => (
+                  <TouchableOpacity
+                    key={piece.id}
+                    onPress={() => onNodeTap(offset + pieceIndex, piece.name)}
+                    activeOpacity={0.7}
+                  >
+                    <Card style={[
+                      styles.pieceCard,
+                      piece.unlocked ? null : { backgroundColor: colors.surface.sunken },
+                    ]}
+                    >
+                      <Text style={[styles.pieceName, { color: colors.text.primary }]}>{piece.name}</Text>
+                      <Text style={[styles.pieceStatus, { color: piece.unlocked ? colors.action.primary : colors.text.tertiary }]}>
+                        {piece.unlocked ? 'Açıldı' : `${(offset + pieceIndex + 1) * (manifest.lightsPerPiece ?? 2)} ışık`}
+                      </Text>
+                    </Card>
+                  </TouchableOpacity>
+                ))}
+              </View>
             );
           })}
 
-          {/* Upcoming chapter teaser */}
-          <Card style={[styles.teaserCard, { backgroundColor: colors.surface.sunken }] as any}>
-            <Text style={[styles.teaserEyebrow, { color: colors.text.accent }] as any}>
-              SONRA
-            </Text>
-            <Text style={[styles.teaserText, { color: colors.text.secondary }]}>
-              Uzaktan bir su sesi geliyor...
-            </Text>
-          </Card>
+          {upcoming && (
+            <Card style={[styles.teaserCard, { backgroundColor: colors.surface.sunken }]}>
+              <Text style={[styles.teaserEyebrow, { color: colors.text.accent }]}>
+                {upcoming.eyebrow || 'SONRA'}
+              </Text>
+              <Text style={[styles.teaserText, { color: colors.text.secondary }]}>
+                {upcoming.teaserLine || upcoming.title}
+              </Text>
+            </Card>
+          )}
         </View>
 
-        {/* Milestones section */}
         <View style={styles.milestonesSection}>
-          <Eyebrow style={[styles.sectionEyebrow, { color: colors.text.accent }] as any}>
-            KİLOMETRE TAŞLARI
-          </Eyebrow>
+          <Eyebrow style={styles.sectionEyebrow}>KİLOMETRE TAŞLARI</Eyebrow>
           <View style={styles.milestonesGrid}>
-            {milestones.map(ms => (
-            <TouchableOpacity
-              key={ms.day}
-              onPress={() => ms.unlocked && onMilestoneTap(ms.day)}
-              activeOpacity={0.7}
-              disabled={!ms.unlocked}
-            >
-              <Card style={[
-                styles.milestoneCard,
-                { backgroundColor: ms.unlocked ? colors.surface.rewardSoft : colors.surface.sunken },
-                !ms.unlocked && { opacity: 0.5 }
-              ] as any}>
-                  <Text style={[styles.milestoneDay, { color: colors.text.primary }]}>
-                    Gün {ms.day}
-                  </Text>
-                  {ms.unlocked && (
-                    <Text style={[styles.milestoneCheck, { color: colors.action.primary }]}>
-                      ✓
+            {DAY_MILESTONES.map(ms => {
+              const reached = days >= ms.day;
+              return (
+                <TouchableOpacity
+                  key={ms.day}
+                  onPress={() => reached && onMilestoneTap(ms.day)}
+                  activeOpacity={0.7}
+                  disabled={!reached}
+                >
+                  <Card style={[
+                    styles.milestoneCard,
+                    { backgroundColor: reached ? colors.surface.rewardSoft : colors.surface.sunken },
+                    !reached && { opacity: 0.5 },
+                  ]}
+                  >
+                    <Text style={[styles.milestoneDay, { color: colors.text.primary }]}>
+                      Gün {ms.day}
                     </Text>
-                  )}
-                </Card>
-              </TouchableOpacity>
-            ))}
+                    {reached && (
+                      <Text style={[styles.milestoneCheck, { color: colors.action.primary }]}>✓</Text>
+                    )}
+                  </Card>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
-        {/* Collection button */}
         <TouchableOpacity onPress={onCollectionTap} activeOpacity={0.7}>
           <Card style={styles.collectionCard}>
-            <Text style={[styles.collectionLabel, { color: colors.text.accent }]}>
-              KOLEKSİYON
-            </Text>
+            <Text style={[styles.collectionLabel, { color: colors.text.accent }]}>KOLEKSİYON</Text>
             <Text style={[styles.collectionTitle, { color: colors.text.primary }]}>
               Kristaller ve aksesuarlar
             </Text>
             <Text style={[styles.collectionSubtitle, { color: colors.text.secondary }]}>
-              4 / 15 öğe kazanıldı
+              {earnedCount} / {itemTotal} öğe kazanıldı
             </Text>
           </Card>
         </TouchableOpacity>
@@ -176,44 +160,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 12,
   },
   eyebrow: {
     marginBottom: 0,
   },
-  pathContainer: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 40,
-    alignItems: 'center',
-    marginBottom: 32,
-    minHeight: 200,
-    justifyContent: 'center',
-  },
-  pathPlaceholder: {
-    fontSize: 32,
-    marginBottom: 12,
-  },
-  pathSubtitle: {
+  caption: {
     ...typography.body.sm,
-    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 20,
   },
   chaptersSection: {
     marginBottom: 32,
   },
+  chapterBlock: {
+    marginBottom: 12,
+  },
   chapterCard: {
     padding: 16,
     marginBottom: 8,
-  },
-  chapterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  chapterLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
     gap: 16,
   },
   chapterNumber: {
@@ -223,6 +190,10 @@ const styles = StyleSheet.create({
   },
   chapterInfo: {
     flex: 1,
+  },
+  chapterEyebrow: {
+    ...typography.label.sm,
+    marginBottom: 4,
   },
   chapterTitle: {
     ...typography.body.md,
@@ -235,9 +206,24 @@ const styles = StyleSheet.create({
   checkmark: {
     fontSize: 20,
   },
+  pieceCard: {
+    padding: 14,
+    marginBottom: 6,
+    marginLeft: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pieceName: {
+    ...typography.body.md,
+    flex: 1,
+  },
+  pieceStatus: {
+    ...typography.label.sm,
+  },
   teaserCard: {
     padding: 16,
-    marginTop: 16,
+    marginTop: 8,
   },
   teaserEyebrow: {
     ...typography.label.sm,

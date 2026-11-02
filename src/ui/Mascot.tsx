@@ -94,6 +94,7 @@ type AccessoryData = {
 };
 
 export function Mascot({ pose, accessories = [], size = 200, darkScene = false, style }: MascotProps) {
+  void darkScene;
   const accessoryPoseName = POSE_TO_ACCESSORY_POSE[pose];
 
   return (
@@ -105,8 +106,8 @@ export function Mascot({ pose, accessories = [], size = 200, darkScene = false, 
         resizeMode="contain"
       />
 
-      {/* Accessories (only on dark scenes) */}
-      {darkScene && accessories.map((slug) => {
+      {/* Accessories overlay the pose. darkScene is kept for callers that tint FX later. */}
+      {accessories.map((slug) => {
         const data = accessoryData[slug as keyof typeof accessoryData] as AccessoryData;
         if (!data || !data.bbox) return null;
 

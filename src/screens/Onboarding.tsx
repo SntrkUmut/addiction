@@ -1,7 +1,6 @@
 /**
  * Onboarding flow (rev 5.1 §5.3)
- * 6 steps: welcome, cigs/day, pack price (optional), quit date, summary, start button
- * Pack price step can be skipped
+ * 5 steps: welcome, cigs/day, pack price (optional), quit date, summary
  */
 
 import React, { useState } from 'react';
@@ -14,13 +13,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { semanticLight as colors } from '../theme/colors';
+import { useTheme } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, PrimaryButton, TextButton, Eyebrow } from '../ui/components';
+import type { Profile } from '../data/schema';
 
 type OnboardingStep = 'welcome' | 'cigs' | 'price' | 'date' | 'summary';
 
-interface OnboardingData {
+export interface OnboardingData {
   cigarettesPerDay: string;
   packPrice: string;
   packSize: string;
@@ -32,16 +32,26 @@ interface Props {
   onComplete: (data: OnboardingData) => void;
   onEdit?: (data: Partial<OnboardingData>) => void;
   isEditing?: boolean;
+  initialProfile?: Profile | null;
 }
 
-export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
-  const [step, setStep] = useState<OnboardingStep>('welcome');
+function todayIso() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function Onboarding({ onComplete, onEdit, isEditing = false, initialProfile }: Props) {
+  const { colors, isDark } = useTheme();
+  const [step, setStep] = useState<OnboardingStep>(isEditing ? 'cigs' : 'welcome');
   const [data, setData] = useState<OnboardingData>({
-    cigarettesPerDay: '',
-    packPrice: '',
-    packSize: '20',
-    currency: '₺',
-    quitDate: new Date().toISOString().split('T')[0],
+    cigarettesPerDay: initialProfile?.cigarettesPerDay ? String(initialProfile.cigarettesPerDay) : '',
+    packPrice: initialProfile?.packPrice ? String(initialProfile.packPrice) : '',
+    packSize: initialProfile?.packSize ? String(initialProfile.packSize) : '20',
+    currency: 'TRY',
+    quitDate: initialProfile?.quitDate?.slice(0, 10) || todayIso(),
   });
 
   const updateData = (updates: Partial<OnboardingData>) => {
@@ -54,16 +64,16 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
     else if (step === 'cigs') setStep('price');
     else if (step === 'price') setStep('date');
     else if (step === 'date') setStep('summary');
-    else if (step === 'summary') onComplete(data);
+    else if (step === 'summary') onComplete({ ...data, currency: 'TRY' });
   };
 
   const handleSkipPrice = () => {
-    updateData({ packPrice: '', packSize: '20' });
+    updateData({ packPrice: '', packSize: '' });
     setStep('date');
   };
 
   return (
-    <Scene variant="day" height={800} horizonY={160}>
+    <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={160}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -73,7 +83,6 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Progress indicator */}
           <View style={styles.progressBar}>
             {(['welcome', 'cigs', 'price', 'date', 'summary'] as const).map((s, i) => (
               <View
@@ -91,12 +100,11 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
             ))}
           </View>
 
-          {/* Step content */}
           {step === 'welcome' && (
             <View style={styles.stepContent}>
               <Eyebrow style={styles.eyebrow}>HOŞ GELDİN</Eyebrow>
-              <Text style={styles.title}>Sigarayı bırakma yolculuğuna başla</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: colors.text.primary }]}>Sigarayı bırakma yolculuğuna başla</Text>
+              <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
                 Burada her gün yeni bir adım, her adım bir ışık. İlerleme kaydedilir; istediğin
                 zaman geri dönebilirsin.
               </Text>
@@ -108,12 +116,12 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
               <Eyebrow style={styles.eyebrow}>
                 {isEditing ? 'PLANINI DÜZENLE' : 'ADIM 1 · BAŞLANGIÇ NOKTAN'}
               </Eyebrow>
-              <Text style={styles.title}>Günde yaklaşık kaç sigara içiyorsun?</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: colors.text.primary }]}>Günde yaklaşık kaç sigara içiyorsun?</Text>
+              <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
                 Yaklaşık bir sayı yeterli. Bu bilgi, kişisel ilerleme tahminini oluşturur.
               </Text>
               <Card style={styles.inputCard}>
-                <Text style={styles.inputLabel}>GÜNLÜK ORTALAMA</Text>
+                <Text style={[styles.inputLabel, { color: colors.text.accent }]}>GÜNLÜK ORTALAMA</Text>
                 <View style={styles.numberRow}>
                   <TextInput
                     value={data.cigarettesPerDay}
@@ -122,11 +130,11 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
                     returnKeyType="done"
                     placeholder="Örn. 10"
                     placeholderTextColor={colors.text.tertiary}
-                    style={styles.numberInput}
+                    style={[styles.numberInput, { color: colors.text.primary, backgroundColor: colors.surface.sunken }]}
                   />
-                  <Text style={styles.inputUnit}>sigara / gün</Text>
+                  <Text style={[styles.inputUnit, { color: colors.text.secondary }]}>sigara / gün</Text>
                 </View>
-                <Text style={styles.fieldHint}>
+                <Text style={[styles.fieldHint, { color: colors.text.tertiary }]}>
                   Yaklaşık değer yeterli; bu alanı daha sonra da doldurabilirsin.
                 </Text>
               </Card>
@@ -136,13 +144,13 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
           {step === 'price' && (
             <View style={styles.stepContent}>
               <Eyebrow style={styles.eyebrow}>ADIM 2 · İSTEĞE BAĞLI</Eyebrow>
-              <Text style={styles.title}>Tasarrufunu da takip edelim mi?</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: colors.text.primary }]}>Tasarrufunu da takip edelim mi?</Text>
+              <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
                 Paket fiyatını bilirsen yaklaşık tasarrufunu gösterebiliriz. Emin değilsen bu
                 adımı geçebilirsin.
               </Text>
               <Card style={styles.inputCard}>
-                <Text style={styles.inputLabel}>PAKET FİYATI</Text>
+                <Text style={[styles.inputLabel, { color: colors.text.accent }]}>PAKET FİYATI</Text>
                 <View style={styles.numberRow}>
                   <TextInput
                     value={data.packPrice}
@@ -151,9 +159,9 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
                     returnKeyType="done"
                     placeholder="Örn. 65"
                     placeholderTextColor={colors.text.tertiary}
-                    style={styles.numberInput}
+                    style={[styles.numberInput, { color: colors.text.primary, backgroundColor: colors.surface.sunken }]}
                   />
-                  <Text style={styles.inputUnit}>₺ / paket</Text>
+                  <Text style={[styles.inputUnit, { color: colors.text.secondary }]}>₺ / paket</Text>
                 </View>
                 <View style={[styles.numberRow, { marginTop: 16 }]}>
                   <TextInput
@@ -163,11 +171,11 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
                     returnKeyType="done"
                     placeholder="20"
                     placeholderTextColor={colors.text.tertiary}
-                    style={[styles.numberInput, { flex: 0, width: 80 }]}
+                    style={[styles.numberInput, { color: colors.text.primary, backgroundColor: colors.surface.sunken, flex: 0, width: 80 }]}
                   />
-                  <Text style={styles.inputUnit}>adet / paket</Text>
+                  <Text style={[styles.inputUnit, { color: colors.text.secondary }]}>adet / paket</Text>
                 </View>
-                <Text style={styles.fieldHint}>
+                <Text style={[styles.fieldHint, { color: colors.text.tertiary }]}>
                   Bu bilgiyi daha sonra Rotam&apos;dan ekleyebilir veya değiştirebilirsin.
                 </Text>
               </Card>
@@ -177,20 +185,20 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
           {step === 'date' && (
             <View style={styles.stepContent}>
               <Eyebrow style={styles.eyebrow}>ADIM 3 · BAŞLANGIÇ TARİHİ</Eyebrow>
-              <Text style={styles.title}>Sigarayı bırakmaya ne zaman başladın?</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: colors.text.primary }]}>Sigarayı bırakmaya ne zaman başladın?</Text>
+              <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
                 Bugün başlıyorsan &quot;bugün&quot; seç. Daha önce başladıysan o tarihi girebilirsin.
               </Text>
               <Card style={styles.inputCard}>
-                <Text style={styles.inputLabel}>BAŞLANGIÇ TARİHİ</Text>
+                <Text style={[styles.inputLabel, { color: colors.text.accent }]}>BAŞLANGIÇ TARİHİ</Text>
                 <TextInput
                   value={data.quitDate}
                   onChangeText={val => updateData({ quitDate: val })}
                   placeholder="YYYY-AA-GG"
                   placeholderTextColor={colors.text.tertiary}
-                  style={[styles.numberInput, { fontSize: 18 }]}
+                  style={[styles.numberInput, { color: colors.text.primary, backgroundColor: colors.surface.sunken, fontSize: 18 }]}
                 />
-                <Text style={styles.fieldHint}>
+                <Text style={[styles.fieldHint, { color: colors.text.tertiary }]}>
                   Bu tarih yolculuk günlerini belirler. İstediğin zaman değiştirebilirsin.
                 </Text>
               </Card>
@@ -200,35 +208,39 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
           {step === 'summary' && (
             <View style={styles.stepContent}>
               <Eyebrow style={styles.eyebrow}>ÖZET</Eyebrow>
-              <Text style={styles.title}>Hazırsın</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: colors.text.primary }]}>Hazırsın</Text>
+              <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
                 Planın hazır. Başlamaya hazır olduğunda devam et; hesap açmadan kullanmaya
                 başlayabilirsin.
               </Text>
               <Card style={styles.summaryCard}>
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Günlük ortalama</Text>
-                  <Text style={styles.summaryValue}>
+                  <Text style={[styles.summaryLabel, { color: colors.text.secondary }]}>Günlük ortalama</Text>
+                  <Text style={[styles.summaryValue, { color: colors.text.primary }]}>
                     {data.cigarettesPerDay || '—'} sigara
                   </Text>
                 </View>
-                {data.packPrice && (
+                {data.packPrice ? (
                   <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Paket fiyatı</Text>
-                    <Text style={styles.summaryValue}>
-                      {data.packPrice} ₺ / {data.packSize} adet
+                    <Text style={[styles.summaryLabel, { color: colors.text.secondary }]}>Paket fiyatı</Text>
+                    <Text style={[styles.summaryValue, { color: colors.text.primary }]}>
+                      {data.packPrice} ₺ / {data.packSize || 20} adet
                     </Text>
+                  </View>
+                ) : (
+                  <View style={styles.summaryRow}>
+                    <Text style={[styles.summaryLabel, { color: colors.text.secondary }]}>Tasarruf hesabı</Text>
+                    <Text style={[styles.summaryValue, { color: colors.text.primary }]}>Şimdilik eklenmedi</Text>
                   </View>
                 )}
                 <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Başlangıç tarihi</Text>
-                  <Text style={styles.summaryValue}>{data.quitDate}</Text>
+                  <Text style={[styles.summaryLabel, { color: colors.text.secondary }]}>Başlangıç tarihi</Text>
+                  <Text style={[styles.summaryValue, { color: colors.text.primary }]}>{data.quitDate}</Text>
                 </View>
               </Card>
             </View>
           )}
 
-          {/* Navigation buttons */}
           <View style={styles.buttons}>
             {step === 'welcome' && <PrimaryButton onPress={handleNext} label="Başla" />}
             {step === 'cigs' && (
@@ -255,7 +267,7 @@ export function Onboarding({ onComplete, onEdit, isEditing = false }: Props) {
           </View>
 
           {!isEditing && (
-            <Text style={styles.footerHint}>
+            <Text style={[styles.footerHint, { color: colors.text.tertiary }]}>
               {step === 'welcome'
                 ? 'Yaklaşık 1 dakika · Adımlarını istediğin zaman değiştirebilirsin'
                 : step === 'summary'
@@ -299,12 +311,10 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.display.md,
-    color: colors.text.primary,
     marginBottom: 12,
   },
   subtitle: {
     ...typography.body.lg,
-    color: colors.text.secondary,
     lineHeight: 24,
     marginBottom: 32,
   },
@@ -313,7 +323,6 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     ...typography.label.sm,
-    color: colors.text.accent,
     marginBottom: 12,
   },
   numberRow: {
@@ -323,20 +332,16 @@ const styles = StyleSheet.create({
   },
   numberInput: {
     ...typography.display.sm,
-    color: colors.text.primary,
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: colors.surface.sunken,
     borderRadius: 8,
   },
   inputUnit: {
     ...typography.body.md,
-    color: colors.text.secondary,
   },
   fieldHint: {
     ...typography.body.sm,
-    color: colors.text.tertiary,
     marginTop: 12,
   },
   summaryCard: {
@@ -350,11 +355,9 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     ...typography.body.md,
-    color: colors.text.secondary,
   },
   summaryValue: {
     ...typography.body.md,
-    color: colors.text.primary,
     fontWeight: '600',
   },
   buttons: {
@@ -363,7 +366,6 @@ const styles = StyleSheet.create({
   },
   footerHint: {
     ...typography.body.sm,
-    color: colors.text.tertiary,
     textAlign: 'center',
   },
 });

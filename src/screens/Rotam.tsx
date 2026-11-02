@@ -1,41 +1,49 @@
 /**
- * Rotam (Journey/Progress) screen (rev 5.1 §17)
- * Shows journey timeline, milestones track, stats, and history
+ * Rotam — journey timeline, milestones, stats, history.
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useTheme } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, Eyebrow } from '../ui/components';
 import { journeyDay, formatTurkishDateSince, formatEventTime } from '../domain/journey';
+import {
+  cigarettesAvoided,
+  estimatedSavings,
+  eventTitle,
+  formatMoney,
+  lightsFrom,
+  todayIso,
+} from '../domain/progress';
+import { DAY_MILESTONES } from '../domain/milestones';
+import type { AppState } from '../data/schema';
 
 interface Props {
-  state: any;
+  state: AppState;
   onMilestoneTap: (day: number) => void;
   onCalcTap: () => void;
+  onSlip: () => void;
 }
 
-export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
+export function Rotam({ state, onMilestoneTap, onCalcTap, onSlip }: Props) {
   const { colors, isDark } = useTheme();
-  const days = journeyDay(state.profile.quitDate);
-  const lightsEarned = state.lights || 0;
+  const quitDate = state.profile?.quitDate ?? todayIso();
+  const days = journeyDay(quitDate);
+  const lightsEarned = lightsFrom(state);
+  const avoided = cigarettesAvoided(state);
+  const saved = estimatedSavings(state);
+  const recent = state.events.slice(0, 12);
 
-  // Mock last 7 days strip
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (6 - i));
-    const dateStr = date.toISOString().split('T')[0];
-    const hasLight = state.events.some((e: any) => e.kind === 'checkin' && e.at.startsWith(dateStr));
+    const dateStr = todayIso(date);
+    const hasLight = state.events.some(event =>
+      (event.kind === 'checkin' || event.kind === 'coping') && event.at.startsWith(dateStr),
+    );
     return { date, hasLight };
   });
-
-  // Mock recent events
-  const recentEvents = [
-    { type: 'checkin', title: 'Check-in', time: new Date(), lights: 1 },
-    { type: 'breath', title: 'Nefes egzersizi', time: new Date(0 - 3600000), lights: 1 },
-    { type: 'milestone', title: 'Gün 7 km taşı', time: new Date(0 - 86400000), lights: 0 },
-  ];
 
   return (
     <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
@@ -43,44 +51,46 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <Eyebrow style={styles.eyebrow}>
-          SENİN YOLCULUĞUN
-        </Eyebrow>
+        <Eyebrow style={styles.eyebrow}>SENİN YOLCULUĞUN</Eyebrow>
 
-        {/* Journey hero */}
         <View style={styles.hero}>
           <Text style={[styles.heroTitle, { color: colors.text.primary }]}>
-            {formatTurkishDateSince(state.profile.quitDate)}
+            {formatTurkishDateSince(quitDate)}
           </Text>
           <Text style={[styles.heroSubtitle, { color: colors.text.secondary }]}>
             {days} gün · {lightsEarned} ışık kazanıldı
           </Text>
         </View>
 
-        {/* Milestones track */}
         <View style={styles.milestonesSection}>
-          <Eyebrow style={styles.sectionEyebrow}>
-            KİLOMETRE TAŞLARI
-          </Eyebrow>
-          <View style={[
-            styles.milestonesTrack,
-            { backgroundColor: colors.surface.card, borderColor: colors.border.default }
-          ]}>
-            <Text style={[styles.trackPlaceholder, { color: colors.text.tertiary }]}>
-              🎯 Horizontal milestone stops
-            </Text>
-            <Text style={[styles.trackSubtitle, { color: colors.text.secondary }]}>
-              Gün 1, 7, 14, 30, 60, 90...
-            </Text>
-          </View>
+          <Eyebrow style={styles.sectionEyebrow}>KİLOMETRE TAŞLARI</Eyebrow>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.track}>
+            {DAY_MILESTONES.map(ms => {
+              const reached = days >= ms.day;
+              return (
+                <TouchableOpacity
+                  key={ms.day}
+                  onPress={() => reached && onMilestoneTap(ms.day)}
+                  disabled={!reached}
+                >
+                  <Card style={[
+                    styles.trackCard,
+                    { backgroundColor: reached ? colors.surface.rewardSoft : colors.surface.sunken },
+                  ]}
+                  >
+                    <Text style={[styles.trackDay, { color: colors.text.primary }]}>Gün {ms.day}</Text>
+                    <Text style={[styles.trackState, { color: reached ? colors.action.primary : colors.text.tertiary }]}>
+                      {reached ? 'Ulaşıldı' : `${ms.day - days} gün sonra`}
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </View>
 
-        {/* Last 7 days strip */}
         <View style={styles.last7DaysSection}>
-          <Eyebrow style={styles.sectionEyebrow}>
-            SON 7 GÜN
-          </Eyebrow>
+          <Eyebrow style={styles.sectionEyebrow}>SON 7 GÜN</Eyebrow>
           <View style={styles.daysStrip}>
             {last7Days.map((day, i) => (
               <View
@@ -88,72 +98,68 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
                 style={[
                   styles.dayDot,
                   {
-                    backgroundColor: day.hasLight
-                      ? colors.accent.gold
-                      : 'transparent',
+                    backgroundColor: day.hasLight ? colors.accent.gold : 'transparent',
                     borderColor: colors.border.default,
                     borderWidth: day.hasLight ? 0 : 1.5,
                     borderStyle: day.hasLight ? 'solid' : 'dashed',
-                  }
+                  },
                 ]}
               />
             ))}
           </View>
         </View>
 
-        {/* Stats row */}
         <View style={styles.statsRow}>
           <Card style={styles.statCard}>
-            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
-              İÇİLMEYEN TAHMİNİ
-            </Text>
+            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>İÇİLMEYEN TAHMİNİ</Text>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              {state.profile.cigarettesPerDay > 0
-                ? Math.round(days * state.profile.cigarettesPerDay)
-                : '—'}
+              {state.profile && state.profile.cigarettesPerDay > 0 ? avoided : '—'}
             </Text>
             <Text style={[styles.statUnit, { color: colors.text.tertiary }]}>
-              {state.profile.cigarettesPerDay > 0 ? 'adet · yaklaşık' : 'Günlük miktarı ekle'}
+              {state.profile && state.profile.cigarettesPerDay > 0 ? 'adet · yaklaşık' : 'Günlük miktarı ekle'}
             </Text>
           </Card>
-          <Card style={styles.statCard}>
-            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
-              TAHMİNİ TASARRUF
-            </Text>
-            <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              —
-            </Text>
-            <Text style={[styles.statUnit, { color: colors.text.tertiary }]}>
-              Paket fiyatı ekle
-            </Text>
-          </Card>
+          <TouchableOpacity style={{ flex: 1 }} onPress={onCalcTap} activeOpacity={0.7}>
+            <Card style={styles.statCard}>
+              <Text style={[styles.statLabel, { color: colors.text.secondary }]}>TAHMİNİ TASARRUF</Text>
+              <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                {saved === null ? '—' : formatMoney(saved, state.profile?.currency || 'TRY')}
+              </Text>
+              <Text style={[styles.statUnit, { color: colors.text.tertiary }]}>
+                {saved === null ? 'Paket fiyatı ekle' : 'girdiğin paket fiyatıyla'}
+              </Text>
+            </Card>
+          </TouchableOpacity>
         </View>
 
-        {/* Recent history */}
         <View style={styles.historySection}>
-          <Eyebrow style={styles.sectionEyebrow}>
-            SON KAYITLARIN
-          </Eyebrow>
-          {recentEvents.map((event, i) => (
-            <Card key={i} style={styles.historyCard}>
+          <Eyebrow style={styles.sectionEyebrow}>SON KAYITLARIN</Eyebrow>
+          {recent.length === 0 ? (
+            <Card style={styles.historyCard}>
+              <Text style={[styles.historyTitle, { color: colors.text.primary }]}>Burada yolculuğun görünecek</Text>
+              <Text style={[styles.historyTime, { color: colors.text.tertiary }]}>
+                Check-in veya baş etme aracı kullandığında kayıtların burada toplanır.
+              </Text>
+            </Card>
+          ) : recent.map(event => (
+            <Card key={event.id} style={styles.historyCard}>
               <View style={styles.historyRow}>
                 <View style={styles.historyLeft}>
                   <Text style={[styles.historyTitle, { color: colors.text.primary }]}>
-                    {event.title}
+                    {eventTitle(event)}
                   </Text>
                   <Text style={[styles.historyTime, { color: colors.text.tertiary }]}>
-                    {formatEventTime(event.time.toISOString())}
+                    {formatEventTime(event.at)}
                   </Text>
                 </View>
-                {event.lights > 0 && (
-                  <Text style={[styles.historyLights, { color: colors.accent.goldText }]}>
-                    +{event.lights}
-                  </Text>
-                )}
               </View>
             </Card>
           ))}
         </View>
+
+        <TouchableOpacity onPress={onSlip} style={styles.slipLink}>
+          <Text style={[styles.slipText, { color: colors.text.accent }]}>Kayma kaydet</Text>
+        </TouchableOpacity>
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -188,19 +194,20 @@ const styles = StyleSheet.create({
   sectionEyebrow: {
     marginBottom: 12,
   },
-  milestonesTrack: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 32,
-    alignItems: 'center',
-    minHeight: 120,
-    justifyContent: 'center',
+  track: {
+    gap: 8,
+    paddingRight: 16,
   },
-  trackPlaceholder: {
-    fontSize: 28,
-    marginBottom: 8,
+  trackCard: {
+    padding: 16,
+    minWidth: 96,
   },
-  trackSubtitle: {
+  trackDay: {
+    ...typography.body.md,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  trackState: {
     ...typography.body.sm,
   },
   last7DaysSection: {
@@ -261,8 +268,12 @@ const styles = StyleSheet.create({
   historyTime: {
     ...typography.body.sm,
   },
-  historyLights: {
+  slipLink: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  slipText: {
     ...typography.label.md,
-    fontWeight: '700',
   },
 });
