@@ -1,15 +1,35 @@
 /**
  * Sığınak — chapters, pieces, milestones, collection from the bundled manifest.
+ * Path ends with a static fog teaser (§19.2) or the end-of-content card (§19.6).
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  AccessibilityInfo,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../ui/theme';
 import { typography } from '../theme/typography';
 import { Scene, Card, Eyebrow, LightChip } from '../ui/components';
+import { CloudFog, Hourglass } from '../ui/icons';
+import { ContentIcon } from '../ui/contentIcons';
 import { journeyDay } from '../domain/journey';
 import { chapterProgress, lightsFrom, todayIso } from '../domain/progress';
+import {
+  CHAPTER_CHROME,
+  collectionA11yLabel,
+  endOfContentView,
+  nextChapterFogTeaser,
+  type EndOfContentView,
+  type FogTeaser,
+} from '../domain/chapters';
 import { DAY_MILESTONES } from '../domain/milestones';
+import { isMascotMotionEnabled } from '../ui/mascotEffects';
 import type { AppState } from '../data/schema';
 import type { Manifest } from '../domain/content';
 
@@ -19,24 +39,222 @@ interface Props {
   onNodeTap: (pieceIndex: number, pieceName: string) => void;
   onMilestoneTap: (day: number) => void;
   onCollectionTap: () => void;
+  focusChapterId?: string | null;
+  onFocusConsumed?: () => void;
 }
 
-export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollectionTap }: Props) {
+function FogTeaserCard({ teaser }: { teaser: FogTeaser }) {
+  const { colors, isDark } = useTheme();
+  const fogFill = isDark ? 'rgba(32, 43, 55, 0.72)' : 'rgba(255, 254, 252, 0.9)';
+
+  return (
+    <View style={styles.fogWrap}>
+      <LinearGradient
+        colors={['transparent', colors.bg.canvas]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <View
+        pointerEvents="none"
+        style={[styles.fogBlob, styles.fogBlobA, { backgroundColor: fogFill }]}
+      />
+      <View
+        pointerEvents="none"
+        style={[styles.fogBlob, styles.fogBlobB, { backgroundColor: fogFill }]}
+      />
+      <View
+        pointerEvents="none"
+        style={[styles.fogBlob, styles.fogBlobC, { backgroundColor: fogFill }]}
+      />
+      <Card style={[styles.teaserCard, { backgroundColor: colors.surface.sunken }]}>
+        <View style={styles.teaserHeader}>
+          <View
+            style={[styles.gate, { borderColor: colors.text.tertiary }]}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            <ContentIcon name={teaser.gateIcon} size={24} color={colors.text.tertiary} weight="regular" />
+          </View>
+          <View style={styles.teaserCopy}>
+            <View style={styles.teaserEyebrowRow}>
+              <CloudFog size={16} color={colors.text.secondary} weight="regular" />
+              <Text style={[styles.teaserEyebrow, { color: colors.text.secondary }]}>
+                {teaser.eyebrow}
+              </Text>
+            </View>
+            <Text style={[styles.teaserText, { color: colors.text.primary }]}>
+              {teaser.line}
+            </Text>
+            <Text style={[styles.teaserCaption, { color: colors.text.tertiary }]}>
+              {CHAPTER_CHROME.fogCaption(teaser.threshold, teaser.remaining)}
+            </Text>
+          </View>
+        </View>
+        {teaser.previewIcons.length > 0 ? (
+          <View
+            style={styles.previewRow}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            {teaser.previewIcons.map((icon, iconIndex) => (
+              <View key={`${icon}-${iconIndex}`} style={[styles.previewDot, { backgroundColor: colors.surface.card }]}>
+                <ContentIcon name={icon} size={16} color={colors.text.tertiary} weight="regular" />
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </Card>
+    </View>
+  );
+}
+
+function EndOfContentCard({
+  view,
+  onCollectionTap,
+}: {
+  view: EndOfContentView;
+  onCollectionTap: () => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Card style={styles.endCard}>
+      <View style={styles.teaserEyebrowRow}>
+        <CloudFog size={16} color={colors.text.accent} weight="regular" />
+        <Text style={[styles.teaserEyebrow, { color: colors.text.accent }]}>{view.eyebrow}</Text>
+      </View>
+      <Text style={[styles.endTitle, { color: colors.text.primary }]}>{view.title}</Text>
+      <Text style={[styles.endBody, { color: colors.text.secondary }]}>{view.body}</Text>
+
+      <View style={[styles.countdown, { backgroundColor: colors.surface.sunken }]}>
+        <View
+          style={[styles.hourglass, { backgroundColor: colors.surface.rewardSoft }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Hourglass size={22} color={colors.accent.goldDeep} weight="fill" />
+        </View>
+        <View
+          style={{ flex: 1 }}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={view.opensA11y}
+        >
+          <Text style={[styles.countdownLabel, { color: colors.text.secondary }]}>{view.opensLabel}</Text>
+          <Text style={[styles.countdownValue, { color: colors.text.primary }]}>{view.opensValue}</Text>
+        </View>
+        {view.bankedLights > 0 ? (
+          <View
+            style={styles.banked}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={view.bankedA11y}
+          >
+            <Text style={[styles.countdownValue, { color: colors.text.primary, textAlign: 'right' }]}>
+              {view.lightsReadyLabel}
+            </Text>
+            <Text style={[styles.countdownLabel, { color: colors.text.secondary, textAlign: 'right' }]}>
+              {view.firstPieceHint}
+            </Text>
+          </View>
+        ) : null}
+      </View>
+
+      <Text style={[styles.meanwhile, { color: colors.text.tertiary }]}>{view.meanwhile}</Text>
+      <TouchableOpacity
+        onPress={onCollectionTap}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={collectionA11yLabel()}
+      >
+        <Card style={[styles.meanwhileCard, { backgroundColor: colors.surface.sunken }]}>
+          <Text style={[styles.collectionTitle, { color: colors.text.primary }]}>{view.collectionLabel}</Text>
+          <Text style={[styles.collectionSubtitle, { color: colors.text.secondary }]}>
+            {CHAPTER_CHROME.collectionItems}
+          </Text>
+        </Card>
+      </TouchableOpacity>
+    </Card>
+  );
+}
+
+export function Siginak({
+  state,
+  manifest,
+  onNodeTap,
+  onMilestoneTap,
+  onCollectionTap,
+  focusChapterId,
+  onFocusConsumed,
+}: Props) {
   const { colors, isDark } = useTheme();
   const lightsEarned = lightsFrom(state);
   const days = journeyDay(state.profile?.quitDate ?? todayIso());
   const chapters = chapterProgress(manifest, lightsEarned);
-  const upcoming = manifest.upcoming;
   const earnedCount = state.collection?.earned.length ?? 0;
   const itemTotal = manifest.items?.length ?? earnedCount;
+  const teaser = nextChapterFogTeaser(manifest, lightsEarned);
+  const end = endOfContentView(manifest, lightsEarned);
+  const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
+  const sectionY = useRef(0);
+  const chapterLocalY = useRef<Record<string, number>>({});
+  const pieceLocalY = useRef<Record<string, { chapterId: string; y: number }>>({});
+  const endLocalY = useRef<number | undefined>(undefined);
+  const consumedFocusRef = useRef<string | null>(null);
+  const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
 
   const chapterOffsets = chapters.map((_, index) => (
     chapters.slice(0, index).reduce((sum, chapter) => sum + chapter.total, 0)
   ));
 
+  const scrollToFocus = (id: string | null | undefined) => {
+    if (!id) return;
+    if (consumedFocusRef.current === id) return;
+    let y: number | undefined;
+    if (id === '__end__') {
+      if (endLocalY.current == null) return;
+      y = sectionY.current + endLocalY.current;
+    } else if (pieceLocalY.current[id]) {
+      const local = pieceLocalY.current[id];
+      const chapterY = chapterLocalY.current[local.chapterId];
+      if (chapterY == null) return;
+      y = sectionY.current + chapterY + local.y;
+    } else if (chapterLocalY.current[id] != null) {
+      y = sectionY.current + chapterLocalY.current[id];
+    } else {
+      return;
+    }
+    consumedFocusRef.current = id;
+    scrollRef.current?.scrollTo({
+      y: Math.max(0, y - 12),
+      animated: isMascotMotionEnabled(reduceMotion),
+    });
+    onFocusConsumed?.();
+  };
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(enabled => setReduceMotion(enabled ?? false))
+      .catch(() => setReduceMotion(false));
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', enabled => {
+      setReduceMotion(enabled);
+    });
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    if (!focusChapterId) {
+      consumedFocusRef.current = null;
+      return;
+    }
+    scrollToFocus(focusChapterId);
+    // Review: only re-run for a new focus target, not every lights/layout render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusChapterId]);
+
   return (
     <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
@@ -49,7 +267,13 @@ export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollecti
           Her 2 ışık yolda yeni bir durak açar. Kayma yolu geri sarmaz; açtığın duraklar hep yerinde kalır.
         </Text>
 
-        <View style={styles.chaptersSection}>
+        <View
+          style={styles.chaptersSection}
+          onLayout={event => {
+            sectionY.current = event.nativeEvent.layout.y;
+            scrollToFocus(focusChapterId);
+          }}
+        >
           {chapters.length === 0 ? (
             <Card style={styles.chapterCard}>
               <Text style={[styles.chapterTitle, { color: colors.text.primary }]}>
@@ -60,11 +284,18 @@ export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollecti
               </Text>
             </Card>
           ) : null}
-          {chapters.map((chapter, index) => {
-            const offset = chapterOffsets[index];
+          {chapters.filter(chapter => chapter.entered).map((chapter, index) => {
+            const offset = chapterOffsets[chapters.findIndex(item => item.id === chapter.id)];
             return (
-              <View key={chapter.id} style={styles.chapterBlock}>
-                <Card style={[styles.chapterCard, chapter.locked ? { opacity: 0.5 } : null]}>
+              <View
+                key={chapter.id}
+                style={styles.chapterBlock}
+                onLayout={event => {
+                  chapterLocalY.current[chapter.id] = event.nativeEvent.layout.y;
+                  scrollToFocus(focusChapterId);
+                }}
+              >
+                <Card style={styles.chapterCard}>
                   <Text style={[styles.chapterNumber, { color: colors.accent.goldText }]}>{index + 1}</Text>
                   <View style={styles.chapterInfo}>
                     <Text style={[styles.chapterEyebrow, { color: colors.text.accent }]}>{chapter.eyebrow}</Text>
@@ -77,38 +308,50 @@ export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollecti
                     <Text style={[styles.checkmark, { color: colors.action.primary }]}>✓</Text>
                   )}
                 </Card>
-                {!chapter.locked && chapter.pieces.map((piece, pieceIndex) => (
-                  <TouchableOpacity
+                {chapter.pieces.map((piece, pieceIndex) => (
+                  <View
                     key={piece.id}
-                    onPress={() => onNodeTap(offset + pieceIndex, piece.name)}
-                    activeOpacity={0.7}
+                    onLayout={event => {
+                      pieceLocalY.current[piece.id] = {
+                        chapterId: chapter.id,
+                        y: event.nativeEvent.layout.y,
+                      };
+                      scrollToFocus(focusChapterId);
+                    }}
                   >
-                    <Card style={[
-                      styles.pieceCard,
-                      piece.unlocked ? null : { backgroundColor: colors.surface.sunken },
-                    ]}
+                    <TouchableOpacity
+                      onPress={() => onNodeTap(offset + pieceIndex, piece.name)}
+                      activeOpacity={0.7}
                     >
-                      <Text style={[styles.pieceName, { color: colors.text.primary }]}>{piece.name}</Text>
-                      <Text style={[styles.pieceStatus, { color: piece.unlocked ? colors.action.primary : colors.text.tertiary }]}>
-                        {piece.unlocked ? 'Açıldı' : `${(offset + pieceIndex + 1) * (manifest.lightsPerPiece ?? 2)} ışık`}
-                      </Text>
-                    </Card>
-                  </TouchableOpacity>
+                      <Card style={[
+                        styles.pieceCard,
+                        piece.unlocked ? null : { backgroundColor: colors.surface.sunken },
+                      ]}
+                      >
+                        <Text style={[styles.pieceName, { color: colors.text.primary }]}>{piece.name}</Text>
+                        <Text style={[styles.pieceStatus, { color: piece.unlocked ? colors.action.primary : colors.text.tertiary }]}>
+                          {piece.unlocked ? 'Açıldı' : `${(offset + pieceIndex + 1) * (manifest.lightsPerPiece ?? 2)} ışık`}
+                        </Text>
+                      </Card>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             );
           })}
 
-          {upcoming && (
-            <Card style={[styles.teaserCard, { backgroundColor: colors.surface.sunken }]}>
-              <Text style={[styles.teaserEyebrow, { color: colors.text.accent }]}>
-                {upcoming.eyebrow || 'SONRA'}
-              </Text>
-              <Text style={[styles.teaserText, { color: colors.text.secondary }]}>
-                {upcoming.teaserLine || upcoming.title}
-              </Text>
-            </Card>
-          )}
+          {end ? (
+            <View
+              onLayout={event => {
+                endLocalY.current = event.nativeEvent.layout.y;
+                scrollToFocus(focusChapterId);
+              }}
+            >
+              <EndOfContentCard view={end} onCollectionTap={onCollectionTap} />
+            </View>
+          ) : teaser ? (
+            <FogTeaserCard teaser={teaser} />
+          ) : null}
         </View>
 
         <View style={styles.milestonesSection}>
@@ -142,11 +385,16 @@ export function Siginak({ state, manifest, onNodeTap, onMilestoneTap, onCollecti
           </View>
         </View>
 
-        <TouchableOpacity onPress={onCollectionTap} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={onCollectionTap}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={collectionA11yLabel()}
+        >
           <Card style={styles.collectionCard}>
             <Text style={[styles.collectionLabel, { color: colors.text.accent }]}>KOLEKSİYON</Text>
             <Text style={[styles.collectionTitle, { color: colors.text.primary }]}>
-              Kristaller ve aksesuarlar
+              {CHAPTER_CHROME.collectionItems}
             </Text>
             <Text style={[styles.collectionSubtitle, { color: colors.text.secondary }]}>
               {earnedCount} / {itemTotal} öğe kazanıldı
@@ -231,17 +479,128 @@ const styles = StyleSheet.create({
   pieceStatus: {
     ...typography.label.sm,
   },
+  fogWrap: {
+    marginTop: 8,
+    paddingTop: 24,
+    minHeight: 170,
+    position: 'relative',
+  },
+  fogBlob: {
+    position: 'absolute',
+    borderRadius: 999,
+  },
+  fogBlobA: {
+    width: 220,
+    height: 90,
+    left: -20,
+    top: 10,
+    opacity: 0.85,
+  },
+  fogBlobB: {
+    width: 180,
+    height: 80,
+    right: -10,
+    top: 36,
+    opacity: 0.75,
+  },
+  fogBlobC: {
+    width: 140,
+    height: 70,
+    left: 80,
+    top: 70,
+    opacity: 0.7,
+  },
   teaserCard: {
     padding: 16,
-    marginTop: 8,
+    gap: 12,
+  },
+  teaserHeader: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'flex-start',
+  },
+  gate: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  teaserCopy: {
+    flex: 1,
+    gap: 4,
+  },
+  teaserEyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   teaserEyebrow: {
     ...typography.label.sm,
-    marginBottom: 8,
   },
   teaserText: {
     ...typography.body.md,
-    fontStyle: 'italic',
+    fontWeight: '700',
+  },
+  teaserCaption: {
+    ...typography.caption.regular,
+  },
+  previewRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  previewDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  endCard: {
+    padding: 20,
+    marginTop: 8,
+    gap: 10,
+  },
+  endTitle: {
+    ...typography.display.sm,
+  },
+  endBody: {
+    ...typography.body.md,
+    lineHeight: 22,
+  },
+  countdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    borderRadius: 16,
+  },
+  hourglass: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countdownLabel: {
+    ...typography.caption.regular,
+  },
+  countdownValue: {
+    ...typography.body.md,
+    fontWeight: '700',
+  },
+  banked: {
+    maxWidth: 120,
+  },
+  meanwhile: {
+    ...typography.label.sm,
+    letterSpacing: 1.2,
+    marginTop: 8,
+  },
+  meanwhileCard: {
+    padding: 16,
   },
   milestonesSection: {
     marginBottom: 32,

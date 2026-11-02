@@ -82,9 +82,11 @@ export type ChapterProgress = {
   id: string;
   title: string;
   eyebrow: string;
-  pieces: { id: string; name: string; unlocked: boolean }[];
+  pieces: { id: string; name: string; unlocked: boolean; icon: string }[];
   unlockedCount: number;
   total: number;
+  /** Previous chapter is complete (or this is chapter 1), so the path has entered it. */
+  entered: boolean;
   locked: boolean;
   complete: boolean;
   completionReward?: string;
@@ -93,16 +95,20 @@ export type ChapterProgress = {
 export function chapterProgress(manifest: Manifest, lights: number): ChapterProgress[] {
   const lightsPerPiece = manifest.lightsPerPiece ?? 2;
   let priorPieces = 0;
+  let previousComplete = true;
   return manifest.chapters.map(chapter => {
+    const entered = previousComplete;
     const pieces = chapter.pieces.map((piece, index) => {
       const globalIndex = priorPieces + index;
       return {
         id: piece.id,
         name: piece.name,
+        icon: piece.icon,
         unlocked: lights >= (globalIndex + 1) * lightsPerPiece,
       };
     });
     const unlockedCount = pieces.filter(piece => piece.unlocked).length;
+    const complete = unlockedCount === pieces.length && pieces.length > 0;
     const result: ChapterProgress = {
       id: chapter.id,
       title: chapter.title,
@@ -110,10 +116,12 @@ export function chapterProgress(manifest: Manifest, lights: number): ChapterProg
       pieces,
       unlockedCount,
       total: pieces.length,
-      locked: unlockedCount === 0 && priorPieces > 0,
-      complete: unlockedCount === pieces.length && pieces.length > 0,
+      entered,
+      locked: !entered,
+      complete,
       completionReward: chapter.completionReward,
     };
+    previousComplete = complete;
     priorPieces += chapter.pieces.length;
     return result;
   });

@@ -8,3 +8,6 @@ export { Tent } from 'phosphor-react-native/lib/module/icons/Tent';
 export { User } from 'phosphor-react-native/lib/module/icons/User';
 export { Sparkle } from 'phosphor-react-native/lib/module/icons/Sparkle';
 export { MapPin } from 'phosphor-react-native/lib/module/icons/MapPin';
+export { CloudFog } from 'phosphor-react-native/lib/module/icons/CloudFog';
+export { ArrowRight } from 'phosphor-react-native/lib/module/icons/ArrowRight';
+export { Hourglass } from 'phosphor-react-native/lib/module/icons/Hourglass';
