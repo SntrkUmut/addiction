@@ -20,7 +20,8 @@ export type ChapterFlow = {
 
 /**
  * UI chrome that is not in the bundled v11 chapter/upcoming copy.
- * copyStatus: approved — Umut, 2026-11-02.
+ * copyStatus: approved, Umut adına Grok Bot, 2026-11-02.
+ * Accessibility labels (opensA11yLabel, bankedA11yLabel, collectionA11yLabel) are approved too.
  */
 export const CHAPTER_CHROME = {
   copyStatus: 'approved' as const,

@@ -195,9 +195,10 @@ export function Siginak({
   const teaser = nextChapterFogTeaser(manifest, lightsEarned);
   const end = endOfContentView(manifest, lightsEarned);
   const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
-  const yMap = useRef<Record<string, number>>({});
-  const pieceOffset = useRef<Record<string, { chapterId: string; y: number }>>({});
   const sectionY = useRef(0);
+  const chapterLocalY = useRef<Record<string, number>>({});
+  const pieceLocalY = useRef<Record<string, { chapterId: string; y: number }>>({});
+  const endLocalY = useRef<number | undefined>(undefined);
   const consumedFocusRef = useRef<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
 
@@ -208,13 +209,19 @@ export function Siginak({
   const scrollToFocus = (id: string | null | undefined) => {
     if (!id) return;
     if (consumedFocusRef.current === id) return;
-    let y = yMap.current[id];
-    if (y == null) {
-      const local = pieceOffset.current[id];
-      const chapterY = local ? yMap.current[local.chapterId] : undefined;
-      if (local == null || chapterY == null) return;
-      y = chapterY + local.y;
-      yMap.current[id] = y;
+    let y: number | undefined;
+    if (id === '__end__') {
+      if (endLocalY.current == null) return;
+      y = sectionY.current + endLocalY.current;
+    } else if (pieceLocalY.current[id]) {
+      const local = pieceLocalY.current[id];
+      const chapterY = chapterLocalY.current[local.chapterId];
+      if (chapterY == null) return;
+      y = sectionY.current + chapterY + local.y;
+    } else if (chapterLocalY.current[id] != null) {
+      y = sectionY.current + chapterLocalY.current[id];
+    } else {
+      return;
     }
     consumedFocusRef.current = id;
     scrollRef.current?.scrollTo({
@@ -284,7 +291,7 @@ export function Siginak({
                 key={chapter.id}
                 style={styles.chapterBlock}
                 onLayout={event => {
-                  yMap.current[chapter.id] = sectionY.current + event.nativeEvent.layout.y;
+                  chapterLocalY.current[chapter.id] = event.nativeEvent.layout.y;
                   scrollToFocus(focusChapterId);
                 }}
               >
@@ -305,7 +312,7 @@ export function Siginak({
                   <View
                     key={piece.id}
                     onLayout={event => {
-                      pieceOffset.current[piece.id] = {
+                      pieceLocalY.current[piece.id] = {
                         chapterId: chapter.id,
                         y: event.nativeEvent.layout.y,
                       };
@@ -336,7 +343,7 @@ export function Siginak({
           {end ? (
             <View
               onLayout={event => {
-                yMap.current.__end__ = sectionY.current + event.nativeEvent.layout.y;
+                endLocalY.current = event.nativeEvent.layout.y;
                 scrollToFocus(focusChapterId);
               }}
             >

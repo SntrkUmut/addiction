@@ -83,6 +83,7 @@ function AppInner() {
   const pendingChapterRef = React.useRef<ChapterFlow | null>(null);
   const chapterFlowRef = React.useRef<{ flow: ChapterFlow; phase: 'celebration' | 'handoff' } | null>(null);
   const considerChapterOnOpenRef = React.useRef<(content: Manifest, appState: AppState) => void>(() => {});
+  const pendingRemoteRef = React.useRef<Manifest | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -105,12 +106,9 @@ function AppInner() {
       try {
         const remoteManifest = await getManifest();
         if (remoteManifest && remoteManifest.version >= bundledManifest.version) {
+          pendingRemoteRef.current = remoteManifest;
           setManifest(remoteManifest);
-          setState(current => {
-            const synced = withSyncedCollection(current, remoteManifest);
-            queueMicrotask(() => considerChapterOnOpenRef.current(remoteManifest, synced));
-            return synced;
-          });
+          setState(current => withSyncedCollection(current, remoteManifest));
         }
       } catch (error) {
         if (__DEV__) console.warn('[App] Remote manifest refresh failed', error);
@@ -192,6 +190,13 @@ function AppInner() {
   useEffect(() => {
     considerChapterOnOpenRef.current = considerChapterOnOpen;
   }, [considerChapterOnOpen]);
+
+  useEffect(() => {
+    const remote = pendingRemoteRef.current;
+    if (!remote || loading) return;
+    pendingRemoteRef.current = null;
+    considerChapterOnOpenRef.current(remote, state);
+  }, [manifest, state, loading]);
 
   const dismissDialog = useCallback(() => {
     setDialog(null);
@@ -613,8 +618,8 @@ function AppInner() {
                       },
                     ]}
                     onPress={() => {
-                      action.onPress();
                       dismissDialog();
+                      action.onPress();
                     }}
                   >
                     <Text style={[

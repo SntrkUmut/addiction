@@ -96,7 +96,7 @@ export function ChapterCelebration({ flow, lights, onContinue, onHome }: Props) 
     <Scene variant="night" height={700} horizonY={700}>
       <View style={[styles.wrap, { paddingTop: Math.max(insets.top, 24) + 12, paddingBottom: Math.max(insets.bottom, 24) }]}>
         <LightChip count={lights} variant="night" />
-        <Mascot pose="hopeful" size={180} darkScene effects={['sparkles']} />
+        <Mascot pose="joyful" size={180} darkScene effects={['sparkles']} />
         <View
           style={styles.pieceRow}
           accessibilityElementsHidden

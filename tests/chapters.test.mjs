@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CHAPTER_CHROME,
+  bankedA11yLabel,
   celebrationCopy,
   chapterCompletedByLight,
   chapterSeenKey,
@@ -16,6 +17,7 @@ import {
   isEndOfPublishedContent,
   latestUnseenChapterCompletion,
   nextChapterFogTeaser,
+  opensA11yLabel,
   planOpenChapterCelebration,
   takeQueuedChapter,
 } from '../src/domain/chapters.ts';
@@ -205,6 +207,9 @@ test('fog teaser uses the next chapter teaser or upcoming copy', () => {
 
 test('chapter chrome copy is approved', () => {
   assert.equal(CHAPTER_CHROME.copyStatus, 'approved');
+  const source = readFileSync(new URL('../src/domain/chapters.ts', import.meta.url), 'utf8');
+  assert.match(source, /copyStatus: approved, Umut adına Grok Bot, 2026-11-02/);
+  assert.match(source, /Accessibility labels \(opensA11yLabel, bankedA11yLabel, collectionA11yLabel\) are approved too/);
 });
 
 test('CHAPTER_CHROME and Sığınak collection copy have no fire/smoke imagery or yak-/yan- verbs', () => {
@@ -224,6 +229,10 @@ test('CHAPTER_CHROME and Sığınak collection copy have no fire/smoke imagery o
     CHAPTER_CHROME.continueCta,
     CHAPTER_CHROME.remainingLights(3),
     collectionA11yLabel(),
+    bankedA11yLabel(2),
+    bankedA11yLabel(0),
+    opensA11yLabel(CHAPTER_CHROME.soon),
+    opensA11yLabel(CHAPTER_CHROME.daysLeft(4)),
   ].join('\n');
   const siginak = readFileSync(new URL('../src/screens/Siginak.tsx', import.meta.url), 'utf8');
   assert.match(siginak, /CHAPTER_CHROME\.collectionItems/);
@@ -235,15 +244,17 @@ test('CHAPTER_CHROME and Sığınak collection copy have no fire/smoke imagery o
   assert.equal(editorialScan('kamp ateşi ve duman').status, 1);
 });
 
-test('Sığınak consumes focus once from onLayout; celebration/handoff use hopeful and header', () => {
+test('Sığınak consumes focus once from onLayout; celebration is joyful and handoff is hopeful', () => {
   const siginak = readFileSync(new URL('../src/screens/Siginak.tsx', import.meta.url), 'utf8');
   assert.match(siginak, /onFocusConsumed/);
   assert.match(siginak, /scrollToFocus\(focusChapterId\)/);
   assert.match(siginak, /}, \[focusChapterId\]\);/);
+  assert.match(siginak, /sectionY\.current \+ chapterY \+ local\.y/);
+  assert.match(siginak, /chapterLocalY\.current\[chapter\.id\] = event\.nativeEvent\.layout\.y/);
   assert.equal(siginak.includes('chapters, teaser, end, reduceMotion'), false);
 
   const celebration = readFileSync(new URL('../src/screens/ChapterCelebration.tsx', import.meta.url), 'utf8');
-  assert.match(celebration, /pose="hopeful"/);
+  assert.match(celebration, /pose="joyful"/);
   assert.match(celebration, /celebrationCopy/);
   assert.match(celebration, /accessibilityRole="header"/);
 
@@ -258,6 +269,8 @@ test('App queues until overlay dismiss and marks seen only when presenting', () 
   assert.match(app, /dismissDialog[\s\S]*flushQueuedChapter/);
   assert.match(app, /dismissUrge[\s\S]*flushQueuedChapter/);
   assert.match(app, /closeMilestone[\s\S]*flushQueuedChapter/);
-  assert.match(app, /queueMicrotask\(\(\) => considerChapterOnOpenRef\.current/);
+  assert.match(app, /setState\(current => withSyncedCollection\(current, remoteManifest\)\)/);
+  assert.equal(app.includes('queueMicrotask'), false);
+  assert.match(app, /dismissDialog\(\);\s*\n\s*action\.onPress\(\)/);
   assert.match(app, /const firstPieceId = chapterFlow\.flow\.next\?\.pieces\[0\]\?\.id \?\? '__end__'/);
 });
