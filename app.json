@@ -1,17 +1,28 @@
 {
   "expo": {
-    "name": "MVP Önizleme",
-    "slug": "smoking-cessation-mvp",
+    "name": "Quit - Sigarayı Bırak",
+    "slug": "quit-smoking",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F5F1EB"
+    },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.example.smokingcessation"
+      "bundleIdentifier": "com.sntrk.quit",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "Bu uygulama kullanıcı takibi yapmaz.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "package": "com.example.smokingcessation",
+      "package": "com.sntrk.quit",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#F8F3E9",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -32,9 +43,14 @@
       "expo-sharing",
       "expo-status-bar"
     ],
-    "scheme": "quit-companion",
+    "scheme": "quit",
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "placeholder-update-after-eas-init"
+      }
     }
   }
 }
