@@ -39,7 +39,13 @@ export const CHAPTER_CHROME = {
   homeCta: 'Ana ekrana dön',
   continueCta: 'Yola devam et',
   remainingLights: (n: number) => `${n} ışık kaldı`,
+  collectionItems: 'Kristaller ve aksesuarlar',
 } as const;
+
+/** Screen-reader label for the collection card on both Sığınak surfaces. */
+export function collectionA11yLabel(): string {
+  return `${CHAPTER_CHROME.collection}, ${CHAPTER_CHROME.collectionItems}`;
+}
 
 /** Screen-reader label for "Açılmasına" + "{n} gün" / "Yakında". */
 export function opensA11yLabel(opensValue: string): string {
@@ -105,50 +111,132 @@ export function isEndOfPublishedContent(
   return builtPieces(lights, lightsPerPieceOf(manifest)) >= total;
 }
 
+function flowAtIndex(
+  manifest: Pick<Manifest, 'chapters' | 'lightsPerPiece'>,
+  index: number,
+): ChapterFlow {
+  const chapter = manifest.chapters[index];
+  return {
+    key: chapterSeenKey(chapter.order),
+    order: chapter.order,
+    lightsAtCompletion: lightsToCompleteChapter(manifest, index),
+    completed: chapter,
+    next: manifest.chapters[index + 1] ?? null,
+  };
+}
+
 /**
- * Earliest completed chapter whose `chapter-N` key is not in milestones.seen.
- * Load/backfill of an already-seen chapter returns null.
+ * On open/backfill: show only the most recently completed chapter if it is
+ * unseen. Older completed unseen keys are returned to mark quietly — never
+ * stacked as a celebration parade.
  */
-export function nextUnseenChapterCompletion(
+export function planOpenChapterCelebration(
+  manifest: Pick<Manifest, 'chapters' | 'lightsPerPiece'>,
+  lights: number,
+  seenKeys: readonly string[],
+): { show: ChapterFlow | null; markSeenQuietly: ChapterSeenKey[] } {
+  const seen = new Set(seenKeys);
+  const completed: ChapterFlow[] = [];
+  const progress = chapterStates(manifest, lights);
+  for (let i = 0; i < progress.length; i += 1) {
+    if (!progress[i].complete) continue;
+    completed.push(flowAtIndex(manifest, i));
+  }
+  if (completed.length === 0) return { show: null, markSeenQuietly: [] };
+  const latest = completed[completed.length - 1];
+  const markSeenQuietly = completed
+    .slice(0, -1)
+    .filter(flow => !seen.has(flow.key))
+    .map(flow => flow.key);
+  if (seen.has(latest.key)) return { show: null, markSeenQuietly };
+  return { show: latest, markSeenQuietly };
+}
+
+export function latestUnseenChapterCompletion(
   manifest: Pick<Manifest, 'chapters' | 'lightsPerPiece'>,
   lights: number,
   seenKeys: readonly string[],
 ): ChapterFlow | null {
-  const seen = new Set(seenKeys);
-  const progress = chapterStates(manifest, lights);
-  for (let i = 0; i < progress.length; i += 1) {
-    if (!progress[i].complete) continue;
-    const chapter = progress[i].chapter;
-    const key = chapterSeenKey(chapter.order);
-    if (seen.has(key)) continue;
-    return {
-      key,
-      order: chapter.order,
-      lightsAtCompletion: lightsToCompleteChapter(manifest, i),
-      completed: chapter,
-      next: manifest.chapters[i + 1] ?? null,
-    };
-  }
-  return null;
+  return planOpenChapterCelebration(manifest, lights, seenKeys).show;
+}
+
+export function olderUnseenChapterKeys(
+  manifest: Pick<Manifest, 'chapters' | 'lightsPerPiece'>,
+  lights: number,
+  seenKeys: readonly string[],
+): ChapterSeenKey[] {
+  return planOpenChapterCelebration(manifest, lights, seenKeys).markSeenQuietly;
 }
 
 /**
- * Fire only when this light crosses chapter N's completion threshold
- * and that chapter has not been seen. Does not re-fire on later lights
- * or on load/backfill of an already-complete unseen chapter (load uses
- * nextUnseenChapterCompletion instead).
+ * Trigger only when a chapter's completion threshold sits in (before, after]
+ * and that chapter has not been seen. Multiple crossings pick the latest
+ * in range; earlier ones in the range are returned as markSeenQuietly.
  */
 export function chapterCompletedByLight(
   manifest: Pick<Manifest, 'chapters' | 'lightsPerPiece'>,
   beforeLights: number,
   afterLights: number,
   seenKeys: readonly string[],
+): { show: ChapterFlow | null; markSeenQuietly: ChapterSeenKey[] } {
+  const seen = new Set(seenKeys);
+  const crossed: ChapterFlow[] = [];
+  for (let i = 0; i < manifest.chapters.length; i += 1) {
+    const flow = flowAtIndex(manifest, i);
+    if (!(beforeLights < flow.lightsAtCompletion && afterLights >= flow.lightsAtCompletion)) continue;
+    if (seen.has(flow.key)) continue;
+    crossed.push(flow);
+  }
+  if (crossed.length === 0) return { show: null, markSeenQuietly: [] };
+  const show = crossed[crossed.length - 1];
+  const quietly: ChapterSeenKey[] = [];
+  const progress = chapterStates(manifest, afterLights);
+  for (let i = 0; i < progress.length; i += 1) {
+    if (!progress[i].complete) continue;
+    const flow = flowAtIndex(manifest, i);
+    if (flow.key === show.key) continue;
+    if (seen.has(flow.key)) continue;
+    quietly.push(flow.key);
+  }
+  return { show, markSeenQuietly: quietly };
+}
+
+/**
+ * Overlay-aware reveal: queue while a dialog/modal is open, present when
+ * the overlay is gone. Seen keys are the caller's job and must be written
+ * only when `present` is non-null — never on queue.
+ */
+export function decideChapterReveal(
+  flow: ChapterFlow | null,
+  overlayOpen: boolean,
+  alreadyShowing: boolean,
+): { present: ChapterFlow | null; queue: ChapterFlow | null } {
+  if (!flow) return { present: null, queue: null };
+  if (overlayOpen || alreadyShowing) return { present: null, queue: flow };
+  return { present: flow, queue: null };
+}
+
+/** Take a queued celebration once every overlay has dismissed. */
+export function takeQueuedChapter(
+  queued: ChapterFlow | null,
+  overlayOpen: boolean,
+  alreadyShowing: boolean,
 ): ChapterFlow | null {
-  const flow = nextUnseenChapterCompletion(manifest, afterLights, seenKeys);
-  if (!flow) return null;
-  if (beforeLights >= flow.lightsAtCompletion) return null;
-  if (afterLights < flow.lightsAtCompletion) return null;
-  return flow;
+  if (!queued || overlayOpen || alreadyShowing) return null;
+  return queued;
+}
+
+export function celebrationCopy(chapter: Chapter): { eyebrow: string; title: string; body: string; cta: string } {
+  const copy = chapter.completion;
+  const title = typeof copy?.title === 'string' && copy.title.trim().length > 0
+    ? copy.title
+    : chapter.title;
+  return {
+    eyebrow: (typeof copy?.eyebrow === 'string' && copy.eyebrow) || chapter.eyebrow,
+    title,
+    body: typeof copy?.body === 'string' ? copy.body : '',
+    cta: (typeof copy?.cta === 'string' && copy.cta) || CHAPTER_CHROME.continueCta,
+  };
 }
 
 export type FogTeaser = {

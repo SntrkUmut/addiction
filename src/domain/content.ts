@@ -10,8 +10,9 @@
 
 import 'expo-sqlite/localStorage/install';
 import bundledManifest from '../content/manifest.bundled.json';
+import { isUsableManifestShape } from './manifestGuard';
 
-export { bundledManifest };
+export { bundledManifest, isUsableManifestShape };
 
 const MANIFEST_CACHE_KEY = 'quit-content-manifest-v1';
 const MANIFEST_FETCH_INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
@@ -21,16 +22,7 @@ const FETCH_TIMEOUT_MS = 4000;
 export type Manifest = typeof bundledManifest;
 
 function isUsableManifest(value: unknown): value is Manifest {
-  if (!value || typeof value !== 'object') return false;
-  const candidate = value as { version?: unknown; chapters?: unknown };
-  if (typeof candidate.version !== 'number' || !Number.isFinite(candidate.version)) return false;
-  if (!Array.isArray(candidate.chapters) || candidate.chapters.length === 0) return false;
-  return candidate.chapters.every(chapter => (
-    !!chapter
-    && typeof chapter === 'object'
-    && Array.isArray((chapter as { pieces?: unknown }).pieces)
-    && (chapter as { pieces: unknown[] }).pieces.length > 0
-  ));
+  return isUsableManifestShape(value);
 }
 
 /**

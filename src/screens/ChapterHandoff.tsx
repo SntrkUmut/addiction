@@ -38,7 +38,7 @@ export function ChapterHandoff({ flow, manifest, lights, onContinue }: Props) {
     <Scene variant={isDark ? 'dusk' : 'day'} height={330} horizonY={240}>
       <View style={[styles.top, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <LightChip count={lights} variant={isDark ? 'night' : 'day'} />
-        <Mascot pose="wistful" size={160} />
+        <Mascot pose="hopeful" size={160} />
       </View>
       <ScrollView
         style={[styles.sheet, { backgroundColor: colors.bg.canvas }]}
@@ -48,7 +48,7 @@ export function ChapterHandoff({ flow, manifest, lights, onContinue }: Props) {
         {copy.eyebrow ? (
           <Text style={[styles.eyebrow, { color: colors.text.accent }]}>{copy.eyebrow}</Text>
         ) : null}
-        <Text style={[styles.title, { color: colors.text.primary }]}>{copy.title}</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]} accessibilityRole="header">{copy.title}</Text>
         <Text style={[styles.body, { color: colors.text.secondary }]}>{copy.body}</Text>
 
         {next ? (

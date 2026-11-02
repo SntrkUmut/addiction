@@ -22,6 +22,7 @@ import { journeyDay } from '../domain/journey';
 import { chapterProgress, lightsFrom, todayIso } from '../domain/progress';
 import {
   CHAPTER_CHROME,
+  collectionA11yLabel,
   endOfContentView,
   nextChapterFogTeaser,
   type EndOfContentView,
@@ -39,6 +40,7 @@ interface Props {
   onMilestoneTap: (day: number) => void;
   onCollectionTap: () => void;
   focusChapterId?: string | null;
+  onFocusConsumed?: () => void;
 }
 
 function FogTeaserCard({ teaser }: { teaser: FogTeaser }) {
@@ -158,11 +160,16 @@ function EndOfContentCard({
       </View>
 
       <Text style={[styles.meanwhile, { color: colors.text.tertiary }]}>{view.meanwhile}</Text>
-      <TouchableOpacity onPress={onCollectionTap} activeOpacity={0.7}>
+      <TouchableOpacity
+        onPress={onCollectionTap}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={collectionA11yLabel()}
+      >
         <Card style={[styles.meanwhileCard, { backgroundColor: colors.surface.sunken }]}>
           <Text style={[styles.collectionTitle, { color: colors.text.primary }]}>{view.collectionLabel}</Text>
           <Text style={[styles.collectionSubtitle, { color: colors.text.secondary }]}>
-            Kristaller ve aksesuarlar
+            {CHAPTER_CHROME.collectionItems}
           </Text>
         </Card>
       </TouchableOpacity>
@@ -177,6 +184,7 @@ export function Siginak({
   onMilestoneTap,
   onCollectionTap,
   focusChapterId,
+  onFocusConsumed,
 }: Props) {
   const { colors, isDark } = useTheme();
   const lightsEarned = lightsFrom(state);
@@ -188,12 +196,33 @@ export function Siginak({
   const end = endOfContentView(manifest, lightsEarned);
   const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
   const yMap = useRef<Record<string, number>>({});
+  const pieceOffset = useRef<Record<string, { chapterId: string; y: number }>>({});
   const sectionY = useRef(0);
+  const consumedFocusRef = useRef<string | null>(null);
   const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
 
   const chapterOffsets = chapters.map((_, index) => (
     chapters.slice(0, index).reduce((sum, chapter) => sum + chapter.total, 0)
   ));
+
+  const scrollToFocus = (id: string | null | undefined) => {
+    if (!id) return;
+    if (consumedFocusRef.current === id) return;
+    let y = yMap.current[id];
+    if (y == null) {
+      const local = pieceOffset.current[id];
+      const chapterY = local ? yMap.current[local.chapterId] : undefined;
+      if (local == null || chapterY == null) return;
+      y = chapterY + local.y;
+      yMap.current[id] = y;
+    }
+    consumedFocusRef.current = id;
+    scrollRef.current?.scrollTo({
+      y: Math.max(0, y - 12),
+      animated: isMascotMotionEnabled(reduceMotion),
+    });
+    onFocusConsumed?.();
+  };
 
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled()
@@ -206,15 +235,14 @@ export function Siginak({
   }, []);
 
   useEffect(() => {
-    if (!focusChapterId) return;
-    const y = yMap.current[focusChapterId];
-    if (y == null) return;
-    const animated = isMascotMotionEnabled(reduceMotion);
-    const timer = setTimeout(() => {
-      scrollRef.current?.scrollTo({ y: Math.max(0, y - 12), animated });
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [focusChapterId, chapters, teaser, end, reduceMotion]);
+    if (!focusChapterId) {
+      consumedFocusRef.current = null;
+      return;
+    }
+    scrollToFocus(focusChapterId);
+    // Review: only re-run for a new focus target, not every lights/layout render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusChapterId]);
 
   return (
     <Scene variant={isDark ? 'dusk' : 'day'} height={800} horizonY={180}>
@@ -236,6 +264,7 @@ export function Siginak({
           style={styles.chaptersSection}
           onLayout={event => {
             sectionY.current = event.nativeEvent.layout.y;
+            scrollToFocus(focusChapterId);
           }}
         >
           {chapters.length === 0 ? (
@@ -256,6 +285,7 @@ export function Siginak({
                 style={styles.chapterBlock}
                 onLayout={event => {
                   yMap.current[chapter.id] = sectionY.current + event.nativeEvent.layout.y;
+                  scrollToFocus(focusChapterId);
                 }}
               >
                 <Card style={styles.chapterCard}>
@@ -272,22 +302,32 @@ export function Siginak({
                   )}
                 </Card>
                 {chapter.pieces.map((piece, pieceIndex) => (
-                  <TouchableOpacity
+                  <View
                     key={piece.id}
-                    onPress={() => onNodeTap(offset + pieceIndex, piece.name)}
-                    activeOpacity={0.7}
+                    onLayout={event => {
+                      pieceOffset.current[piece.id] = {
+                        chapterId: chapter.id,
+                        y: event.nativeEvent.layout.y,
+                      };
+                      scrollToFocus(focusChapterId);
+                    }}
                   >
-                    <Card style={[
-                      styles.pieceCard,
-                      piece.unlocked ? null : { backgroundColor: colors.surface.sunken },
-                    ]}
+                    <TouchableOpacity
+                      onPress={() => onNodeTap(offset + pieceIndex, piece.name)}
+                      activeOpacity={0.7}
                     >
-                      <Text style={[styles.pieceName, { color: colors.text.primary }]}>{piece.name}</Text>
-                      <Text style={[styles.pieceStatus, { color: piece.unlocked ? colors.action.primary : colors.text.tertiary }]}>
-                        {piece.unlocked ? 'Açıldı' : `${(offset + pieceIndex + 1) * (manifest.lightsPerPiece ?? 2)} ışık`}
-                      </Text>
-                    </Card>
-                  </TouchableOpacity>
+                      <Card style={[
+                        styles.pieceCard,
+                        piece.unlocked ? null : { backgroundColor: colors.surface.sunken },
+                      ]}
+                      >
+                        <Text style={[styles.pieceName, { color: colors.text.primary }]}>{piece.name}</Text>
+                        <Text style={[styles.pieceStatus, { color: piece.unlocked ? colors.action.primary : colors.text.tertiary }]}>
+                          {piece.unlocked ? 'Açıldı' : `${(offset + pieceIndex + 1) * (manifest.lightsPerPiece ?? 2)} ışık`}
+                        </Text>
+                      </Card>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             );
@@ -297,6 +337,7 @@ export function Siginak({
             <View
               onLayout={event => {
                 yMap.current.__end__ = sectionY.current + event.nativeEvent.layout.y;
+                scrollToFocus(focusChapterId);
               }}
             >
               <EndOfContentCard view={end} onCollectionTap={onCollectionTap} />
@@ -337,11 +378,16 @@ export function Siginak({
           </View>
         </View>
 
-        <TouchableOpacity onPress={onCollectionTap} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={onCollectionTap}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={collectionA11yLabel()}
+        >
           <Card style={styles.collectionCard}>
             <Text style={[styles.collectionLabel, { color: colors.text.accent }]}>KOLEKSİYON</Text>
             <Text style={[styles.collectionTitle, { color: colors.text.primary }]}>
-              Kristaller ve aksesuarlar
+              {CHAPTER_CHROME.collectionItems}
             </Text>
             <Text style={[styles.collectionSubtitle, { color: colors.text.secondary }]}>
               {earnedCount} / {itemTotal} öğe kazanıldı

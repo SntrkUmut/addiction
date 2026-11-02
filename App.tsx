@@ -37,8 +37,11 @@ import {
 import { latestUnseenMilestone, milestoneByDay, type MilestoneCopy } from './src/domain/milestones';
 import {
   chapterCompletedByLight,
-  nextUnseenChapterCompletion,
+  decideChapterReveal,
+  planOpenChapterCelebration,
+  takeQueuedChapter,
   type ChapterFlow,
+  type ChapterSeenKey,
 } from './src/domain/chapters';
 import { earnedLight } from './src/domain/rewards';
 import { createExportJson } from './src/domain/export';
@@ -78,6 +81,8 @@ function AppInner() {
   const [activeTab, setActiveTab] = useState<Tab>('yuva');
   const [dialog, setDialog] = useState<DialogState>(null);
   const pendingChapterRef = React.useRef<ChapterFlow | null>(null);
+  const chapterFlowRef = React.useRef<{ flow: ChapterFlow; phase: 'celebration' | 'handoff' } | null>(null);
+  const considerChapterOnOpenRef = React.useRef<(content: Manifest, appState: AppState) => void>(() => {});
 
   useEffect(() => {
     const init = async () => {
@@ -91,21 +96,7 @@ function AppInner() {
         if (!nextState.profile?.quitDate) {
           setOnboardingVisible(true);
         } else {
-          const seenKeys = nextState.milestones?.seen.map(item => item.key) ?? [];
-          const unseen = latestUnseenMilestone(
-            journeyDay(nextState.profile.quitDate),
-            seenKeys,
-          );
-          if (unseen) {
-            setActiveMilestone(unseen);
-          } else {
-            const chapter = nextUnseenChapterCompletion(
-              bundledManifest,
-              earnedLight(nextState.events),
-              seenKeys,
-            );
-            if (chapter) setChapterFlow({ flow: chapter, phase: 'celebration' });
-          }
+          considerChapterOnOpenRef.current(bundledManifest, nextState);
         }
       } finally {
         setLoading(false);
@@ -115,7 +106,11 @@ function AppInner() {
         const remoteManifest = await getManifest();
         if (remoteManifest && remoteManifest.version >= bundledManifest.version) {
           setManifest(remoteManifest);
-          setState(current => withSyncedCollection(current, remoteManifest));
+          setState(current => {
+            const synced = withSyncedCollection(current, remoteManifest);
+            queueMicrotask(() => considerChapterOnOpenRef.current(remoteManifest, synced));
+            return synced;
+          });
         }
       } catch (error) {
         if (__DEV__) console.warn('[App] Remote manifest refresh failed', error);
@@ -131,12 +126,82 @@ function AppInner() {
     });
   }, [state, loading]);
 
+  useEffect(() => {
+    chapterFlowRef.current = chapterFlow;
+  }, [chapterFlow]);
+
   const updateState = useCallback((updater: (current: AppState) => AppState) => {
     setState(current => {
       const next = updater(current);
       return manifest ? withSyncedCollection(next, manifest) : next;
     });
   }, [manifest]);
+
+  const markKeysSeen = useCallback((keys: readonly string[]) => {
+    if (keys.length === 0) return;
+    updateState(current => {
+      const seen = current.milestones?.seen ?? [];
+      const have = new Set<string>(seen.map(item => item.key));
+      const extra = keys
+        .filter((key): key is ChapterSeenKey => /^chapter-\d+$/.test(key) && !have.has(key))
+        .map(key => ({
+          key,
+          seenAt: new Date().toISOString(),
+          variant: (hasLoggedSlip(current) ? 'slip' : 'default') as 'slip' | 'default',
+        }));
+      if (extra.length === 0) return current;
+      return { ...current, milestones: { seen: [...seen, ...extra] } };
+    });
+  }, [updateState]);
+
+  const presentChapter = useCallback((flow: ChapterFlow) => {
+    pendingChapterRef.current = null;
+    markKeysSeen([flow.key]);
+    const next = { flow, phase: 'celebration' as const };
+    chapterFlowRef.current = next;
+    setChapterFlow(next);
+  }, [markKeysSeen]);
+
+  const revealOrQueue = useCallback((flow: ChapterFlow | null, overlayOpen: boolean) => {
+    const decision = decideChapterReveal(flow, overlayOpen, chapterFlowRef.current != null);
+    if (decision.queue) pendingChapterRef.current = decision.queue;
+    if (decision.present) presentChapter(decision.present);
+  }, [presentChapter]);
+
+  const flushQueuedChapter = useCallback(() => {
+    const flow = takeQueuedChapter(pendingChapterRef.current, false, chapterFlowRef.current != null);
+    if (flow) presentChapter(flow);
+  }, [presentChapter]);
+
+  const considerChapterOnOpen = useCallback((content: Manifest, appState: AppState) => {
+    const seenKeys = appState.milestones?.seen.map(item => item.key) ?? [];
+    const lights = earnedLight(appState.events);
+    const plan = planOpenChapterCelebration(content, lights, seenKeys);
+    if (plan.markSeenQuietly.length > 0) markKeysSeen(plan.markSeenQuietly);
+    if (chapterFlowRef.current || pendingChapterRef.current) return;
+    if (!appState.profile?.quitDate) return;
+    const day = latestUnseenMilestone(journeyDay(appState.profile.quitDate), seenKeys);
+    if (day) {
+      setActiveMilestone(day);
+      revealOrQueue(plan.show, true);
+      return;
+    }
+    revealOrQueue(plan.show, false);
+  }, [markKeysSeen, revealOrQueue]);
+
+  useEffect(() => {
+    considerChapterOnOpenRef.current = considerChapterOnOpen;
+  }, [considerChapterOnOpen]);
+
+  const dismissDialog = useCallback(() => {
+    setDialog(null);
+    flushQueuedChapter();
+  }, [flushQueuedChapter]);
+
+  const dismissUrge = useCallback(() => {
+    setUrgeVisible(false);
+    flushQueuedChapter();
+  }, [flushQueuedChapter]);
 
   const handleOnboardingComplete = async (data: OnboardingData) => {
     const packPrice = parseFloat(data.packPrice) || 0;
@@ -177,16 +242,12 @@ function AppInner() {
     const seenKeys = state.milestones?.seen.map(item => item.key) ?? [];
     const completed = chapterCompletedByLight(content, before, after, seenKeys);
     updateState(current => appendEvent(current, event));
+    if (completed.markSeenQuietly.length > 0) markKeysSeen(completed.markSeenQuietly);
+    revealOrQueue(completed.show, true);
     await haptic('light');
     setDialog({
       title: 'Check-in kaydedildi',
       message: '+1 ışık kazandın!',
-      actions: [{
-        label: 'Tamam',
-        onPress: () => {
-          if (completed) setChapterFlow({ flow: completed, phase: 'celebration' });
-        },
-      }],
     });
   };
 
@@ -222,7 +283,8 @@ function AppInner() {
       const piece = getPiece(content, unlockedPieceCount(after, perPiece) - 1);
       setUnlockedPieceName(piece?.piece.name ?? null);
     }
-    pendingChapterRef.current = completed;
+    if (completed.markSeenQuietly.length > 0) markKeysSeen(completed.markSeenQuietly);
+    revealOrQueue(completed.show, true);
   };
 
   const handleUrgeResult = async (result: string) => {
@@ -297,43 +359,29 @@ function AppInner() {
     setActiveMilestone(null);
     if (goShelter) setActiveTab('siginak');
     else setActiveTab('yuva');
-  };
-
-  const markChapterSeen = (flow: ChapterFlow) => {
-    updateState(current => {
-      const seen = current.milestones?.seen ?? [];
-      if (seen.some(item => item.key === flow.key)) return current;
-      return {
-        ...current,
-        milestones: {
-          seen: [...seen, {
-            key: flow.key,
-            seenAt: new Date().toISOString(),
-            variant: hasLoggedSlip(current) ? 'slip' : 'default',
-          }],
-        },
-      };
-    });
+    flushQueuedChapter();
   };
 
   const closeChapterCelebration = (goHandoff: boolean) => {
     if (!chapterFlow) return;
-    markChapterSeen(chapterFlow.flow);
     if (goHandoff) {
-      setChapterFlow({ flow: chapterFlow.flow, phase: 'handoff' });
+      const next = { flow: chapterFlow.flow, phase: 'handoff' as const };
+      chapterFlowRef.current = next;
+      setChapterFlow(next);
       return;
     }
+    chapterFlowRef.current = null;
     setChapterFlow(null);
     setActiveTab('yuva');
   };
 
   const finishChapterHandoff = () => {
     if (!chapterFlow) return;
-    markChapterSeen(chapterFlow.flow);
-    const nextId = chapterFlow.flow.next?.id ?? '__end__';
+    const firstPieceId = chapterFlow.flow.next?.pieces[0]?.id ?? '__end__';
+    chapterFlowRef.current = null;
     setChapterFlow(null);
     setActiveTab('siginak');
-    setSiginakFocusChapterId(nextId);
+    setSiginakFocusChapterId(firstPieceId);
   };
 
   const handleCollectionTap = () => setCollectionVisible(true);
@@ -411,6 +459,7 @@ function AppInner() {
             onMilestoneTap={handleMilestoneTap}
             onCollectionTap={handleCollectionTap}
             focusChapterId={siginakFocusChapterId}
+            onFocusConsumed={() => setSiginakFocusChapterId(null)}
           />
         )}
         {activeTab === 'rotam' && (
@@ -470,19 +519,14 @@ function AppInner() {
         />
       </Modal>
 
-      <Modal visible={urgeVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setUrgeVisible(false)}>
+      <Modal visible={urgeVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={dismissUrge}>
         <Istek
           reason={state.profile?.reason}
           unlockedPieceName={unlockedPieceName}
           onCravingOpened={handleCravingOpened}
           onComplete={handleCopingComplete}
           onResult={handleUrgeResult}
-          onClose={() => {
-            setUrgeVisible(false);
-            const pending = pendingChapterRef.current;
-            pendingChapterRef.current = null;
-            if (pending) setChapterFlow({ flow: pending, phase: 'celebration' });
-          }}
+          onClose={dismissUrge}
         />
       </Modal>
 
@@ -549,8 +593,8 @@ function AppInner() {
       </Modal>
 
       {dialog && (
-        <Modal visible transparent animationType="fade" onRequestClose={() => setDialog(null)}>
-          <TouchableOpacity style={styles.dialogBackdrop} activeOpacity={1} onPress={() => setDialog(null)}>
+        <Modal visible transparent animationType="fade" onRequestClose={dismissDialog}>
+          <TouchableOpacity style={styles.dialogBackdrop} activeOpacity={1} onPress={dismissDialog}>
             <View style={[styles.dialogCard, { backgroundColor: colors.surface.card }]}>
               <Text style={[styles.dialogTitle, { color: colors.text.primary }]}>{dialog.title}</Text>
               <Text style={[styles.dialogMessage, { color: colors.text.secondary }]}>{dialog.message}</Text>
@@ -569,8 +613,8 @@ function AppInner() {
                       },
                     ]}
                     onPress={() => {
-                      setDialog(null);
                       action.onPress();
+                      dismissDialog();
                     }}
                   >
                     <Text style={[

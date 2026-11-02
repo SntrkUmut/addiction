@@ -21,7 +21,7 @@ import { ArrowRight } from '../ui/icons';
 import { ContentIcon } from '../ui/contentIcons';
 import { haptic } from '../ui/haptics';
 import { isMascotMotionEnabled } from '../ui/mascotEffects';
-import { CHAPTER_CHROME, type ChapterFlow } from '../domain/chapters';
+import { CHAPTER_CHROME, celebrationCopy, type ChapterFlow } from '../domain/chapters';
 
 interface Props {
   flow: ChapterFlow;
@@ -76,7 +76,7 @@ export function ChapterCelebration({ flow, lights, onContinue, onHome }: Props) 
   const insets = useSafeAreaInsets();
   const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
   const motion = isMascotMotionEnabled(reduceMotion);
-  const copy = flow.completed.completion;
+  const copy = celebrationCopy(flow.completed);
 
   useEffect(() => {
     haptic('success');
@@ -96,7 +96,7 @@ export function ChapterCelebration({ flow, lights, onContinue, onHome }: Props) 
     <Scene variant="night" height={700} horizonY={700}>
       <View style={[styles.wrap, { paddingTop: Math.max(insets.top, 24) + 12, paddingBottom: Math.max(insets.bottom, 24) }]}>
         <LightChip count={lights} variant="night" />
-        <Mascot pose="joyful" size={180} darkScene effects={['sparkles']} />
+        <Mascot pose="hopeful" size={180} darkScene effects={['sparkles']} />
         <View
           style={styles.pieceRow}
           accessibilityElementsHidden
@@ -114,7 +114,7 @@ export function ChapterCelebration({ flow, lights, onContinue, onHome }: Props) 
           ))}
         </View>
         <Text style={[styles.eyebrow, { color: colors.accent.gold }]}>{copy.eyebrow}</Text>
-        <Text style={[styles.title, { color: colors.text.onDark }]}>{copy.title}</Text>
+        <Text style={[styles.title, { color: colors.text.onDark }]} accessibilityRole="header">{copy.title}</Text>
         <Text style={[styles.body, { color: colors.text.onDarkMuted }]}>{copy.body}</Text>
         <View style={styles.actions}>
           <PrimaryButton label={copy.cta} onPress={onContinue} icon={ArrowRight} />
