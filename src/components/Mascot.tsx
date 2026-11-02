@@ -32,8 +32,8 @@ type MascotProps = {
 };
 
 // Custom hook to track reduce motion setting with live updates
-function useReduceMotion(): boolean {
-  const [reduceMotion, setReduceMotion] = useState(false);
+function useReduceMotion(): boolean | null {
+  const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Get initial value
@@ -371,7 +371,8 @@ export function Mascot({
 }: MascotProps) {
   const reducedMotion = useReduceMotion();
 
-  const motionEnabled = !reducedMotion;
+  // Don't start animations until we know the reduce motion preference (null means unknown)
+  const motionEnabled = reducedMotion === false;
   const label = POSE_LABELS[pose];
 
   const uniqueEffects = [...new Set(effects)];
