@@ -51,11 +51,6 @@
     "scheme": "quit",
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "eas": {
-        "projectId": "placeholder-update-after-eas-init"
-      }
     }
   }
 }

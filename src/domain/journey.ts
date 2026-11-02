@@ -3,7 +3,7 @@
  * Uses turkishSuffix.ts for proper date formatting.
  */
 
-import { sinceLabel, untilLabel, chapterCta } from './turkishSuffix';
+import { sinceLabel, untilLabel, chapterCta } from './turkishSuffix.ts';
 
 /**
  * Calculate journey day (days since quit date, 0-indexed from quit date).
@@ -21,7 +21,7 @@ export function journeyDay(quitDate: string, now: Date = new Date()): number {
   const quit = startOfDay(parseLocalDate(quitDate));
   const today = startOfDay(now);
   const diff = today.getTime() - quit.getTime();
-  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+  return Math.max(0, Math.round(diff / (1000 * 60 * 60 * 24)));
 }
 
 /**

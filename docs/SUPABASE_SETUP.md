@@ -37,20 +37,14 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_your_key_here
 3. `.env` is gitignored and never committed
 
 #### EAS Builds (TestFlight/App Store)
-Set environment variables in EAS using one of:
+The `production` build profile uses the EAS `production` environment. Create the vars there:
 
-**Option 1: EAS CLI** (`eas env:set` is the current name of `eas env:create`)
 ```bash
-eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co" --environment preview --visibility plaintext
-eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here" --environment preview --visibility plaintext
-eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co" --environment production --visibility plaintext
-eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here" --environment production --visibility plaintext
+eas env:create --name EXPO_PUBLIC_SUPABASE_URL --value "https://your-project.supabase.co" --environment production --visibility plaintext
+eas env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_your_key_here" --environment production --visibility plaintext
 ```
 
-**Option 2: Expo Dashboard**
-1. Go to https://expo.dev/accounts/[account]/projects/[project]/secrets
-2. Add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-3. Secrets are injected into builds automatically
+Or in the Expo dashboard: https://expo.dev/accounts/[account]/projects/[project]/secrets — add the same two names. Secrets are injected into builds automatically.
 
 ---
 
@@ -153,32 +147,20 @@ Repo kökünde:
 eas init
 ```
 
-Bu komut `app.json` içindeki `extra.eas.projectId` yer tutucusunu senin Expo proje kimliğinle değiştirir.
+`app.json` içinde `extra.eas.projectId` yok; placeholder da yok. `eas init` gerçek `projectId`'yi kendisi yazar. Dolu bir ID varsa CLI "already linked" deyip onu kullanır, bu yüzden sahte bir değer koymuyoruz.
 
 ### 3. Supabase ortam değişkenlerini ayarla
 
-Güncel EAS CLI'da oluşturma komutu `eas env:set` (eski adı `eas env:create`). `preview` = TestFlight, `production` = App Store. Değerleri kendi Supabase projenle değiştir.
+`eas.json` içindeki `production` build profili EAS **`production` ortamını** kullanır. TestFlight ve App Store build'i bu profilledir (`eas build --platform ios --profile production`), bu yüzden env var'ları **production** için oluşturulmalı. Değerleri kendi Supabase projenle değiştir.
 
 ```bash
-eas env:create --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment preview --visibility plaintext
-eas env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment preview --visibility plaintext
 eas env:create --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment production --visibility plaintext
 eas env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment production --visibility plaintext
-```
-
-`eas env:create` yoksa aynı adımlar `eas env:set` ile:
-
-```bash
-eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment preview --visibility plaintext
-eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment preview --visibility plaintext
-eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "https://YOUR_PROJECT.supabase.co" --environment production --visibility plaintext
-eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "sb_publishable_YOUR_KEY" --environment production --visibility plaintext
 ```
 
 Kontrol:
 
 ```bash
-eas env:list --environment preview
 eas env:list --environment production
 ```
 

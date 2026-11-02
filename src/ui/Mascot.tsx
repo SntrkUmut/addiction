@@ -363,6 +363,7 @@ export function Mascot({
     <View
       style={[styles.container, { width: size, height: size }, style]}
       accessible={false}
+      accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
       {back.map(effect => renderEffect(effect, size, motionEnabled))}
