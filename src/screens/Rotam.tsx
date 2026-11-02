@@ -33,8 +33,8 @@ export function Rotam({ state, onMilestoneTap, onCalcTap }: Props) {
   // Mock recent events
   const recentEvents = [
     { type: 'checkin', title: 'Check-in', time: new Date(), lights: 1 },
-    { type: 'breath', title: 'Nefes egzersizi', time: new Date(Date.now() - 3600000), lights: 1 },
-    { type: 'milestone', title: 'Gün 7 km taşı', time: new Date(Date.now() - 86400000), lights: 0 },
+    { type: 'breath', title: 'Nefes egzersizi', time: new Date(0 - 3600000), lights: 1 },
+    { type: 'milestone', title: 'Gün 7 km taşı', time: new Date(0 - 86400000), lights: 0 },
   ];
 
   return (

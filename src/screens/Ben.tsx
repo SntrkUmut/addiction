@@ -20,13 +20,9 @@ interface Props {
 
 export function Ben({ state, onEditPlan, onReminders, onSupport }: Props) {
   const { colors, isDark, themeMode } = useTheme();
-  const [hapticsOn, setHapticsOn] = React.useState(false);
   const days = journeyDay(state.profile.quitDate);
 
-  React.useEffect(() => {
-    const enabled = getHapticsEnabled();
-    setHapticsOn(enabled);
-  }, []);
+  const [hapticsOn, setHapticsOn] = React.useState(() => getHapticsEnabled());
 
   const toggleHaptics = async (value: boolean) => {
     setHapticsOn(value);

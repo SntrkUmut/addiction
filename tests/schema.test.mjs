@@ -25,11 +25,11 @@ test('accepts valid state and returns only the supported profile and event field
     unexpectedTopLevel: true,
   });
 
-  assert.deepEqual(parsed, { profile, events: [event] });
+  assert.deepEqual(parsed, { profile, events: [event], milestones: { seen: [] }, collection: { earned: [] } });
 });
 
 test('accepts an unconfigured profile with local events', () => {
-  assert.deepEqual(parseAppState({ profile: null, events: [event] }), { profile: null, events: [event] });
+  assert.deepEqual(parseAppState({ profile: null, events: [event] }), { profile: null, events: [event], milestones: { seen: [] }, collection: { earned: [] } });
 });
 
 test('rejects invalid event kinds, timestamps, and non-object details', () => {
